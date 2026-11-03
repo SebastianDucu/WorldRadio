@@ -1,0 +1,1394 @@
+[
+  {
+    "code": "AL",
+    "name": "Albania",
+    "flag": "AL",
+    "lat": 41.3185,
+    "lng": 19.8071,
+    "stationCount": 4
+  },
+  {
+    "code": "DE",
+    "name": "Alemania",
+    "flag": "DE",
+    "lat": 52.4803,
+    "lng": 13.3348,
+    "stationCount": 1150
+  },
+  {
+    "code": "AO",
+    "name": "Angola",
+    "flag": "AO",
+    "lat": -8.8298,
+    "lng": 13.2273,
+    "stationCount": 4
+  },
+  {
+    "code": "SA",
+    "name": "Arabia Saudí",
+    "flag": "SA",
+    "lat": 24.4989,
+    "lng": 46.6919,
+    "stationCount": 13
+  },
+  {
+    "code": "DZ",
+    "name": "Argelia",
+    "flag": "DZ",
+    "lat": 36.7481,
+    "lng": 3.0678,
+    "stationCount": 57
+  },
+  {
+    "code": "AR",
+    "name": "Argentina",
+    "flag": "AR",
+    "lat": -34.6017,
+    "lng": -58.4373,
+    "stationCount": 179
+  },
+  {
+    "code": "AM",
+    "name": "Armenia",
+    "flag": "AM",
+    "lat": 40.1778,
+    "lng": 44.5125,
+    "stationCount": 3
+  },
+  {
+    "code": "AU",
+    "name": "Australia",
+    "flag": "AU",
+    "lat": -33.9415,
+    "lng": 151.0342,
+    "stationCount": 190
+  },
+  {
+    "code": "AT",
+    "name": "Austria",
+    "flag": "AT",
+    "lat": 48.1777,
+    "lng": 16.2878,
+    "stationCount": 67
+  },
+  {
+    "code": "AZ",
+    "name": "Azerbaiyán",
+    "flag": "AZ",
+    "lat": 40.3337,
+    "lng": 49.7915,
+    "stationCount": 10
+  },
+  {
+    "code": "BS",
+    "name": "Bahamas",
+    "flag": "BS",
+    "lat": 25.0708,
+    "lng": -77.3506,
+    "stationCount": 3
+  },
+  {
+    "code": "BD",
+    "name": "Bangladés",
+    "flag": "BD",
+    "lat": 23.7683,
+    "lng": 90.4002,
+    "stationCount": 8
+  },
+  {
+    "code": "BB",
+    "name": "Barbados",
+    "flag": "BB",
+    "lat": 13.0957,
+    "lng": -59.6092,
+    "stationCount": 5
+  },
+  {
+    "code": "BH",
+    "name": "Baréin",
+    "flag": "BH",
+    "lat": 26.1638,
+    "lng": 50.5542,
+    "stationCount": 4
+  },
+  {
+    "code": "BE",
+    "name": "Bélgica",
+    "flag": "BE",
+    "lat": 50.8333,
+    "lng": 4.33,
+    "stationCount": 93
+  },
+  {
+    "code": "BJ",
+    "name": "Benín",
+    "flag": "BJ",
+    "lat": 9.3654,
+    "lng": 2.5286,
+    "stationCount": 2
+  },
+  {
+    "code": "BY",
+    "name": "Bielorrusia",
+    "flag": "BY",
+    "lat": 53.9016,
+    "lng": 27.5535,
+    "stationCount": 14
+  },
+  {
+    "code": "BO",
+    "name": "Bolivia",
+    "flag": "BO",
+    "lat": -16.4948,
+    "lng": -68.1389,
+    "stationCount": 40
+  },
+  {
+    "code": "BA",
+    "name": "Bosnia y Herzegovina",
+    "flag": "BA",
+    "lat": 43.8559,
+    "lng": 18.4131,
+    "stationCount": 22
+  },
+  {
+    "code": "BR",
+    "name": "Brasil",
+    "flag": "BR",
+    "lat": -23.5579,
+    "lng": -46.66,
+    "stationCount": 534
+  },
+  {
+    "code": "BG",
+    "name": "Bulgaria",
+    "flag": "BG",
+    "lat": 42.6973,
+    "lng": 23.3218,
+    "stationCount": 49
+  },
+  {
+    "code": "BF",
+    "name": "Burkina Faso",
+    "flag": "BF",
+    "lat": 11.6549,
+    "lng": -1.8457,
+    "stationCount": 4
+  },
+  {
+    "code": "CV",
+    "name": "Cabo Verde",
+    "flag": "CV",
+    "lat": 14.91,
+    "lng": -23.5157,
+    "stationCount": 15
+  },
+  {
+    "code": "KH",
+    "name": "Camboya",
+    "flag": "KH",
+    "lat": 11.5564,
+    "lng": 104.9282,
+    "stationCount": 4
+  },
+  {
+    "code": "CA",
+    "name": "Canadá",
+    "flag": "CA",
+    "lat": 43.6379,
+    "lng": -79.3876,
+    "stationCount": 545
+  },
+  {
+    "code": "BQ",
+    "name": "Caribe neerlandés",
+    "flag": "BQ",
+    "lat": 12.1636,
+    "lng": -68.2838,
+    "stationCount": 3
+  },
+  {
+    "code": "QA",
+    "name": "Catar",
+    "flag": "QA",
+    "lat": 25.3877,
+    "lng": 51.5218,
+    "stationCount": 5
+  },
+  {
+    "code": "CZ",
+    "name": "Chequia",
+    "flag": "CZ",
+    "lat": 50.0785,
+    "lng": 14.4346,
+    "stationCount": 34
+  },
+  {
+    "code": "CL",
+    "name": "Chile",
+    "flag": "CL",
+    "lat": -20.2316,
+    "lng": -70.1388,
+    "stationCount": 85
+  },
+  {
+    "code": "CN",
+    "name": "China",
+    "flag": "CN",
+    "lat": 28.4049,
+    "lng": 120.6685,
+    "stationCount": 21
+  },
+  {
+    "code": "CY",
+    "name": "Chipre",
+    "flag": "CY",
+    "lat": 35.0514,
+    "lng": 33.1952,
+    "stationCount": 7
+  },
+  {
+    "code": "VA",
+    "name": "Ciudad del Vaticano",
+    "flag": "VA",
+    "lat": 41.9034,
+    "lng": 12.4529,
+    "stationCount": 2
+  },
+  {
+    "code": "CO",
+    "name": "Colombia",
+    "flag": "CO",
+    "lat": 4.6544,
+    "lng": -74.0843,
+    "stationCount": 106
+  },
+  {
+    "code": "KP",
+    "name": "Corea del Norte",
+    "flag": "KP",
+    "lat": 39.0365,
+    "lng": 125.7584,
+    "stationCount": 2
+  },
+  {
+    "code": "KR",
+    "name": "Corea del Sur",
+    "flag": "KR",
+    "lat": 37.5794,
+    "lng": 126.9802,
+    "stationCount": 13
+  },
+  {
+    "code": "CR",
+    "name": "Costa Rica",
+    "flag": "CR",
+    "lat": 9.935,
+    "lng": -84.0796,
+    "stationCount": 19
+  },
+  {
+    "code": "CI",
+    "name": "Côte d’Ivoire",
+    "flag": "CI",
+    "lat": 5.3165,
+    "lng": -4.0189,
+    "stationCount": 6
+  },
+  {
+    "code": "HR",
+    "name": "Croacia",
+    "flag": "HR",
+    "lat": 45.8012,
+    "lng": 15.9763,
+    "stationCount": 33
+  },
+  {
+    "code": "CU",
+    "name": "Cuba",
+    "flag": "CU",
+    "lat": 26.5934,
+    "lng": -81.6321,
+    "stationCount": 6
+  },
+  {
+    "code": "DK",
+    "name": "Dinamarca",
+    "flag": "DK",
+    "lat": 56.3397,
+    "lng": 9.4153,
+    "stationCount": 48
+  },
+  {
+    "code": "DM",
+    "name": "Dominica",
+    "flag": "DM",
+    "lat": 15.2442,
+    "lng": -61.3211,
+    "stationCount": 1
+  },
+  {
+    "code": "EC",
+    "name": "Ecuador",
+    "flag": "EC",
+    "lat": -2.1626,
+    "lng": -79.8863,
+    "stationCount": 37
+  },
+  {
+    "code": "EG",
+    "name": "Egipto",
+    "flag": "EG",
+    "lat": 30.0444,
+    "lng": 31.2357,
+    "stationCount": 6
+  },
+  {
+    "code": "SV",
+    "name": "El Salvador",
+    "flag": "SV",
+    "lat": 13.7166,
+    "lng": -89.2173,
+    "stationCount": 18
+  },
+  {
+    "code": "AE",
+    "name": "Emiratos Árabes Unidos",
+    "flag": "AE",
+    "lat": 25.0604,
+    "lng": 55.2114,
+    "stationCount": 35
+  },
+  {
+    "code": "SK",
+    "name": "Eslovaquia",
+    "flag": "SK",
+    "lat": 48.154,
+    "lng": 17.1138,
+    "stationCount": 20
+  },
+  {
+    "code": "SI",
+    "name": "Eslovenia",
+    "flag": "SI",
+    "lat": 46.0488,
+    "lng": 14.6063,
+    "stationCount": 22
+  },
+  {
+    "code": "ES",
+    "name": "España",
+    "flag": "ES",
+    "lat": 40.4118,
+    "lng": -3.7354,
+    "stationCount": 367
+  },
+  {
+    "code": "US",
+    "name": "Estados Unidos",
+    "flag": "US",
+    "lat": 40.7517,
+    "lng": -73.9754,
+    "stationCount": 1503
+  },
+  {
+    "code": "EE",
+    "name": "Estonia",
+    "flag": "EE",
+    "lat": 59.437,
+    "lng": 24.754,
+    "stationCount": 44
+  },
+  {
+    "code": "ET",
+    "name": "Etiopía",
+    "flag": "ET",
+    "lat": 8.7982,
+    "lng": 39.0894,
+    "stationCount": 12
+  },
+  {
+    "code": "PH",
+    "name": "Filipinas",
+    "flag": "PH",
+    "lat": 14.557,
+    "lng": 120.9856,
+    "stationCount": 23
+  },
+  {
+    "code": "FI",
+    "name": "Finlandia",
+    "flag": "FI",
+    "lat": 66.5039,
+    "lng": 25.7294,
+    "stationCount": 42
+  },
+  {
+    "code": "FR",
+    "name": "Francia",
+    "flag": "FR",
+    "lat": 43.5772,
+    "lng": 5.7458,
+    "stationCount": 476
+  },
+  {
+    "code": "GE",
+    "name": "Georgia",
+    "flag": "GE",
+    "lat": 41.722,
+    "lng": 44.8009,
+    "stationCount": 11
+  },
+  {
+    "code": "GH",
+    "name": "Ghana",
+    "flag": "GH",
+    "lat": 6.5948,
+    "lng": -1.4062,
+    "stationCount": 30
+  },
+  {
+    "code": "GR",
+    "name": "Grecia",
+    "flag": "GR",
+    "lat": 38.013,
+    "lng": 23.8255,
+    "stationCount": 123
+  },
+  {
+    "code": "GP",
+    "name": "Guadalupe",
+    "flag": "GP",
+    "lat": 16.2402,
+    "lng": -61.5526,
+    "stationCount": 4
+  },
+  {
+    "code": "GU",
+    "name": "Guam",
+    "flag": "GU",
+    "lat": 13.476,
+    "lng": 144.7521,
+    "stationCount": 1
+  },
+  {
+    "code": "GT",
+    "name": "Guatemala",
+    "flag": "GT",
+    "lat": 14.6378,
+    "lng": -90.4951,
+    "stationCount": 15
+  },
+  {
+    "code": "GG",
+    "name": "Guernesey",
+    "flag": "GG",
+    "lat": 49.7161,
+    "lng": -2.2031,
+    "stationCount": 1
+  },
+  {
+    "code": "GN",
+    "name": "Guinea",
+    "flag": "GN",
+    "lat": 9.5099,
+    "lng": -13.6982,
+    "stationCount": 1
+  },
+  {
+    "code": "GY",
+    "name": "Guyana",
+    "flag": "GY",
+    "lat": 6.2489,
+    "lng": -57.5171,
+    "stationCount": 4
+  },
+  {
+    "code": "HT",
+    "name": "Haití",
+    "flag": "HT",
+    "lat": -85.0191,
+    "lng": -65.0741,
+    "stationCount": 4
+  },
+  {
+    "code": "HN",
+    "name": "Honduras",
+    "flag": "HN",
+    "lat": 14.0996,
+    "lng": -87.1932,
+    "stationCount": 7
+  },
+  {
+    "code": "HU",
+    "name": "Hungría",
+    "flag": "HU",
+    "lat": 47.4889,
+    "lng": 19.0336,
+    "stationCount": 42
+  },
+  {
+    "code": "IN",
+    "name": "India",
+    "flag": "IN",
+    "lat": 19.0304,
+    "lng": 72.8696,
+    "stationCount": 68
+  },
+  {
+    "code": "ID",
+    "name": "Indonesia",
+    "flag": "ID",
+    "lat": -6.2081,
+    "lng": 106.7945,
+    "stationCount": 99
+  },
+  {
+    "code": "IQ",
+    "name": "Irak",
+    "flag": "IQ",
+    "lat": 33.3053,
+    "lng": 44.386,
+    "stationCount": 4
+  },
+  {
+    "code": "IR",
+    "name": "Irán",
+    "flag": "IR",
+    "lat": 35.6952,
+    "lng": 51.3844,
+    "stationCount": 3
+  },
+  {
+    "code": "IE",
+    "name": "Irlanda",
+    "flag": "IE",
+    "lat": 53.3486,
+    "lng": -6.2512,
+    "stationCount": 69
+  },
+  {
+    "code": "IM",
+    "name": "Isla de Man",
+    "flag": "IM",
+    "lat": 54.2059,
+    "lng": -4.5648,
+    "stationCount": 2
+  },
+  {
+    "code": "IS",
+    "name": "Islandia",
+    "flag": "IS",
+    "lat": 64.14,
+    "lng": -21.9026,
+    "stationCount": 4
+  },
+  {
+    "code": "AX",
+    "name": "Islas Aland",
+    "flag": "AX",
+    "lat": 60.1027,
+    "lng": 19.9372,
+    "stationCount": 1
+  },
+  {
+    "code": "KY",
+    "name": "Islas Caimán",
+    "flag": "KY",
+    "lat": 19.2925,
+    "lng": -81.2996,
+    "stationCount": 4
+  },
+  {
+    "code": "FO",
+    "name": "Islas Feroe",
+    "flag": "FO",
+    "lat": 62.0067,
+    "lng": -6.7828,
+    "stationCount": 6
+  },
+  {
+    "code": "FK",
+    "name": "Islas Malvinas",
+    "flag": "FK",
+    "lat": -51.7216,
+    "lng": -57.8101,
+    "stationCount": 1
+  },
+  {
+    "code": "MH",
+    "name": "Islas Marshall",
+    "flag": "MH",
+    "lat": 7.0867,
+    "lng": 171.3741,
+    "stationCount": 1
+  },
+  {
+    "code": "UM",
+    "name": "Islas menores alejadas de EE. UU.",
+    "flag": "UM",
+    "lat": 22.1925,
+    "lng": 46.4063,
+    "stationCount": 4
+  },
+  {
+    "code": "VG",
+    "name": "Islas Vírgenes Británicas",
+    "flag": "VG",
+    "lat": 18.4431,
+    "lng": -64.7638,
+    "stationCount": 2
+  },
+  {
+    "code": "VI",
+    "name": "Islas Vírgenes de EE. UU.",
+    "flag": "VI",
+    "lat": 33.8808,
+    "lng": -83.1102,
+    "stationCount": 1
+  },
+  {
+    "code": "IL",
+    "name": "Israel",
+    "flag": "IL",
+    "lat": 31.9682,
+    "lng": 34.8047,
+    "stationCount": 11
+  },
+  {
+    "code": "IT",
+    "name": "Italia",
+    "flag": "IT",
+    "lat": 46.3323,
+    "lng": 10.2359,
+    "stationCount": 189
+  },
+  {
+    "code": "JM",
+    "name": "Jamaica",
+    "flag": "JM",
+    "lat": 16.888,
+    "lng": -76.8929,
+    "stationCount": 18
+  },
+  {
+    "code": "JP",
+    "name": "Japón",
+    "flag": "JP",
+    "lat": 35.7652,
+    "lng": 139.8094,
+    "stationCount": 6
+  },
+  {
+    "code": "JE",
+    "name": "Jersey",
+    "flag": "JE",
+    "lat": 49.1859,
+    "lng": -2.1087,
+    "stationCount": 2
+  },
+  {
+    "code": "JO",
+    "name": "Jordania",
+    "flag": "JO",
+    "lat": 31.9982,
+    "lng": 35.8796,
+    "stationCount": 5
+  },
+  {
+    "code": "KZ",
+    "name": "Kazajistán",
+    "flag": "KZ",
+    "lat": 49.8149,
+    "lng": 73.1123,
+    "stationCount": 12
+  },
+  {
+    "code": "KE",
+    "name": "Kenia",
+    "flag": "KE",
+    "lat": -0.3318,
+    "lng": 35.9421,
+    "stationCount": 5
+  },
+  {
+    "code": "KG",
+    "name": "Kirguistán",
+    "flag": "KG",
+    "lat": 42.8746,
+    "lng": 74.5698,
+    "stationCount": 2
+  },
+  {
+    "code": "XK",
+    "name": "Kosovo",
+    "flag": "XK",
+    "lat": 42.0765,
+    "lng": 20.7236,
+    "stationCount": 1
+  },
+  {
+    "code": "KW",
+    "name": "Kuwait",
+    "flag": "KW",
+    "lat": 29.3504,
+    "lng": 47.9658,
+    "stationCount": 10
+  },
+  {
+    "code": "LV",
+    "name": "Letonia",
+    "flag": "LV",
+    "lat": 56.8102,
+    "lng": 24.1575,
+    "stationCount": 16
+  },
+  {
+    "code": "LB",
+    "name": "Líbano",
+    "flag": "LB",
+    "lat": 33.955,
+    "lng": 35.6132,
+    "stationCount": 7
+  },
+  {
+    "code": "LY",
+    "name": "Libia",
+    "flag": "LY",
+    "lat": 32.8937,
+    "lng": 13.1799,
+    "stationCount": 3
+  },
+  {
+    "code": "LI",
+    "name": "Liechtenstein",
+    "flag": "LI",
+    "lat": 47.1326,
+    "lng": 9.523,
+    "stationCount": 1
+  },
+  {
+    "code": "LT",
+    "name": "Lituania",
+    "flag": "LT",
+    "lat": 55.3733,
+    "lng": 24.104,
+    "stationCount": 8
+  },
+  {
+    "code": "LU",
+    "name": "Luxemburgo",
+    "flag": "LU",
+    "lat": 49.6255,
+    "lng": 6.1549,
+    "stationCount": 3
+  },
+  {
+    "code": "MK",
+    "name": "Macedonia del Norte",
+    "flag": "MK",
+    "lat": 41.9923,
+    "lng": 21.4183,
+    "stationCount": 13
+  },
+  {
+    "code": "MG",
+    "name": "Madagascar",
+    "flag": "MG",
+    "lat": -18.9128,
+    "lng": 47.5536,
+    "stationCount": 5
+  },
+  {
+    "code": "MY",
+    "name": "Malasia",
+    "flag": "MY",
+    "lat": 3.1333,
+    "lng": 101.6408,
+    "stationCount": 11
+  },
+  {
+    "code": "MV",
+    "name": "Maldivas",
+    "flag": "MV",
+    "lat": 4.1746,
+    "lng": 73.5111,
+    "stationCount": 4
+  },
+  {
+    "code": "ML",
+    "name": "Mali",
+    "flag": "ML",
+    "lat": 12.6453,
+    "lng": -8.003,
+    "stationCount": 1
+  },
+  {
+    "code": "MA",
+    "name": "Marruecos",
+    "flag": "MA",
+    "lat": 30.4231,
+    "lng": -9.5845,
+    "stationCount": 10
+  },
+  {
+    "code": "MQ",
+    "name": "Martinica",
+    "flag": "MQ",
+    "lat": 14.6096,
+    "lng": -60.9992,
+    "stationCount": 2
+  },
+  {
+    "code": "MU",
+    "name": "Mauricio",
+    "flag": "MU",
+    "lat": -20.1726,
+    "lng": 57.501,
+    "stationCount": 10
+  },
+  {
+    "code": "YT",
+    "name": "Mayotte",
+    "flag": "YT",
+    "lat": -12.7977,
+    "lng": 45.2793,
+    "stationCount": 1
+  },
+  {
+    "code": "MX",
+    "name": "México",
+    "flag": "MX",
+    "lat": 19.4335,
+    "lng": -99.1336,
+    "stationCount": 1977
+  },
+  {
+    "code": "MD",
+    "name": "Moldavia",
+    "flag": "MD",
+    "lat": 47.0072,
+    "lng": 28.8642,
+    "stationCount": 8
+  },
+  {
+    "code": "MC",
+    "name": "Mónaco",
+    "flag": "MC",
+    "lat": 43.7326,
+    "lng": 7.4257,
+    "stationCount": 3
+  },
+  {
+    "code": "ME",
+    "name": "Montenegro",
+    "flag": "ME",
+    "lat": 42.4399,
+    "lng": 19.2586,
+    "stationCount": 2
+  },
+  {
+    "code": "MZ",
+    "name": "Mozambique",
+    "flag": "MZ",
+    "lat": -19.8289,
+    "lng": 34.8431,
+    "stationCount": 3
+  },
+  {
+    "code": "MM",
+    "name": "Myanmar (Birmania)",
+    "flag": "MM",
+    "lat": 16.7871,
+    "lng": 96.1428,
+    "stationCount": 1
+  },
+  {
+    "code": "NA",
+    "name": "Namibia",
+    "flag": "NA",
+    "lat": -22.5774,
+    "lng": 17.0749,
+    "stationCount": 9
+  },
+  {
+    "code": "NP",
+    "name": "Nepal",
+    "flag": "NP",
+    "lat": 27.8002,
+    "lng": 85.3308,
+    "stationCount": 5
+  },
+  {
+    "code": "NI",
+    "name": "Nicaragua",
+    "flag": "NI",
+    "lat": 73.5618,
+    "lng": -53.1489,
+    "stationCount": 8
+  },
+  {
+    "code": "NE",
+    "name": "Níger",
+    "flag": "NE",
+    "lat": 69.1626,
+    "lng": 93.2813,
+    "stationCount": 1
+  },
+  {
+    "code": "NG",
+    "name": "Nigeria",
+    "flag": "NG",
+    "lat": 6.4341,
+    "lng": 3.381,
+    "stationCount": 16
+  },
+  {
+    "code": "NO",
+    "name": "Noruega",
+    "flag": "NO",
+    "lat": 59.9133,
+    "lng": 10.7401,
+    "stationCount": 51
+  },
+  {
+    "code": "NC",
+    "name": "Nueva Caledonia",
+    "flag": "NC",
+    "lat": -22.2717,
+    "lng": 166.4525,
+    "stationCount": 1
+  },
+  {
+    "code": "NZ",
+    "name": "Nueva Zelanda",
+    "flag": "NZ",
+    "lat": -36.8779,
+    "lng": 174.7673,
+    "stationCount": 41
+  },
+  {
+    "code": "OM",
+    "name": "Omán",
+    "flag": "OM",
+    "lat": 23.588,
+    "lng": 58.3829,
+    "stationCount": 1
+  },
+  {
+    "code": "NL",
+    "name": "Países Bajos",
+    "flag": "NL",
+    "lat": 52.0035,
+    "lng": 4.1607,
+    "stationCount": 334
+  },
+  {
+    "code": "PK",
+    "name": "Pakistán",
+    "flag": "PK",
+    "lat": 24.7952,
+    "lng": 67.0707,
+    "stationCount": 5
+  },
+  {
+    "code": "PA",
+    "name": "Panamá",
+    "flag": "PA",
+    "lat": 9.0396,
+    "lng": -79.4301,
+    "stationCount": 6
+  },
+  {
+    "code": "PG",
+    "name": "Papúa Nueva Guinea",
+    "flag": "PG",
+    "lat": -9.4508,
+    "lng": 147.1959,
+    "stationCount": 2
+  },
+  {
+    "code": "PY",
+    "name": "Paraguay",
+    "flag": "PY",
+    "lat": -25.3,
+    "lng": -57.5941,
+    "stationCount": 5
+  },
+  {
+    "code": "PE",
+    "name": "Perú",
+    "flag": "PE",
+    "lat": -6.7723,
+    "lng": -79.8397,
+    "stationCount": 64
+  },
+  {
+    "code": "PF",
+    "name": "Polinesia Francesa",
+    "flag": "PF",
+    "lat": -17.6461,
+    "lng": -149.5074,
+    "stationCount": 5
+  },
+  {
+    "code": "PL",
+    "name": "Polonia",
+    "flag": "PL",
+    "lat": 50.1041,
+    "lng": 18.9934,
+    "stationCount": 165
+  },
+  {
+    "code": "PT",
+    "name": "Portugal",
+    "flag": "PT",
+    "lat": 38.7394,
+    "lng": -9.0651,
+    "stationCount": 71
+  },
+  {
+    "code": "PR",
+    "name": "Puerto Rico",
+    "flag": "PR",
+    "lat": 18.244,
+    "lng": -66.0547,
+    "stationCount": 8
+  },
+  {
+    "code": "HK",
+    "name": "RAE de Hong Kong (China)",
+    "flag": "HK",
+    "lat": 22.2484,
+    "lng": 114.1699,
+    "stationCount": 8
+  },
+  {
+    "code": "GB",
+    "name": "Reino Unido",
+    "flag": "GB",
+    "lat": 51.5089,
+    "lng": -0.1272,
+    "stationCount": 300
+  },
+  {
+    "code": "CD",
+    "name": "República Democrática del Congo",
+    "flag": "CD",
+    "lat": -6.4323,
+    "lng": 20.7912,
+    "stationCount": 2
+  },
+  {
+    "code": "DO",
+    "name": "República Dominicana",
+    "flag": "DO",
+    "lat": 18.4673,
+    "lng": -69.9268,
+    "stationCount": 24
+  },
+  {
+    "code": "RE",
+    "name": "Reunión",
+    "flag": "RE",
+    "lat": -20.8815,
+    "lng": 55.4484,
+    "stationCount": 15
+  },
+  {
+    "code": "RO",
+    "name": "Rumanía",
+    "flag": "RO",
+    "lat": 46.7735,
+    "lng": 23.6281,
+    "stationCount": 366
+  },
+  {
+    "code": "RU",
+    "name": "Rusia",
+    "flag": "RU",
+    "lat": 55.7372,
+    "lng": 37.591,
+    "stationCount": 185
+  },
+  {
+    "code": "AS",
+    "name": "Samoa Americana",
+    "flag": "AS",
+    "lat": 15.9872,
+    "lng": 36.1719,
+    "stationCount": 1
+  },
+  {
+    "code": "SM",
+    "name": "San Marino",
+    "flag": "SM",
+    "lat": 43.9382,
+    "lng": 12.4488,
+    "stationCount": 1
+  },
+  {
+    "code": "MF",
+    "name": "San Martín",
+    "flag": "MF",
+    "lat": 17.9132,
+    "lng": -62.8527,
+    "stationCount": 1
+  },
+  {
+    "code": "PM",
+    "name": "San Pedro y Miquelón",
+    "flag": "PM",
+    "lat": 46.7832,
+    "lng": -56.1734,
+    "stationCount": 1
+  },
+  {
+    "code": "VC",
+    "name": "San Vicente y las Granadinas",
+    "flag": "VC",
+    "lat": 13.169,
+    "lng": -61.2277,
+    "stationCount": 1
+  },
+  {
+    "code": "SH",
+    "name": "Santa Elena",
+    "flag": "SH",
+    "lat": -15.8788,
+    "lng": -5.8228,
+    "stationCount": 2
+  },
+  {
+    "code": "LC",
+    "name": "Santa Lucía",
+    "flag": "LC",
+    "lat": 14.0163,
+    "lng": -60.989,
+    "stationCount": 5
+  },
+  {
+    "code": "SN",
+    "name": "Senegal",
+    "flag": "SN",
+    "lat": 14.7114,
+    "lng": -17.456,
+    "stationCount": 1
+  },
+  {
+    "code": "RS",
+    "name": "Serbia",
+    "flag": "RS",
+    "lat": 44.3851,
+    "lng": 20.7697,
+    "stationCount": 43
+  },
+  {
+    "code": "SC",
+    "name": "Seychelles",
+    "flag": "SC",
+    "lat": -4.6191,
+    "lng": 55.4513,
+    "stationCount": 3
+  },
+  {
+    "code": "SG",
+    "name": "Singapur",
+    "flag": "SG",
+    "lat": 1.2954,
+    "lng": 103.7922,
+    "stationCount": 18
+  },
+  {
+    "code": "SX",
+    "name": "Sint Maarten",
+    "flag": "SX",
+    "lat": 17.9074,
+    "lng": -62.8502,
+    "stationCount": 1
+  },
+  {
+    "code": "SY",
+    "name": "Siria",
+    "flag": "SY",
+    "lat": 37.0267,
+    "lng": 41.2688,
+    "stationCount": 1
+  },
+  {
+    "code": "SO",
+    "name": "Somalia",
+    "flag": "SO",
+    "lat": 3.1207,
+    "lng": 43.6493,
+    "stationCount": 1
+  },
+  {
+    "code": "LK",
+    "name": "Sri Lanka",
+    "flag": "LK",
+    "lat": 6.932,
+    "lng": 79.8437,
+    "stationCount": 13
+  },
+  {
+    "code": "ZA",
+    "name": "Sudáfrica",
+    "flag": "ZA",
+    "lat": -25.8741,
+    "lng": 28.6523,
+    "stationCount": 52
+  },
+  {
+    "code": "SD",
+    "name": "Sudán",
+    "flag": "SD",
+    "lat": 51.5924,
+    "lng": 9.8438,
+    "stationCount": 1
+  },
+  {
+    "code": "SE",
+    "name": "Suecia",
+    "flag": "SE",
+    "lat": 59.3272,
+    "lng": 18.0154,
+    "stationCount": 90
+  },
+  {
+    "code": "CH",
+    "name": "Suiza",
+    "flag": "CH",
+    "lat": 47.32,
+    "lng": 7.8972,
+    "stationCount": 80
+  },
+  {
+    "code": "SR",
+    "name": "Surinam",
+    "flag": "SR",
+    "lat": 5.9422,
+    "lng": -56.9711,
+    "stationCount": 3
+  },
+  {
+    "code": "TH",
+    "name": "Tailandia",
+    "flag": "TH",
+    "lat": 13.7182,
+    "lng": 100.481,
+    "stationCount": 17
+  },
+  {
+    "code": "TW",
+    "name": "Taiwán",
+    "flag": "TW",
+    "lat": 25.2096,
+    "lng": 121.6286,
+    "stationCount": 12
+  },
+  {
+    "code": "TZ",
+    "name": "Tanzania",
+    "flag": "TZ",
+    "lat": -2.5002,
+    "lng": 30.6667,
+    "stationCount": 3
+  },
+  {
+    "code": "TF",
+    "name": "Territorios Australes Franceses",
+    "flag": "TF",
+    "lat": -21.2757,
+    "lng": 55.5231,
+    "stationCount": 1
+  },
+  {
+    "code": "PS",
+    "name": "Territorios Palestinos",
+    "flag": "PS",
+    "lat": 32.7008,
+    "lng": 35.2972,
+    "stationCount": 2
+  },
+  {
+    "code": "TO",
+    "name": "Tonga",
+    "flag": "TO",
+    "lat": -21.1419,
+    "lng": -175.2182,
+    "stationCount": 3
+  },
+  {
+    "code": "TT",
+    "name": "Trinidad y Tobago",
+    "flag": "TT",
+    "lat": 10.6679,
+    "lng": -61.529,
+    "stationCount": 4
+  },
+  {
+    "code": "TN",
+    "name": "Túnez",
+    "flag": "TN",
+    "lat": 35.0131,
+    "lng": 9.7119,
+    "stationCount": 7
+  },
+  {
+    "code": "TR",
+    "name": "Turquía",
+    "flag": "TR",
+    "lat": 41.0345,
+    "lng": 29.0707,
+    "stationCount": 116
+  },
+  {
+    "code": "UA",
+    "name": "Ucrania",
+    "flag": "UA",
+    "lat": 49.9864,
+    "lng": 36.2593,
+    "stationCount": 51
+  },
+  {
+    "code": "UG",
+    "name": "Uganda",
+    "flag": "UG",
+    "lat": 0.3194,
+    "lng": 32.5894,
+    "stationCount": 8
+  },
+  {
+    "code": "UY",
+    "name": "Uruguay",
+    "flag": "UY",
+    "lat": -34.8961,
+    "lng": -56.1649,
+    "stationCount": 27
+  },
+  {
+    "code": "VU",
+    "name": "Vanuatu",
+    "flag": "VU",
+    "lat": -17.6794,
+    "lng": 168.4347,
+    "stationCount": 3
+  },
+  {
+    "code": "VE",
+    "name": "Venezuela",
+    "flag": "VE",
+    "lat": 10.5055,
+    "lng": -66.9103,
+    "stationCount": 26
+  },
+  {
+    "code": "ZW",
+    "name": "Zimbabue",
+    "flag": "ZW",
+    "lat": -17.8644,
+    "lng": 31.0515,
+    "stationCount": 2
+  }
+]

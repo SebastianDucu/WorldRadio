@@ -1,0 +1,9 @@
+import { IconBase, type IconProps } from "./IconBase";
+
+export function BellIcon(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15L6 16.5Z" /><path d="M10 21a2.2 2.2 0 0 0 4 0" />
+    </IconBase>
+  );
+}

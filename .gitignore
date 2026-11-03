@@ -1,0 +1,28 @@
+# Node
+node_modules/
+dist/
+frontend/dist/
+.vite/
+frontend/.vite/
+coverage/
+*.log
+
+# Gemini / Brain artifacts
+.gemini/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+# Datos locales y secretos
+*.db
+*.sqlite3
+.env
+.env.*
+!.env.example
+# SO / editores
+.DS_Store
+.idea/
+.vscode/
