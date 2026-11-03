@@ -43,3 +43,4 @@ export { RadioIcon } from "./RadioIcon";
 export { CompassIcon } from "./CompassIcon";
 export { BoltIcon } from "./BoltIcon";
 export { SparklesIcon } from "./SparklesIcon";
+export { UsersIcon } from "./UsersIcon";

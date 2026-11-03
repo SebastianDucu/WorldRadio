@@ -14,16 +14,21 @@ import {
   MoonIcon,
   TargetIcon,
   TimerIcon,
+  UsersIcon,
 } from "@/components/icons";
 import { toast } from "@/store/toast";
 import { usePlayerStore } from "@/store/player";
 import { getStationTimeInfo } from "@/lib/timeZones";
+import { useLiveListeners } from "@/hooks/useLiveListeners";
+import { useChristmasActive } from "@/hooks/useApplyUiPreferences";
+import { SnowCap } from "@/components/snow/SnowCap";
 import { LiquidVisualizer } from "./LiquidVisualizer";
 import { StationDetailsModal } from "./StationDetailsModal";
 
 export function AudioPlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const isChristmas = useChristmasActive();
 
   const {
     currentStation,
@@ -51,6 +56,7 @@ export function AudioPlayer() {
     sleepTimerRemaining,
   } = usePlayerStore();
 
+  const liveListeners = useLiveListeners(currentStation);
   const [timeInfo, setTimeInfo] = useState(() => getStationTimeInfo(currentStation));
 
   useEffect(() => {
@@ -185,77 +191,101 @@ export function AudioPlayer() {
           onError={handleAudioError}
         />
 
-        <div className="liquid-glass mx-auto flex max-w-4xl items-center justify-between gap-2.5 sm:gap-3 rounded-2xl sm:rounded-3xl px-3 sm:px-4 py-2 sm:py-2.5 shadow-2xl border border-amber-400/25">
-          {/* Left: Station Identity & Marquee Title */}
-          <div className="flex min-w-0 flex-1 items-center gap-2.5 sm:gap-3">
-            {/* Frequency Badge with golden border when playing */}
-            <div
-              onClick={() => setDetailsOpen(true)}
-              className="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 cursor-pointer items-center justify-center rounded-xl font-bold text-xs text-white shadow-md transition-all duration-200 hover:scale-105 active:scale-95"
-              style={{
-                background: isPlaying
-                  ? "linear-gradient(135deg, #f59e0b, #d97706)"
-                  : `linear-gradient(135deg, hsl(${currentStation?.hue || 200}, 75%, 45%), hsl(${(currentStation?.hue || 200) + 30}, 80%, 25%))`,
-                boxShadow: isPlaying ? "0 0 16px rgba(255, 201, 74, 0.45)" : undefined,
-              }}
-              title="Ver ficha técnica"
-            >
-              {currentStation?.frequency || currentStation?.name.slice(0, 3).toUpperCase() || "RAD"}
-            </div>
+        <div className="relative mx-auto max-w-4xl">
+          {/* Winter Snow Cap over player bar */}
+          {isChristmas && <SnowCap />}
 
-            <div className="min-w-0 flex-1 overflow-hidden">
-              <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="liquid-glass flex items-center justify-between gap-2.5 sm:gap-3 rounded-2xl sm:rounded-3xl px-3 sm:px-4 py-2 sm:py-2.5 shadow-2xl border border-amber-400/25">
+            {/* Left: Station Identity & Marquee Title */}
+            <div className="flex min-w-0 flex-1 items-center gap-2.5 sm:gap-3">
+              {/* Frequency Badge with golden border & festive Santa Hat */}
+              <div className="relative shrink-0">
+                {isChristmas && (
+                  <div className="absolute -top-3.5 -left-2 z-20 pointer-events-none drop-shadow-md select-none transform -rotate-12 animate-[bounce_5s_infinite]">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <path d="M4 16C5.5 10 9 6 14 5c2.5 1 4.5 5 5 11" fill="#E11D48" stroke="#991B1B" strokeWidth="1" />
+                      <rect x="2.5" y="15" width="18" height="4" rx="2" fill="#FFFFFF" />
+                      <circle cx="15.5" cy="4.5" r="2.5" fill="#FFFFFF" />
+                    </svg>
+                  </div>
+                )}
                 <div
                   onClick={() => setDetailsOpen(true)}
-                  className="cursor-pointer truncate text-xs sm:text-sm font-semibold tracking-tight text-white hover:text-amber-400 transition-colors"
+                  className="flex h-10 w-10 sm:h-11 sm:w-11 cursor-pointer items-center justify-center rounded-xl font-bold text-xs text-white shadow-md transition-all duration-200 hover:scale-105 active:scale-95"
+                  style={{
+                    background: isPlaying
+                      ? "linear-gradient(135deg, #f59e0b, #d97706)"
+                      : `linear-gradient(135deg, hsl(${currentStation?.hue || 200}, 75%, 45%), hsl(${(currentStation?.hue || 200) + 30}, 80%, 25%))`,
+                    boxShadow: isPlaying ? "0 0 16px rgba(255, 201, 74, 0.45)" : undefined,
+                  }}
+                  title="Ver ficha técnica"
                 >
-                  {currentStation ? currentStation.name : "Elige una emisora en el mapa"}
+                  {currentStation?.frequency || currentStation?.name.slice(0, 3).toUpperCase() || "RAD"}
+                </div>
+              </div>
+
+              <div className="min-w-0 flex-1 overflow-hidden">
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <div
+                    onClick={() => setDetailsOpen(true)}
+                    className="cursor-pointer truncate text-xs sm:text-sm font-semibold tracking-tight text-white hover:text-amber-400 transition-colors"
+                  >
+                    {currentStation ? currentStation.name : "Elige una emisora en el mapa"}
+                  </div>
+
+                  {currentStation && (
+                    <button
+                      onClick={() => toggleFavorite(currentStation.id)}
+                      className="p-1 text-slate-400 hover:text-white transition-colors shrink-0"
+                      aria-label={isFav ? "Quitar de favoritas" : "Añadir a favoritas"}
+                    >
+                      <HeartIcon
+                        size={16}
+                        className={isFav ? "fill-rose-500 text-rose-500" : ""}
+                      />
+                    </button>
+                  )}
                 </div>
 
-                {currentStation && (
-                  <button
-                    onClick={() => toggleFavorite(currentStation.id)}
-                    className="p-1 text-slate-400 hover:text-white transition-colors shrink-0"
-                    aria-label={isFav ? "Quitar de favoritas" : "Añadir a favoritas"}
-                  >
-                    <HeartIcon
-                      size={16}
-                      className={isFav ? "fill-rose-500 text-rose-500" : ""}
-                    />
-                  </button>
-                )}
-              </div>
-
-              {/* Subtitle with live indicator dot and kbps quality */}
-              <div className="flex items-center gap-1.5 text-[11px] sm:text-xs font-normal text-slate-400 truncate mt-0.5">
-                {currentStation ? (
-                  <>
-                    <span className="flex items-center gap-1.5 truncate">
+                {/* Subtitle with live indicator dot, kbps quality & LIVE LISTENERS COUNTER */}
+                <div className="flex items-center gap-1.5 text-[11px] sm:text-xs font-normal text-slate-400 truncate mt-0.5">
+                  {currentStation ? (
+                    <>
+                      <span className="flex items-center gap-1.5 truncate">
+                        <span
+                          className={`inline-block h-2 w-2 shrink-0 rounded-full ${
+                            isPlaying ? "bg-emerald-400 shadow-[0_0_8px_#3df59a] animate-pulse" : "bg-slate-600"
+                          }`}
+                        />
+                        <span className="truncate">{currentStation.city}, {currentStation.country}</span>
+                      </span>
+                      <span>·</span>
+                      <span className="text-amber-400 font-semibold shrink-0">{currentStation.bitrate}k</span>
+                      <span>·</span>
+                      {/* Live Listeners Badge */}
                       <span
-                        className={`inline-block h-2 w-2 shrink-0 rounded-full ${
-                          isPlaying ? "bg-emerald-400 shadow-[0_0_8px_#3df59a] animate-pulse" : "bg-slate-600"
-                        }`}
-                      />
-                      <span className="truncate">{currentStation.city}, {currentStation.country}</span>
-                    </span>
-                    <span>·</span>
-                    <span className="text-amber-400 font-semibold shrink-0">{currentStation.bitrate}k</span>
-                    <span className="hidden sm:inline">·</span>
-                    <span className="hidden sm:inline-flex items-center gap-1 text-xs text-amber-300 font-mono font-semibold">
-                      {timeInfo.isDay ? (
-                        <SunIcon size={12} className="text-amber-400" />
-                      ) : (
-                        <MoonIcon size={12} className="text-sky-300" />
-                      )}
-                      <span>{timeInfo.timeString}</span>
-                    </span>
-                  </>
-                ) : (
-                  <span>Toca un punto brillante del globo</span>
-                )}
+                        className="flex items-center gap-1 text-emerald-400 font-mono font-semibold shrink-0"
+                        title={`${liveListeners.fullString} personas escuchando esta emisora en vivo`}
+                      >
+                        <UsersIcon size={12} className="text-emerald-400 shrink-0" />
+                        <span>{liveListeners.formatted}</span>
+                      </span>
+                      <span className="hidden sm:inline">·</span>
+                      <span className="hidden sm:inline-flex items-center gap-1 text-xs text-amber-300 font-mono font-semibold">
+                        {timeInfo.isDay ? (
+                          <SunIcon size={12} className="text-amber-400" />
+                        ) : (
+                          <MoonIcon size={12} className="text-sky-300" />
+                        )}
+                        <span>{timeInfo.timeString}</span>
+                      </span>
+                    </>
+                  ) : (
+                    <span>Toca un punto brillante del globo</span>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
 
           {/* Center: Controls & Liquid Visualizer */}
           <div className="flex items-center justify-center gap-1.5 sm:gap-2 shrink-0">
@@ -367,7 +397,8 @@ export function AudioPlayer() {
             </button>
           </div>
         </div>
-      </footer>
+      </div>
+    </footer>
 
       {/* Technical Station Details Modal */}
       <StationDetailsModal

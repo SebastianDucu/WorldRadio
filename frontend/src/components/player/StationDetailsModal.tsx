@@ -1,8 +1,9 @@
 import { useState } from "react";
 import type { Station } from "@/types/radio";
-import { CloseIcon, RadioTowerIcon, GlobeIcon, HeartIcon } from "@/components/icons";
+import { CloseIcon, RadioTowerIcon, GlobeIcon, HeartIcon, UsersIcon } from "@/components/icons";
 import { usePlayerStore } from "@/store/player";
 import { toast } from "@/store/toast";
+import { useLiveListeners } from "@/hooks/useLiveListeners";
 
 interface StationDetailsModalProps {
   station: Station | null;
@@ -13,6 +14,7 @@ interface StationDetailsModalProps {
 export function StationDetailsModal({ station, isOpen, onClose }: StationDetailsModalProps) {
   const { flyTo, toggleFavorite, isFavorite, setViewMode } = usePlayerStore();
   const [copied, setCopied] = useState(false);
+  const liveListeners = useLiveListeners(station);
 
   if (!isOpen || !station) return null;
 
@@ -90,9 +92,25 @@ export function StationDetailsModal({ station, isOpen, onClose }: StationDetails
           </div>
 
           <div className="rounded-xl bg-surface/70 p-3 border border-white/5">
+            <span className="text-[11px] font-bold text-muted block">Audiencia en Directo</span>
+            <span className="font-extrabold text-emerald-400 text-sm mt-0.5 flex items-center gap-1.5">
+              <UsersIcon size={14} className="text-emerald-400" />
+              <span>{liveListeners.fullString} oyentes</span>
+            </span>
+          </div>
+
+          <div className="rounded-xl bg-surface/70 p-3 border border-white/5">
             <span className="text-[11px] font-bold text-muted block">Coordenadas GPS</span>
             <span className="font-extrabold text-fg text-sm mt-0.5 block">
               {station.lat.toFixed(2)}°, {station.lng.toFixed(2)}°
+            </span>
+          </div>
+
+          <div className="rounded-xl bg-surface/70 p-3 border border-white/5">
+            <span className="text-[11px] font-bold text-muted block">Estado de Señal</span>
+            <span className="font-extrabold text-sky-400 text-sm mt-0.5 flex items-center gap-1.5">
+              <span className="h-2 w-2 rounded-full bg-sky-400" />
+              <span>Emisión Satelital HQ</span>
             </span>
           </div>
 

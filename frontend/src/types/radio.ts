@@ -16,6 +16,7 @@ export interface Station {
   description?: string;
   frequency?: string;
   hue?: number;
+  listeners?: number;
 }
 
 export interface CountryInfo {

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { usePlayerStore } from "@/store/player";
 import { getStationTimeInfo } from "@/lib/timeZones";
+import { useLiveListeners } from "@/hooks/useLiveListeners";
+import { useChristmasActive } from "@/hooks/useApplyUiPreferences";
 import {
   PlayIcon,
   PauseIcon,
@@ -9,9 +11,11 @@ import {
   MoonIcon,
   TimerIcon,
   CompassIcon,
+  UsersIcon,
 } from "@/components/icons";
 
 export function DynamicIslandHUD() {
+  const isChristmas = useChristmasActive();
   const {
     currentStation,
     isPlaying,
@@ -25,6 +29,7 @@ export function DynamicIslandHUD() {
     tickTour,
   } = usePlayerStore();
 
+  const liveListeners = useLiveListeners(currentStation);
   const [timeInfo, setTimeInfo] = useState(() => getStationTimeInfo(currentStation));
 
   // Update city local time every 10 seconds
@@ -66,16 +71,27 @@ export function DynamicIslandHUD() {
         
         {/* Left: Station Identity */}
         <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
-          <div
-            className="flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-full text-[10px] sm:text-[11px] font-bold text-white shadow-sm"
-            style={{
-              background: `linear-gradient(135deg, hsl(${currentStation?.hue || 200}, 85%, 45%), hsl(${(currentStation?.hue || 200) + 30}, 90%, 30%))`,
-            }}
-          >
-            {currentStation?.frequency || "FM"}
+          <div className="relative shrink-0">
+            {isChristmas && (
+              <div className="absolute -top-2.5 -left-1.5 z-10 pointer-events-none drop-shadow-sm select-none transform -rotate-12 animate-[bounce_5s_infinite]">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M4 16C5.5 10 9 6 14 5c2.5 1 4.5 5 5 11" fill="#E11D48" stroke="#991B1B" strokeWidth="1" />
+                  <rect x="2.5" y="15" width="18" height="4" rx="2" fill="#FFFFFF" />
+                  <circle cx="15.5" cy="4.5" r="2.5" fill="#FFFFFF" />
+                </svg>
+              </div>
+            )}
+            <div
+              className="flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-full text-[10px] sm:text-[11px] font-bold text-white shadow-sm"
+              style={{
+                background: `linear-gradient(135deg, hsl(${currentStation?.hue || 200}, 85%, 45%), hsl(${(currentStation?.hue || 200) + 30}, 90%, 30%))`,
+              }}
+            >
+              {currentStation?.frequency || "FM"}
+            </div>
           </div>
 
-          <div className="min-w-0 truncate max-w-[100px] sm:max-w-[170px]">
+          <div className="min-w-0 truncate max-w-[95px] sm:max-w-[160px]">
             <p className="text-xs font-bold text-white truncate leading-tight">
               {currentStation?.name || "WorldRadio"}
             </p>
@@ -85,8 +101,8 @@ export function DynamicIslandHUD() {
           </div>
         </div>
 
-        {/* Center: City Telepresence Local Time & Signal */}
-        <div className="flex items-center gap-1.5 sm:gap-3 px-2 sm:px-3 border-x border-white/10 text-xs font-semibold text-slate-300 whitespace-nowrap">
+        {/* Center: City Telepresence Local Time & Live Audience */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5 px-2 sm:px-3 border-x border-white/10 text-xs font-semibold text-slate-300 whitespace-nowrap">
           {/* Local Time with Sun/Moon SVG indicator */}
           <span className="flex items-center gap-1 sm:gap-1.5 bg-white/5 rounded-full px-2 sm:px-2.5 py-0.5" title={`Hora local en ${currentStation?.city}`}>
             {timeInfo.isDay ? (
@@ -96,6 +112,15 @@ export function DynamicIslandHUD() {
             )}
             <span className="font-mono text-xs sm:text-sm font-semibold text-white">{timeInfo.timeString}</span>
             <span className="text-[11px] text-slate-400 font-normal hidden sm:inline">{timeInfo.label}</span>
+          </span>
+
+          {/* Live Listeners Badge */}
+          <span
+            className="flex items-center gap-1 text-emerald-400 font-mono text-[11px] font-semibold bg-emerald-500/10 border border-emerald-500/20 rounded-full px-2 py-0.5"
+            title={`${liveListeners.fullString} personas escuchando en directo`}
+          >
+            <UsersIcon size={12} className="text-emerald-400 shrink-0" />
+            <span>{liveListeners.formatted}</span>
           </span>
 
           {/* 5-bar Signal Strength Indicator */}

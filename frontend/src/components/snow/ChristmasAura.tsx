@@ -27,28 +27,28 @@ export function ChristmasAura() {
     let animFrame: number;
 
     const triggerSleigh = () => {
-      setSleighProgress(-250);
+      setSleighProgress(-320);
       const startTime = performance.now();
-      const duration = 15000; // 15 seconds to gracefully cross
+      const duration = 14000; // 14 seconds to gracefully cross
 
       const animateSleigh = (now: number) => {
         const elapsed = now - startTime;
-        const p = (elapsed / duration) * (window.innerWidth + 500) - 250;
+        const p = (elapsed / duration) * (window.innerWidth + 640) - 320;
         setSleighProgress(p);
 
         if (elapsed < duration) {
           animFrame = requestAnimationFrame(animateSleigh);
         } else {
-          // Trigger next flight after 25-45 seconds
-          timeoutId = window.setTimeout(triggerSleigh, 25000 + Math.random() * 20000);
+          // Trigger next flight after 18-35 seconds
+          timeoutId = window.setTimeout(triggerSleigh, 18000 + Math.random() * 16000);
         }
       };
 
       animFrame = requestAnimationFrame(animateSleigh);
     };
 
-    // First appearance after 4 seconds
-    timeoutId = window.setTimeout(triggerSleigh, 4000);
+    // First appearance after 2.5 seconds
+    timeoutId = window.setTimeout(triggerSleigh, 2500);
 
     return () => {
       clearTimeout(timeoutId);
@@ -206,34 +206,56 @@ export function ChristmasAura() {
         })}
       </div>
 
-      {/* Santa's Flying Sleigh Silhouette with magic golden stardust trail (100% SVG Vector) */}
+      {/* Santa's Flying Sleigh with Rudolph and Reindeer Team */}
       <div
-        className="absolute top-18 flex items-center gap-2 transition-transform will-change-transform opacity-95 pointer-events-none"
+        className="absolute top-14 sm:top-18 flex items-center gap-1.5 transition-transform will-change-transform opacity-95 pointer-events-none transform-gpu"
         style={{
-          transform: `translateX(${sleighProgress}px) translateY(${Math.sin(sleighProgress / 70) * 14}px)`,
+          transform: `translate3d(${sleighProgress}px, ${Math.sin(sleighProgress / 65) * 16}px, 0)`,
         }}
       >
-        <div className="flex items-center gap-1 text-amber-300 drop-shadow-[0_0_14px_rgba(255,201,74,0.85)]">
-          {/* Reindeer 1 */}
-          <svg className="w-5 h-5 fill-amber-300" viewBox="0 0 24 24">
+        <div className="flex items-center gap-1.5 drop-shadow-[0_0_16px_rgba(255,201,74,0.9)]">
+          {/* Rudolph in the Lead with glowing Red Nose */}
+          <div className="relative flex items-center">
+            <svg className="w-6 h-6 fill-amber-300" viewBox="0 0 24 24">
+              <path d="M19 3l-1.5 2h-2L14 3h-1l.5 3-1.5 1.5L9 7v2l2 1v3l-2 2-1 4h2l1-3 2-1v-2l2-1.5 3-1 2-3.5L21 4l-2-1z" />
+            </svg>
+            {/* Rudolph's Glowing Ruby Nose Beacon */}
+            <span className="absolute top-[8px] right-[2px] h-2 w-2 rounded-full bg-rose-500 shadow-[0_0_10px_#f43f5e] animate-ping" />
+            <span className="absolute top-[8px] right-[2px] h-2 w-2 rounded-full bg-rose-500 shadow-[0_0_6px_#f43f5e]" />
+          </div>
+
+          {/* Reindeers 2, 3 & 4 in convoy */}
+          <svg className="w-5 h-5 fill-amber-300 -ml-1.5 opacity-90" viewBox="0 0 24 24">
             <path d="M19 3l-1.5 2h-2L14 3h-1l.5 3-1.5 1.5L9 7v2l2 1v3l-2 2-1 4h2l1-3 2-1v-2l2-1.5 3-1 2-3.5L21 4l-2-1z" />
           </svg>
-          {/* Reindeer 2 */}
-          <svg className="w-5 h-5 fill-amber-300 -ml-1" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 fill-amber-300 -ml-1.5 opacity-85" viewBox="0 0 24 24">
             <path d="M19 3l-1.5 2h-2L14 3h-1l.5 3-1.5 1.5L9 7v2l2 1v3l-2 2-1 4h2l1-3 2-1v-2l2-1.5 3-1 2-3.5L21 4l-2-1z" />
           </svg>
-          {/* Reindeer 3 */}
-          <svg className="w-5 h-5 fill-amber-300 -ml-1" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 fill-amber-300 -ml-1.5 opacity-80" viewBox="0 0 24 24">
             <path d="M19 3l-1.5 2h-2L14 3h-1l.5 3-1.5 1.5L9 7v2l2 1v3l-2 2-1 4h2l1-3 2-1v-2l2-1.5 3-1 2-3.5L21 4l-2-1z" />
           </svg>
-          {/* Sleigh */}
-          <svg className="w-7 h-7 fill-amber-400 -ml-0.5" viewBox="0 0 24 24">
-            <path d="M3 17c1.5 0 3-1 4-2.5l5.5.5c2 0 4-1.5 4.5-3.5l1-4.5H16l-.5 2.5c-.3 1-1.2 1.5-2 1.5H8.5L7 8.5C6.5 7.5 5.5 7 4.5 7H2v2h2.5c.3 0 .7.2.8.5l1.4 2.8C5.5 14 4 15 3 15v2zm1 2c3.5 0 6.5-2 8-4.5l6 .5c1.5 0 3-.8 3.8-2l-1.6-.9c-.5.8-1.3 1.4-2.2 1.4l-6.2-.5C10.5 16 7.5 18 4 18v2h-.5c-.8 0-1.5-.7-1.5-1.5S2.7 17 3.5 17H5v2H4z" />
+
+          {/* Golden Reins Line */}
+          <svg className="w-5 h-3 text-amber-300/80 -ml-1" viewBox="0 0 24 10" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M0 5 Q 12 9 24 4" />
           </svg>
+
+          {/* Santa Claus in his Festive Sleigh */}
+          <div className="relative -ml-1">
+            <svg className="w-8 h-8 sm:w-9 sm:h-9 fill-amber-400" viewBox="0 0 32 32">
+              <path d="M4 22c2 0 4-1.3 5.5-3.3l7 .7c2.5 0 5-2 5.8-4.5l1.2-6H21l-.7 3.3c-.4 1.3-1.6 2-2.7 2H11l-2-3c-.7-1.3-2-2-3.3-2H3v2.7h3.3c.4 0 1 .3 1.1.7l1.9 3.7c-2 2.7-4 4-5.3 4v2zm1.3 2.7c4.7 0 8.7-2.7 10.7-6l8 .7c2 0 4-1.1 5.1-2.7l-2.1-1.2c-.7 1.1-1.7 1.9-3 1.9l-8.3-.7C14 21.3 10 24 5.3 24v2.7H4.7c-1.1 0-2-.9-2-2s.9-2 2-2H6.7v2.7h-1.4z" />
+              {/* Santa Figure with Red Cap */}
+              <circle cx="16" cy="11" r="2.8" fill="#E11D48" />
+              <circle cx="17.5" cy="9.5" r="1.2" fill="#FFFFFF" />
+            </svg>
+          </div>
         </div>
 
-        {/* Shimmering Golden Trail */}
-        <span className="h-1.5 w-32 bg-gradient-to-l from-amber-400/90 via-amber-400/40 to-transparent blur-[1px] rounded-full" />
+        {/* Shimmering Golden Cometary Trail & Sparkles */}
+        <div className="flex items-center -ml-2">
+          <span className="h-1.5 w-32 sm:w-48 bg-gradient-to-l from-amber-400/90 via-amber-300/40 to-transparent blur-[1.5px] rounded-full" />
+          <span className="h-1 w-16 -ml-8 bg-gradient-to-l from-white/90 to-transparent blur-[0.5px] rounded-full" />
+        </div>
       </div>
 
       {/* Decorative frosted pine branches in bottom corners (SVG paths, zero emojis) */}

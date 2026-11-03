@@ -16,12 +16,16 @@ import {
   MicIcon,
   BoltIcon,
   SparklesIcon,
+  UsersIcon,
 } from "@/components/icons";
 import { IconButton } from "@/components/ui/IconButton";
 import { STATIONS, COUNTRIES } from "@/data/stations";
 import { usePlayerStore } from "@/store/player";
 import { searchOnlineStations } from "@/services/radioApi";
 import { ChangelogModal } from "@/components/modals/ChangelogModal";
+import { useChristmasActive } from "@/hooks/useApplyUiPreferences";
+import { SnowCap } from "@/components/snow/SnowCap";
+import { getStationBaseListeners, formatListenerCount } from "@/hooks/useLiveListeners";
 import type { Station } from "@/types/radio";
 
 const MOOD_FILTERS = [
@@ -69,6 +73,7 @@ export function StationSidebar() {
   } = usePlayerStore();
 
   const [onlineResults, setOnlineResults] = useState<Station[]>([]);
+  const isChristmas = useChristmasActive();
   const [isSearchingOnline, setIsSearchingOnline] = useState(false);
   const [changelogOpen, setChangelogOpen] = useState(false);
 
@@ -175,6 +180,9 @@ export function StationSidebar() {
         }`}
         aria-label="Explorador de emisoras"
       >
+        {/* Winter Snow Cap atop sidebar */}
+        {isChristmas && <SnowCap className="-top-2 inset-x-2" />}
+
         {/* Header */}
         <header className="flex items-center justify-between border-b border-white/10 px-4 py-3.5">
           <div className="flex items-center gap-3">
@@ -558,8 +566,13 @@ export function StationSidebar() {
                         >
                           {station.name}
                         </p>
-                        <p className="truncate text-xs font-normal text-slate-400">
-                          {station.city ? `${station.city}, ` : ""}{station.country} · {station.bitrate} kbps
+                        <p className="truncate text-xs font-normal text-slate-400 mt-0.5 flex items-center gap-1.5">
+                          <span className="truncate">{station.city ? `${station.city}, ` : ""}{station.country}</span>
+                          <span>·</span>
+                          <span className="text-emerald-400 font-semibold shrink-0 flex items-center gap-0.5">
+                            <UsersIcon size={11} className="text-emerald-400" />
+                            <span>{formatListenerCount(getStationBaseListeners(station))}</span>
+                          </span>
                         </p>
                       </div>
                     </div>
