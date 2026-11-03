@@ -77,15 +77,16 @@ export function ChristmasAura() {
     };
     window.addEventListener("resize", onResize);
 
-    // Multi-layer snow & golden stardust particles
-    const flakeCount = Math.min(130, Math.floor(width / 13));
+    // Multi-layer snow & golden stardust particles (optimized per device)
+    const isMobile = width < 768;
+    const flakeCount = isMobile ? Math.min(38, Math.floor(width / 18)) : Math.min(85, Math.floor(width / 15));
     const flakes: SnowFlake[] = Array.from({ length: flakeCount }, (_, i) => ({
       x: Math.random() * width,
       y: Math.random() * height,
-      radius: Math.random() * 2.4 + 0.6,
-      speed: Math.random() * 1.1 + 0.35,
-      wind: Math.random() * 0.7 - 0.35,
-      alpha: Math.random() * 0.65 + 0.35,
+      radius: Math.random() * 2.2 + 0.6,
+      speed: Math.random() * 1.0 + 0.35,
+      wind: Math.random() * 0.6 - 0.3,
+      alpha: Math.random() * 0.6 + 0.35,
       oscillation: Math.random() * Math.PI * 2,
       isGold: i % 4 === 0, // 25% golden stardust particles
     }));
@@ -108,19 +109,23 @@ export function ChristmasAura() {
       ctx.fillStyle = auroraGrad;
       ctx.fillRect(0, 0, width, height * 0.55);
 
-      // 2. Snowflakes & Golden Stardust
+      // 2. High-performance Snowflakes & Golden Stardust (0 GPU raster blur stalls)
       for (const flake of flakes) {
         flake.oscillation += 0.025;
         const currentWind = flake.wind + Math.sin(flake.oscillation) * 0.45;
 
-        ctx.beginPath();
-        ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
-
         if (flake.isGold) {
           const goldTwinkle = Math.sin(flake.oscillation * 2) * 0.3 + 0.7;
-          ctx.fillStyle = `rgba(255, 201, 74, ${flake.alpha * goldTwinkle})`;
-          ctx.shadowColor = "rgba(255, 201, 74, 0.8)";
-          ctx.shadowBlur = 6;
+          // Outer subtle aura ring
+          ctx.fillStyle = `rgba(255, 201, 74, ${flake.alpha * goldTwinkle * 0.35})`;
+          ctx.beginPath();
+          ctx.arc(flake.x, flake.y, flake.radius * 1.7, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Crisp core
+          ctx.fillStyle = `rgba(255, 230, 150, ${flake.alpha * goldTwinkle})`;
+          ctx.beginPath();
+          ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
           ctx.fill();
 
           // Draw small 4-point star glint for larger golden stardust
@@ -136,12 +141,10 @@ export function ChristmasAura() {
           }
         } else {
           ctx.fillStyle = `rgba(248, 250, 252, ${flake.alpha})`;
-          ctx.shadowColor = "rgba(255, 255, 255, 0.45)";
-          ctx.shadowBlur = 4;
+          ctx.beginPath();
+          ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
           ctx.fill();
         }
-
-        ctx.shadowBlur = 0;
 
         flake.y += flake.speed;
         flake.x += currentWind;
@@ -172,30 +175,30 @@ export function ChristmasAura() {
       {/* Canvas for Aurora, Parallax Snow & Golden Stardust */}
       <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
 
-      {/* Decorative overhead garland of glowing festive lights */}
-      <div className="absolute top-0 inset-x-0 flex justify-around px-4 py-1.5 opacity-90">
-        {Array.from({ length: 32 }).map((_, i) => {
+      {/* Decorative overhead garland of glowing festive lights (responsive density) */}
+      <div className="absolute top-0 inset-x-0 flex justify-around px-3 sm:px-6 py-1 opacity-85">
+        {Array.from({ length: 22 }).map((_, i) => {
           const colors = [
-            { bg: "#E11D48", glow: "rgba(225, 29, 72, 0.9)" }, // Ruby Rose
-            { bg: "#FFC94A", glow: "rgba(255, 201, 74, 0.9)" }, // Orbe Gold
-            { bg: "#10B981", glow: "rgba(16, 185, 129, 0.9)" }, // Pine Emerald
-            { bg: "#38B6FF", glow: "rgba(56, 182, 255, 0.9)" }, // Cyan Sky
-            { bg: "#F59E0B", glow: "rgba(245, 158, 11, 0.9)" }, // Amber
+            { bg: "#E11D48", glow: "rgba(225, 29, 72, 0.75)" }, // Ruby Rose
+            { bg: "#FFC94A", glow: "rgba(255, 201, 74, 0.75)" }, // Holiday Gold
+            { bg: "#10B981", glow: "rgba(16, 185, 129, 0.75)" }, // Pine Emerald
+            { bg: "#38B6FF", glow: "rgba(56, 182, 255, 0.75)" }, // Cyan Sky
+            { bg: "#F59E0B", glow: "rgba(245, 158, 11, 0.75)" }, // Amber
           ];
           const c = colors[i % colors.length]!;
 
           return (
-            <div key={i} className="flex flex-col items-center">
+            <div key={i} className={`flex flex-col items-center ${i % 2 !== 0 ? "hidden sm:flex" : "flex"}`}>
               {/* Wire socket */}
-              <span className="w-1 h-1.5 bg-slate-700/80 rounded-xs" />
+              <span className="w-1 h-1 bg-slate-700/80 rounded-xs" />
               {/* Glowing Bulb */}
               <span
-                className="h-2.5 w-2 rounded-full animate-pulse transition-all duration-300"
+                className="h-2 w-1.5 sm:h-2.5 sm:w-2 rounded-full animate-pulse transition-all duration-300"
                 style={{
                   backgroundColor: c.bg,
-                  boxShadow: `0 0 12px ${c.glow}, 0 0 4px #fff`,
-                  animationDelay: `${(i % 7) * 0.28}s`,
-                  animationDuration: "1.7s",
+                  boxShadow: `0 0 8px ${c.glow}`,
+                  animationDelay: `${(i % 5) * 0.35}s`,
+                  animationDuration: "2.1s",
                 }}
               />
             </div>

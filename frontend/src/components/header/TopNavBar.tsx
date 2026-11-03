@@ -59,7 +59,7 @@ export function TopNavBar() {
                 WorldRadio
               </h1>
               <span className="hidden sm:inline-block rounded-md bg-accent/15 px-2 py-0.5 text-[10px] font-extrabold text-accent">
-                ORBE 3D
+                GLOBO 3D
               </span>
             </div>
             <p className="mt-0.5 text-[11px] font-bold text-muted flex items-center gap-1.5">

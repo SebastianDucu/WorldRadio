@@ -186,8 +186,9 @@ export function StationSidebar() {
                 <h2 className="text-sm font-bold tracking-tight text-white leading-none">
                   WorldRadio
                 </h2>
-                <span className="rounded-md bg-amber-400/20 px-1.5 py-0.5 text-[10px] font-bold text-amber-400 uppercase tracking-wide">
-                  Orbe
+                <span className="flex items-center gap-1 rounded-md bg-emerald-400/15 border border-emerald-400/25 px-1.5 py-0.5 text-[10px] font-bold text-emerald-400 uppercase tracking-wide">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>EN VIVO</span>
                 </span>
               </div>
               <p className="mt-1 text-xs font-normal text-slate-400">

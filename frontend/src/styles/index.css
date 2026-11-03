@@ -17,7 +17,7 @@
 [data-theme="dark"] {
   --color-bg: 3 8 22;            /* #030816 Cosmic Deep Obsidian */
   --color-surface: 6 14 38;      /* #060E26 Rich Glass Panel */
-  --color-accent: 255 201 74;    /* #FFC94A Orbe Amber Gold */
+  --color-accent: 255 201 74;    /* #FFC94A Radiance Amber Gold */
   --color-accent-2: 225 29 72;   /* #E11D48 Festive Ruby Rose */
   --color-cyan: 255 214 112;     /* #FFD670 Pure Liquid Gold */
   --color-fg: 248 250 255;       /* #F8FAFF Ultra Crisp Snow Text */
@@ -37,7 +37,7 @@
   --liquid-glass-highlight: rgba(255, 230, 150, 0.42);
   color-scheme: dark;
 
-  /* Paleta Navideña Orbe */
+  /* Paleta Navideña */
   --color-xmas-red: 225 29 72;
   --color-xmas-pine: 16 185 129;
   --color-xmas-gold: 255 201 74;
@@ -67,7 +67,7 @@
   color-scheme: light;
 }
 
-/* Modo Navidad Orbe Radio Edition */
+/* Modo Navidad */
 [data-christmas="on"][data-theme="dark"],
 [data-christmas="on"] {
   --color-bg: 4 7 19;            /* #040713 Cosmic Midnight Velvet */
@@ -135,10 +135,10 @@
       135deg,
       rgba(255, 255, 255, 0.08) 0%,
       rgba(255, 255, 255, 0.02) 40%,
-      rgba(10, 16, 36, 0.74) 100%
+      rgba(10, 16, 36, 0.76) 100%
     );
-    backdrop-filter: blur(28px) saturate(200%) contrast(106%);
-    -webkit-backdrop-filter: blur(28px) saturate(200%) contrast(106%);
+    backdrop-filter: blur(18px) saturate(180%);
+    -webkit-backdrop-filter: blur(18px) saturate(180%);
     border: 1px solid rgba(255, 201, 74, 0.22);
     border-top: 1px solid rgba(255, 230, 150, 0.42);
     border-left: 1px solid rgba(255, 255, 255, 0.22);
@@ -148,6 +148,7 @@
       0 0 28px -4px rgba(255, 201, 74, 0.22);
     will-change: transform;
     transform: translateZ(0);
+    backface-visibility: hidden;
   }
 
   .liquid-glass-pill {
@@ -197,24 +198,6 @@
     transform: translateY(-2px);
     border-color: rgba(255, 201, 74, 0.4);
     box-shadow: 0 14px 36px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 201, 74, 0.25);
-  }
-
-  /* Backward compatibility for orbe-glass */
-  .orbe-glass {
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.08) 0%,
-      rgba(255, 255, 255, 0.02) 40%,
-      rgba(10, 16, 36, 0.78) 100%
-    );
-    border: 1px solid rgba(255, 201, 74, 0.22);
-    border-top: 1px solid rgba(255, 230, 150, 0.42);
-    border-left: 1px solid rgba(255, 255, 255, 0.22);
-    backdrop-filter: blur(28px) saturate(190%);
-    -webkit-backdrop-filter: blur(28px) saturate(190%);
-    box-shadow: 0 16px 44px rgba(0, 0, 0, 0.65), inset 0 1px 1px rgba(255, 230, 150, 0.2), var(--glow);
-    will-change: transform;
-    transform: translateZ(0);
   }
 
   /* Marquee Smooth Text Scrolling for Long Station Names */
@@ -273,7 +256,6 @@
 }
 
 /* ===== Fluid Liquid Volume & Dial Slider ===== */
-.orbe-slider,
 .liquid-slider {
   -webkit-appearance: none;
   appearance: none;
@@ -289,7 +271,6 @@
   transition: background 0.1s ease;
 }
 
-.orbe-slider::-webkit-slider-thumb,
 .liquid-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 15px;
@@ -302,7 +283,6 @@
   transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.orbe-slider::-webkit-slider-thumb:hover,
 .liquid-slider::-webkit-slider-thumb:hover {
   transform: scale(1.3);
   box-shadow: 0 0 16px rgba(255, 201, 74, 1), 0 2px 8px rgba(0, 0, 0, 0.5);

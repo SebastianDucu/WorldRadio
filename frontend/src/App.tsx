@@ -37,7 +37,7 @@ export default function App() {
     initStationsDirectory();
   }, []);
 
-  // Global Keyboard Shortcuts matching Orbe Radio
+  // Global Keyboard Shortcuts
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       // Ignore if user is typing in search input
@@ -81,7 +81,7 @@ export default function App() {
       {/* 3. Floating Dynamic Island Liquid HUD at top center */}
       <DynamicIslandHUD />
 
-      {/* Snapshot progress & completion banner matching Orbe Radio */}
+      {/* Snapshot progress & completion banner */}
       <SnapshotBanner />
 
       {/* 4. Main Interactive Stage: 3D WebGL Globe, 2D Map, or Lite Mode */}

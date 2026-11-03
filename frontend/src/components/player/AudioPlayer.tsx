@@ -267,7 +267,7 @@ export function AudioPlayer() {
               <PrevIcon size={18} />
             </button>
 
-            {/* Giant Circular Play/Pause button with radiant Orbe Gold glow */}
+            {/* Giant Circular Play/Pause button with radiant Holiday Gold glow */}
             <button
               type="button"
               onClick={togglePlay}

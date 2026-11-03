@@ -44,10 +44,12 @@ export function WorldGlobe() {
     }
   }, [targetLocation]);
 
-  // Planetary broadcast markers across all countries
+  // Planetary broadcast markers across all countries (dynamically optimized per device)
   const markers = useMemo(() => {
     const list = allStations && allStations.length > 0 ? allStations : STATIONS;
-    const sampled = list.length <= 2200 ? list : list.filter((_, i) => i % Math.ceil(list.length / 2200) === 0);
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+    const maxMarkers = isMobile ? 1100 : 1900;
+    const sampled = list.length <= maxMarkers ? list : list.filter((_, i) => i % Math.ceil(list.length / maxMarkers) === 0);
     const hasCurrent = sampled.some((s) => s.id === currentStation?.id);
     const pool = hasCurrent || !currentStation ? sampled : [currentStation, ...sampled];
 
@@ -83,28 +85,31 @@ export function WorldGlobe() {
         to: toCoord,
         color: isChristmas
           ? ([1.0, 0.79, 0.29] as [number, number, number]) // Warm Holiday Gold
-          : ([0.22, 0.71, 1.0] as [number, number, number]), // Orbe Electric Cyan
+          : ([0.22, 0.71, 1.0] as [number, number, number]), // Electric Cyan
         id: `arc-${i}`,
       }));
   }, [currentStation, isPlaying, isChristmas]);
 
-  // High-Refresh-Rate 240 FPS WebGL Engine
+  // High-Refresh-Rate 120+ FPS Hardware-Accelerated WebGL Engine
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     let width = canvas.offsetWidth;
     const isDark = theme === "dark";
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+    const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2);
+    const globeSize = Math.round(width * dpr);
 
     const globe = createGlobe(canvas, {
-      devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
-      width: width * 2,
-      height: width * 2,
+      devicePixelRatio: dpr,
+      width: globeSize,
+      height: globeSize,
       phi: phiRef.current,
       theta: thetaRef.current,
       dark: isDark ? 1 : 0.75,
       diffuse: 1.4,
-      mapSamples: 24000, // Ultra-high resolution continent mapping
+      mapSamples: isMobile ? 13000 : 18500, // Balanced high-resolution continent mapping
       mapBrightness: isDark ? 7.6 : 9.0,
       baseColor: isDark
         ? isChristmas
