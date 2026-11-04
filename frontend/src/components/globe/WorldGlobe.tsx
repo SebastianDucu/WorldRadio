@@ -120,7 +120,13 @@ export function WorldGlobe() {
     playStation,
   } = usePlayerStore();
 
-  const [autoRotate, setAutoRotate] = useState(true);
+  type RadioPointTuple = [number, number, string, string, string, string, string];
+  const radioPointsRef = useRef<RadioPointTuple[]>([]);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const earthGroupRef = useRef<THREE.Group | null>(null);
+
+  // Auto-rotation disabled by default per user request (only moves when user drags)
+  const [autoRotate, setAutoRotate] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [telemetryCoords, setTelemetryCoords] = useState("LAT 04.7°N · LNG 74.1°W");
@@ -178,6 +184,7 @@ export function WorldGlobe() {
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
     camera.position.set(0, 0, 2.85 / zoomLevel);
+    cameraRef.current = camera;
 
     const renderer = new THREE.WebGLRenderer({
       canvas,
@@ -194,6 +201,7 @@ export function WorldGlobe() {
     earthGroup.rotation.order = "YXZ";
     earthGroup.rotation.y = rotationYRef.current;
     earthGroup.rotation.x = rotationXRef.current;
+    earthGroupRef.current = earthGroup;
     scene.add(earthGroup);
 
     // 3. Texture Loading (NASA Satellite Blue Marble, Specular & Night Lights)
@@ -360,21 +368,52 @@ export function WorldGlobe() {
       scene.add(spaceSnowField);
     }
 
-    // 10. 3D Broadcast Station Markers on Surface
-    const pinsGeo = new THREE.SphereGeometry(0.007, 8, 8);
+    // 10. 3D Broadcast Station Markers on Surface (Radio Garden Constellation)
+    // 2,800 luminous electric cyan radio points covering the Earth
+    const pinsGeo = new THREE.SphereGeometry(0.0055, 6, 6);
     const pinsMat = new THREE.MeshBasicMaterial({
-      color: isChristmas ? 0xffc94a : 0x38b6ff,
+      color: 0x38bdf8, // Luminous electric cyan matching Radio Garden exactly
     });
-    const pinsInstanced = new THREE.InstancedMesh(pinsGeo, pinsMat, stationPins.length);
+
+    let pinsInstanced: THREE.InstancedMesh | null = null;
     const dummy = new THREE.Object3D();
-    stationPins.forEach((st, i) => {
-      const vec = latLngToVector3(st.lat, st.lng, 1.002);
-      dummy.position.copy(vec);
-      dummy.updateMatrix();
-      pinsInstanced.setMatrixAt(i, dummy.matrix);
-    });
-    pinsInstanced.instanceMatrix.needsUpdate = true;
-    earthGroup.add(pinsInstanced);
+
+    const applyRadioPoints = (pts: RadioPointTuple[]) => {
+      if (pinsInstanced) {
+        earthGroup.remove(pinsInstanced);
+        pinsInstanced.geometry.dispose();
+      }
+      pinsInstanced = new THREE.InstancedMesh(pinsGeo, pinsMat, pts.length);
+      for (let i = 0; i < pts.length; i++) {
+        const pt = pts[i];
+        if (!pt) continue;
+        const [lat, lng] = pt;
+        const vec = latLngToVector3(lat, lng, 1.002);
+        dummy.position.copy(vec);
+        dummy.updateMatrix();
+        pinsInstanced.setMatrixAt(i, dummy.matrix);
+      }
+      pinsInstanced.instanceMatrix.needsUpdate = true;
+      earthGroup.add(pinsInstanced);
+    };
+
+    if (radioPointsRef.current.length > 0) {
+      applyRadioPoints(radioPointsRef.current);
+    } else {
+      fetch(`${baseUrl}data/radio_points.json`)
+        .then((res) => res.json())
+        .then((pts: RadioPointTuple[]) => {
+          radioPointsRef.current = pts;
+          applyRadioPoints(pts);
+        })
+        .catch(() => {
+          const fallback = stationPins.map(
+            (s) => [s.lat, s.lng, s.name, s.city, s.countryCode, s.id, s.streamUrl] as RadioPointTuple,
+          );
+          radioPointsRef.current = fallback;
+          applyRadioPoints(fallback);
+        });
+    }
 
     // 11. Lighting Setup
     const sunLight = new THREE.DirectionalLight(0xffffff, 1.85);
@@ -461,9 +500,8 @@ export function WorldGlobe() {
           targetRotYRef.current = null;
           targetRotXRef.current = null;
         }
-      } else if (autoRotate && !isDraggingRef.current && !motionOff && velocityYRef.current === 0) {
-        rotationYRef.current += dt * 0.09;
       }
+      // Note: Globe auto-rotation is disabled; it only moves when dragged by the user or when centering a station.
 
       // Clamp X tilt
       rotationXRef.current = Math.max(-0.85, Math.min(0.85, rotationXRef.current));
@@ -614,35 +652,31 @@ export function WorldGlobe() {
             ctx2d.fillStyle = isChristmas ? `rgba(225, 29, 72, ${opacity})` : `rgba(16, 185, 129, ${opacity})`;
             ctx2d.fill();
 
-            // Satellite live callout tag
-            const flagX = x + 14 * dpr;
-            const flagY = y - 12 * dpr;
+            // Radio Garden Style Callout Tag (e.g. "New York NY, Estados Unidos" / "Bogotá, Colombia")
+            const locationTitle = currentStation.city
+              ? `${currentStation.city}, ${currentStation.country || currentStation.countryCode}`
+              : currentStation.country || currentStation.name;
+
+            ctx2d.font = `bold ${Math.round(10.5 * dpr)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+            const textMetrics = ctx2d.measureText(locationTitle);
+            const tagW = textMetrics.width + 18 * dpr;
+            const tagH = 22 * dpr;
+            const tagX = x - tagW / 2;
+            const tagY = y - 28 * dpr;
+
+            // Sleek dark pill with glowing border matching Radio Garden
+            ctx2d.fillStyle = "rgba(7, 13, 29, 0.92)";
+            ctx2d.strokeStyle = isChristmas ? "rgba(255, 201, 74, 0.85)" : "rgba(56, 189, 248, 0.85)";
+            ctx2d.lineWidth = 1.2 * dpr;
 
             ctx2d.beginPath();
-            ctx2d.moveTo(x, y);
-            ctx2d.lineTo(x + 8 * dpr, y - 8 * dpr);
-            ctx2d.lineTo(flagX, flagY);
-            ctx2d.strokeStyle = "rgba(255, 255, 255, 0.5)";
-            ctx2d.lineWidth = 1 * dpr;
-            ctx2d.stroke();
-
-            const labelText = `EN VIVO · ${currentStation.name} (${currentStation.frequency || "FM"})`;
-            ctx2d.font = `bold ${Math.round(9 * dpr)}px -apple-system, system-ui, sans-serif`;
-            const textMetrics = ctx2d.measureText(labelText);
-            const tagW = textMetrics.width + 12 * dpr;
-            const tagH = 17 * dpr;
-
-            ctx2d.fillStyle = "rgba(3, 8, 22, 0.85)";
-            ctx2d.strokeStyle = isChristmas ? "rgba(255, 201, 74, 0.6)" : "rgba(52, 211, 153, 0.6)";
-            ctx2d.lineWidth = 1 * dpr;
-
-            ctx2d.beginPath();
-            ctx2d.roundRect(flagX, flagY - tagH / 2, tagW, tagH, 4 * dpr);
+            ctx2d.roundRect(tagX, tagY, tagW, tagH, tagH / 2);
             ctx2d.fill();
             ctx2d.stroke();
 
-            ctx2d.fillStyle = isChristmas ? "#FFC94A" : "#34D399";
-            ctx2d.fillText(labelText, flagX + 6 * dpr, flagY + 3.5 * dpr);
+            // Text Typography
+            ctx2d.fillStyle = "#FFFFFF";
+            ctx2d.fillText(locationTitle, tagX + 9 * dpr, tagY + 15 * dpr);
           }
         }
 
@@ -811,10 +845,12 @@ export function WorldGlobe() {
           const clickX = (e.clientX - rect.left) * dpr;
           const clickY = (e.clientY - rect.top) * dpr;
 
+          let tappedLabel = false;
           // Check if any visible country or city label was tapped
           for (const item of visibleLabelsRef.current) {
             const dist = Math.hypot(clickX - item.x, clickY - item.y);
             if (dist < 28 * dpr) {
+              tappedLabel = true;
               flyTo(item.lat, item.lng);
 
               const stationsList = allStations && allStations.length > 0 ? allStations : STATIONS;
@@ -832,6 +868,61 @@ export function WorldGlobe() {
                 if (match) playStation(match);
               }
               break;
+            }
+          }
+
+          // If no prominent label was tapped, check nearest radio transmitter dot
+          const activeCam = cameraRef.current;
+          const activeEarth = earthGroupRef.current;
+          const cWidth = canvasRef.current.clientWidth || window.innerWidth;
+          const cHeight = canvasRef.current.clientHeight || window.innerHeight;
+
+          if (!tappedLabel && activeCam && activeEarth && radioPointsRef.current.length > 0) {
+            let closestPt: RadioPointTuple | null = null;
+            let minPtDist = 24 * dpr;
+
+            for (let i = 0; i < radioPointsRef.current.length; i++) {
+              const pt = radioPointsRef.current[i];
+              if (!pt) continue;
+              const ptLocal = latLngToVector3(pt[0], pt[1], 1.002);
+              const ptWorld = ptLocal.applyEuler(activeEarth.rotation);
+              const normal = ptWorld.clone().normalize();
+              const viewDir = activeCam.position.clone().sub(ptWorld).normalize();
+
+              if (normal.dot(viewDir) > 0.08) {
+                const scr = ptWorld.project(activeCam);
+                const px = ((scr.x * 0.5 + 0.5) * cWidth) * dpr;
+                const py = ((-scr.y * 0.5 + 0.5) * cHeight) * dpr;
+                const d = Math.hypot(clickX - px, clickY - py);
+                if (d < minPtDist) {
+                  minPtDist = d;
+                  closestPt = pt;
+                }
+              }
+            }
+
+            if (closestPt) {
+              const [lat, lng, name, city, cc, id, streamUrl] = closestPt;
+              flyTo(lat, lng);
+              if (cc) setSelectedCountryCode(cc);
+              if (city) setSelectedCity(city);
+              playStation({
+                id,
+                name: name || "Emisora Local",
+                city: city || "",
+                country: cc || "",
+                countryCode: cc || "",
+                streamUrl,
+                lat,
+                lng,
+                genre: "General",
+                tags: [],
+                bitrate: 128,
+                codec: "MP3",
+                frequency: "LIVE",
+                hue: Math.floor(Math.random() * 360),
+                description: `Emisora transmitiendo en vivo desde ${city || cc}`,
+              });
             }
           }
         }

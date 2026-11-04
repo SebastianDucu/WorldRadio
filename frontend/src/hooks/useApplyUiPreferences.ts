@@ -1,11 +1,12 @@
 import { useEffect } from "react";
-import { isChristmasSeason } from "@/lib/christmas";
 import { useUiStore } from "@/store/ui";
 
 /** Calcula si el modo Navidad está activo según la preferencia y la fecha. */
 export function useChristmasActive(): boolean {
   const mode = useUiStore((s) => s.christmas);
-  return mode === "on" || (mode === "auto" && isChristmasSeason());
+  // Siempre activo por defecto a menos que el usuario lo desactive explícitamente en configuración
+  if (mode === "off") return false;
+  return true;
 }
 
 /** Refleja tema, Navidad y movimiento en atributos de <html> para que el CSS reaccione. */

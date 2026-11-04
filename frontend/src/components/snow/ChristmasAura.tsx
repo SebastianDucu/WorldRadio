@@ -30,7 +30,7 @@ export function ChristmasAura() {
     const triggerSleigh = () => {
       setSleighProgress(-380);
       const startTime = performance.now();
-      const duration = 15000; // 15 seconds to glide across the celestial sky
+      const duration = 13000; // 13 seconds to glide gracefully across the celestial sky
 
       const animateSleigh = (now: number) => {
         const elapsed = now - startTime;
@@ -41,16 +41,16 @@ export function ChristmasAura() {
           animFrame = requestAnimationFrame(animateSleigh);
         } else {
           setSleighFlightCount((prev) => prev + 1);
-          // Trigger next flight after 10-18 seconds for lively Christmas ambiance
-          timeoutId = window.setTimeout(triggerSleigh, 10000 + Math.random() * 8000);
+          // Frequent flyovers (every 7-14 seconds) for rich Christmas ambiance
+          timeoutId = window.setTimeout(triggerSleigh, 7000 + Math.random() * 7000);
         }
       };
 
       animFrame = requestAnimationFrame(animateSleigh);
     };
 
-    // First appearance shortly after loading
-    timeoutId = window.setTimeout(triggerSleigh, 1800);
+    // Fly shortly after loading so it's immediately seen
+    timeoutId = window.setTimeout(triggerSleigh, 400);
 
     return () => {
       clearTimeout(timeoutId);
@@ -79,21 +79,21 @@ export function ChristmasAura() {
     };
     window.addEventListener("resize", onResize, { passive: true });
 
-    // Multi-layer snow & golden stardust particles (optimized per device)
+    // Multi-layer snow & golden stardust particles (dense and clearly visible)
     const isMobile = width < 768;
-    const flakeCount = isMobile ? Math.min(52, Math.floor(width / 14)) : Math.min(115, Math.floor(width / 11));
+    const flakeCount = isMobile ? Math.min(80, Math.floor(width / 9)) : Math.min(160, Math.floor(width / 7.5));
     const flakes: SnowFlake[] = Array.from({ length: flakeCount }, () => {
       const typeRoll = Math.random();
       const type: "soft" | "crystal" | "gold" =
-        typeRoll < 0.22 ? "gold" : typeRoll < 0.48 ? "crystal" : "soft";
+        typeRoll < 0.25 ? "gold" : typeRoll < 0.52 ? "crystal" : "soft";
 
       return {
         x: Math.random() * width,
         y: Math.random() * height,
-        radius: type === "soft" ? Math.random() * 2.8 + 1.2 : type === "crystal" ? Math.random() * 2.2 + 1.5 : Math.random() * 1.8 + 0.8,
-        speed: type === "soft" ? Math.random() * 1.1 + 0.4 : type === "crystal" ? Math.random() * 0.9 + 0.35 : Math.random() * 0.7 + 0.25,
-        wind: Math.random() * 0.6 - 0.3,
-        alpha: Math.random() * 0.55 + 0.4,
+        radius: type === "soft" ? Math.random() * 3.2 + 1.4 : type === "crystal" ? Math.random() * 2.6 + 1.6 : Math.random() * 2.0 + 1.0,
+        speed: type === "soft" ? Math.random() * 1.3 + 0.5 : type === "crystal" ? Math.random() * 1.0 + 0.4 : Math.random() * 0.8 + 0.3,
+        wind: Math.random() * 0.7 - 0.35,
+        alpha: Math.random() * 0.4 + 0.6,
         oscillation: Math.random() * Math.PI * 2,
         type,
       };
