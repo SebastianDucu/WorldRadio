@@ -47,7 +47,6 @@ export function StationDetailsModal({ station, isOpen, onClose }: StationDetails
         className="glass relative w-full max-w-lg overflow-hidden border border-white/15 bg-surface/95 p-6 shadow-2xl backdrop-blur-2xl text-fg"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Top Header */}
         <div className="flex items-start justify-between border-b border-white/10 pb-4">
           <div className="flex items-center gap-3.5">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/20 text-accent border border-accent/30 shadow-inner">
@@ -75,14 +74,12 @@ export function StationDetailsModal({ station, isOpen, onClose }: StationDetails
           </button>
         </div>
 
-        {/* Station Description */}
         {station.description && (
           <p className="mt-4 text-xs font-medium leading-relaxed text-muted/90 bg-surface/60 p-3.5 rounded-xl border border-white/5">
             {station.description}
           </p>
         )}
 
-        {/* Technical Data Grid */}
         <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
           <div className="rounded-xl bg-surface/70 p-3 border border-white/5">
             <span className="text-[11px] font-bold text-muted block">Calidad de Audio</span>
@@ -130,7 +127,6 @@ export function StationDetailsModal({ station, isOpen, onClose }: StationDetails
           </div>
         </div>
 
-        {/* Tags */}
         {station.tags && station.tags.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-1.5">
             {station.tags.map((tag) => (
@@ -144,7 +140,6 @@ export function StationDetailsModal({ station, isOpen, onClose }: StationDetails
           </div>
         )}
 
-        {/* Action Buttons */}
         <div className="mt-6 flex items-center justify-between gap-3 border-t border-white/10 pt-4">
           <button
             onClick={() => toggleFavorite(station.id)}

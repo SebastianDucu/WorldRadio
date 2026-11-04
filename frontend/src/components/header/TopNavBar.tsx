@@ -36,7 +36,7 @@ export function TopNavBar() {
   return (
     <header className="fixed top-0 inset-x-0 z-30 p-2.5 sm:p-4 pointer-events-none">
       <div className="glass pointer-events-auto mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 border border-white/10 bg-surface/85 px-4 py-2.5 shadow-2xl backdrop-blur-2xl">
-        {/* Left: Branding & Station Counter */}
+
         <div className="flex items-center gap-3">
           <button
             onClick={toggleSidebar}
@@ -69,7 +69,6 @@ export function TopNavBar() {
           </div>
         </div>
 
-        {/* Center: Search & Quick Genre Filters */}
         <div className="flex flex-1 max-w-lg items-center gap-2 order-last md:order-none w-full md:w-auto">
           <div className="relative flex-1 flex items-center">
             <SearchIcon size={16} className="absolute left-3 text-muted pointer-events-none" />
@@ -91,7 +90,6 @@ export function TopNavBar() {
             )}
           </div>
 
-          {/* Quick Christmas Pill Shortcut */}
           <button
             onClick={() => {
               setSelectedGenre("Navideña");
@@ -108,9 +106,7 @@ export function TopNavBar() {
           </button>
         </div>
 
-        {/* Right: Actions & Theme Controls */}
         <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Quick Random Station */}
           <IconButton
             size="sm"
             label="Sintonizar radio al azar"
@@ -118,7 +114,6 @@ export function TopNavBar() {
             onClick={randomStation}
           />
 
-          {/* 3D / 2D View Switch */}
           <IconButton
             size="sm"
             label={viewMode === "globe" ? "Cambiar a Mapa 2D" : "Cambiar a Globo 3D"}
@@ -126,7 +121,6 @@ export function TopNavBar() {
             onClick={() => setViewMode(viewMode === "globe" ? "map" : "globe")}
           />
 
-          {/* Christmas Atmosphere Toggle */}
           <IconButton
             size="sm"
             label={isChristmas ? "Desactivar aura navideña" : "Activar ambiente navideño"}
@@ -135,7 +129,6 @@ export function TopNavBar() {
             onClick={() => setChristmas(isChristmas ? "off" : "on")}
           />
 
-          {/* Dark / Light Theme Toggle */}
           <IconButton
             size="sm"
             label={theme === "dark" ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
@@ -145,7 +138,6 @@ export function TopNavBar() {
 
           <div className="h-6 w-px bg-white/10 hidden sm:block" />
 
-          {/* Toggle Sidebar Button */}
           <button
             onClick={toggleSidebar}
             className={`flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-extrabold transition-all active:scale-95 border ${
@@ -160,7 +152,6 @@ export function TopNavBar() {
         </div>
       </div>
 
-      {/* Floating Category Pills below top bar for rapid exploration */}
       <div className="pointer-events-auto mx-auto mt-2 flex max-w-7xl gap-1.5 overflow-x-auto px-1 py-1 scrollbar-none">
         {GENRE_CATEGORIES.map((genre) => {
           const isSelected = selectedGenre === genre;

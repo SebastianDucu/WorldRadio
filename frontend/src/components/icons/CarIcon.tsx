@@ -10,4 +10,3 @@ export function CarIcon(props: IconProps) {
     </IconBase>
   );
 }
-

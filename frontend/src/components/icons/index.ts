@@ -33,7 +33,6 @@ export { MoonIcon } from "./MoonIcon";
 export { SpinnerIcon } from "./SpinnerIcon";
 export { AlertIcon } from "./AlertIcon";
 
-// Next-gen SVG icons
 export { CarIcon } from "./CarIcon";
 export { TargetIcon } from "./TargetIcon";
 export { TimerIcon } from "./TimerIcon";

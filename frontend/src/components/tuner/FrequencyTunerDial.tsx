@@ -20,7 +20,6 @@ export function FrequencyTunerDial() {
 
   if (!tunerDialModalOpen) return null;
 
-  // Stations mapped to frequencies
   const nearbyStations = useMemo(() => {
     return STATIONS.filter((s) => {
       if (!s.frequency) return false;
@@ -48,7 +47,6 @@ export function FrequencyTunerDial() {
         className="liquid-glass relative w-full max-w-lg overflow-hidden rounded-3xl p-6 text-[#eaf4ff] shadow-2xl border border-white/20"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header with SVG RadioIcon */}
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
           <div className="flex items-center gap-2.5">
             <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-400/20 text-amber-400 border border-amber-400/30 shadow-inner">
@@ -82,7 +80,6 @@ export function FrequencyTunerDial() {
           </div>
         </div>
 
-        {/* Big LED Frequency Display */}
         <div className="mt-5 flex flex-col items-center justify-center rounded-2xl bg-slate-950/80 p-5 border border-amber-400/20 shadow-inner">
           <span className="text-xs font-mono tracking-widest text-amber-400 uppercase font-bold">
             Banda FM Comercial
@@ -101,7 +98,6 @@ export function FrequencyTunerDial() {
           )}
         </div>
 
-        {/* Analog Slider Tape */}
         <div className="mt-5 space-y-2">
           <div className="flex justify-between text-xs font-mono font-semibold text-slate-400 px-1">
             <span>87.5 FM</span>
@@ -129,7 +125,6 @@ export function FrequencyTunerDial() {
               } as React.CSSProperties}
             />
 
-            {/* Simulated analog tick marks */}
             <div className="flex justify-between px-2 mt-2 h-2 pointer-events-none opacity-40">
               {Array.from({ length: 41 }).map((_, i) => (
                 <span
@@ -141,7 +136,6 @@ export function FrequencyTunerDial() {
           </div>
         </div>
 
-        {/* Stations detected near current dial frequency */}
         <div className="mt-5">
           <label className="text-xs font-semibold text-slate-400 block mb-2">
             Emisoras detectadas en esta frecuencia:

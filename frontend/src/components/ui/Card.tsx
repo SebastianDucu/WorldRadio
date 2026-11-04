@@ -2,7 +2,7 @@ import type { HTMLAttributes } from "react";
 import { cn } from "@/lib/cn";
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
-  /** Eleva ligeramente la tarjeta al pasar el cursor (para tarjetas pulsables). */
+
   interactive?: boolean;
 }
 

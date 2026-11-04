@@ -66,7 +66,6 @@ export async function initStationsDirectory() {
 
   const store = usePlayerStore.getState();
 
-  // 1. Initial Instant Bootstrap: Load 174 canonical countries from local JSON
   let base174Countries: CountryInfo[] = [];
   try {
     const res = await fetch("./data/countries.json");
@@ -81,14 +80,13 @@ export async function initStationsDirectory() {
     console.warn("Failed loading bundled countries.json:", err);
   }
 
-  // 2. Check IndexedDB cache
   const cached = await getCachedSnapshot();
   const ONE_DAY = 24 * 60 * 60 * 1000;
   if (cached && cached.stations && cached.stations.length > 1000 && Date.now() - cached.timestamp < ONE_DAY) {
     const merged = [...STATIONS, ...cached.stations.filter((s) => !STATIONS.some((cur) => cur.id === s.id))];
     store.setAllStations(merged);
     if (cached.countries && cached.countries.length > 0) {
-      // Ensure strictly 174 countries from cache or fallback
+
       const canonical = base174Countries.length > 0 ? base174Countries : COUNTRIES;
       const cachedMap = new Map(cached.countries.map((c) => [c.code.toUpperCase(), c]));
       const sanitizedCountries = canonical.map((base: CountryInfo) => {
@@ -101,21 +99,19 @@ export async function initStationsDirectory() {
     return;
   }
 
-  // 3. Download Full Snapshot in background with live progress
   store.setDirectoryStatus("loading", 0.05, 0);
 
   try {
-    const metaRes = await fetch("https://orberadio.com/stations-all.meta.json", { cache: "no-cache" });
+    const metaRes = await fetch("https://worldradio.app/stations-all.meta.json", { cache: "no-cache" });
     if (!metaRes.ok) throw new Error("Metadata request failed");
     const meta = await metaRes.json();
     const totalBytes = meta.bytes || 7400000;
 
-    const dataRes = await fetch(`https://orberadio.com/stations-all.json?v=${encodeURIComponent(meta.ver)}`, {
+    const dataRes = await fetch(`https://worldradio.app/stations-all.json?v=${encodeURIComponent(meta.ver)}`, {
       cache: "no-cache",
     });
     if (!dataRes.ok || !dataRes.body) throw new Error("Dataset request failed");
 
-    // Read streamed chunks for real-time progress bar
     const reader = dataRes.body.getReader();
     const decoder = new TextDecoder();
     let text = "";
@@ -142,7 +138,6 @@ export async function initStationsDirectory() {
     const cn: Record<string, string> = parsed.cn || {};
     const rows: unknown[][] = parsed.rows;
 
-    // Seed countryMap strictly with the canonical 174 countries
     const canonicalCountries = base174Countries.length > 0 ? base174Countries : COUNTRIES;
     const countryMap = new Map<string, CountryInfo>();
     for (const c of canonicalCountries) {
@@ -154,7 +149,6 @@ export async function initStationsDirectory() {
     const parsedStations: Station[] = [];
     const seedIds = new Set(STATIONS.map((s) => s.id));
 
-    // Coordinate centers for country fallback placement
     const countryCoords = new Map<string, { lat: number; lng: number }>();
 
     for (let i = 0; i < rows.length; i++) {
@@ -176,7 +170,6 @@ export async function initStationsDirectory() {
         countryCoords.set(cc, { lat, lng });
       }
 
-      // If missing geo, place near country centroid with slight jitter
       if (lat == null || lng == null) {
         const center = countryCoords.get(cc);
         if (center) {
@@ -185,7 +178,7 @@ export async function initStationsDirectory() {
           lat = center.lat + jitterLat;
           lng = center.lng + jitterLng;
         } else {
-          continue; // Skip stations with completely unknown country/geo
+          continue; 
         }
       }
 
@@ -228,7 +221,6 @@ export async function initStationsDirectory() {
       });
     }
 
-    // Sort 174 countries alphabetically in Spanish
     const sortedCountries = [...countryMap.values()]
       .sort((a, b) => a.name.localeCompare(b.name, "es"));
 
@@ -240,7 +232,6 @@ export async function initStationsDirectory() {
     }
     store.setDirectoryStatus("done", 1, parsedStations.length);
 
-    // Persist to IndexedDB
     await setCachedSnapshot({
       stations: parsedStations,
       countries: sortedCountries,

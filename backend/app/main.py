@@ -1,4 +1,3 @@
-"""Punto de entrada de la API de WorldRadio."""
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
@@ -28,10 +27,10 @@ app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(GZipMiddleware, minimum_size=500)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origin_list,  # solo el dominio del frontend
+    allow_origins=settings.cors_origin_list,
     allow_methods=["GET", "POST"],
     allow_headers=["Content-Type", "X-Admin-Token"],
-    allow_credentials=False,  # sin cookies
+    allow_credentials=False,
 )
 
 app.include_router(health.router, prefix="/api")

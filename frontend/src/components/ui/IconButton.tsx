@@ -3,12 +3,12 @@ import { cn } from "@/lib/cn";
 import { Tooltip } from "./Tooltip";
 
 export interface IconButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "aria-label"> {
-  /** Obligatorio: nombre accesible y texto del tooltip. */
+
   label: string;
   icon: ReactNode;
   size?: "sm" | "md" | "lg";
   active?: boolean;
-  /** Muestra el tooltip (desactívalo si el botón ya tiene texto cerca). */
+
   tooltip?: boolean;
 }
 

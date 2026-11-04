@@ -21,7 +21,6 @@ export function AudioEqualizerModal() {
     setVisualizerMode,
   } = usePlayerStore();
 
-  // 5-band Equalizer visual gains (dB from -10 to +10)
   const defaultBands: Record<EqualizerPreset, number[]> = {
     flat: [0, 0, 0, 0, 0],
     bass: [8, 5, 1, 0, -1],
@@ -90,7 +89,6 @@ export function AudioEqualizerModal() {
         className="liquid-glass relative w-full max-w-md overflow-hidden rounded-3xl p-6 text-[#eaf4ff] shadow-2xl border border-white/20"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header with SVG EqualizerIcon */}
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
           <div className="flex items-center gap-2.5">
             <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-500/20 text-sky-400 border border-sky-400/30 shadow-inner">
@@ -115,7 +113,6 @@ export function AudioEqualizerModal() {
           </button>
         </div>
 
-        {/* Presets Grid */}
         <div className="mt-4">
           <label className="text-xs font-semibold text-slate-400 block mb-2">
             Perfiles de audio predefinidos:
@@ -142,7 +139,6 @@ export function AudioEqualizerModal() {
           </div>
         </div>
 
-        {/* 5-Band Equalizer Sliders */}
         <div className="mt-5 rounded-2xl bg-slate-900/70 p-4 border border-white/5">
           <div className="flex items-center justify-between mb-3 text-sm">
             <span className="font-semibold text-white">Bandas de Frecuencia</span>
@@ -160,7 +156,6 @@ export function AudioEqualizerModal() {
                     {gain > 0 ? `+${gain}` : gain}dB
                   </span>
 
-                  {/* Vertical Range Slider */}
                   <div className="relative flex items-center justify-center h-20 w-4">
                     <input
                       type="range"
@@ -181,7 +176,6 @@ export function AudioEqualizerModal() {
           </div>
         </div>
 
-        {/* Visualizer Mode Switch */}
         <div className="mt-4 flex items-center justify-between rounded-2xl bg-slate-900/50 p-3 border border-white/5">
           <span className="text-sm font-semibold text-slate-300">Estilo de Visualizador:</span>
           <div className="flex gap-1">

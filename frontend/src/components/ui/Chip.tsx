@@ -5,7 +5,6 @@ interface ChipProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   selected?: boolean;
 }
 
-/** Etiqueta pulsable para filtros (género, idioma). Es un interruptor accesible (aria-pressed). */
 export function Chip({ selected = false, className, children, type = "button", ...rest }: ChipProps) {
   return (
     <button

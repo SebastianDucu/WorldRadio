@@ -9,4 +9,3 @@ export function MicIcon(props: IconProps) {
     </IconBase>
   );
 }
-

@@ -20,15 +20,12 @@ import { toast } from "@/store/toast";
 import { usePlayerStore } from "@/store/player";
 import { getStationTimeInfo } from "@/lib/timeZones";
 import { useLiveListeners } from "@/hooks/useLiveListeners";
-import { useChristmasActive } from "@/hooks/useApplyUiPreferences";
-import { SnowCap } from "@/components/snow/SnowCap";
 import { LiquidVisualizer } from "./LiquidVisualizer";
 import { StationDetailsModal } from "./StationDetailsModal";
 
 export function AudioPlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
-  const isChristmas = useChristmasActive();
 
   const {
     currentStation,
@@ -63,14 +60,12 @@ export function AudioPlayer() {
     setTimeInfo(getStationTimeInfo(currentStation));
   }, [currentStation]);
 
-  // Synchronize volume and mute with HTML5 audio
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = muted ? 0 : volume;
     }
   }, [volume, muted]);
 
-  // Mobile Lock Screen, Dynamic Island & Bluetooth Background Media Controls (iOS & Android)
   useEffect(() => {
     if (!("mediaSession" in navigator)) return;
 
@@ -114,7 +109,6 @@ export function AudioPlayer() {
     };
   }, [currentStation, isPlaying, setIsPlaying, prevStation, nextStation]);
 
-  // Handle stream play/pause changes with automatic recovery
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -192,23 +186,9 @@ export function AudioPlayer() {
         />
 
         <div className="relative mx-auto max-w-4xl">
-          {/* Winter Snow Cap over player bar */}
-          {isChristmas && <SnowCap />}
-
           <div className="liquid-glass flex items-center justify-between gap-2.5 sm:gap-3 rounded-2xl sm:rounded-3xl px-3 sm:px-4 py-2 sm:py-2.5 shadow-2xl border border-amber-400/25">
-            {/* Left: Station Identity & Marquee Title */}
             <div className="flex min-w-0 flex-1 items-center gap-2.5 sm:gap-3">
-              {/* Frequency Badge with golden border & festive Santa Hat */}
               <div className="relative shrink-0">
-                {isChristmas && (
-                  <div className="absolute -top-3.5 -left-2 z-20 pointer-events-none drop-shadow-md select-none transform -rotate-12 animate-[bounce_5s_infinite]">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                      <path d="M4 16C5.5 10 9 6 14 5c2.5 1 4.5 5 5 11" fill="#E11D48" stroke="#991B1B" strokeWidth="1" />
-                      <rect x="2.5" y="15" width="18" height="4" rx="2" fill="#FFFFFF" />
-                      <circle cx="15.5" cy="4.5" r="2.5" fill="#FFFFFF" />
-                    </svg>
-                  </div>
-                )}
                 <div
                   onClick={() => setDetailsOpen(true)}
                   className="flex h-10 w-10 sm:h-11 sm:w-11 cursor-pointer items-center justify-center rounded-xl font-bold text-xs text-white shadow-md transition-all duration-200 hover:scale-105 active:scale-95"
@@ -247,7 +227,6 @@ export function AudioPlayer() {
                   )}
                 </div>
 
-                {/* Subtitle with live indicator dot, kbps quality & LIVE LISTENERS COUNTER */}
                 <div className="flex items-center gap-1.5 text-[11px] sm:text-xs font-normal text-slate-400 truncate mt-0.5">
                   {currentStation ? (
                     <>
@@ -262,7 +241,6 @@ export function AudioPlayer() {
                       <span>·</span>
                       <span className="text-amber-400 font-semibold shrink-0">{currentStation.bitrate}k</span>
                       <span>·</span>
-                      {/* Live Listeners Badge */}
                       <span
                         className="flex items-center gap-1 text-emerald-400 font-mono font-semibold shrink-0"
                         title={`${liveListeners.fullString} personas escuchando esta emisora en vivo`}
@@ -287,7 +265,6 @@ export function AudioPlayer() {
               </div>
             </div>
 
-          {/* Center: Controls & Liquid Visualizer */}
           <div className="flex items-center justify-center gap-1.5 sm:gap-2 shrink-0">
             <button
               onClick={prevStation}
@@ -297,7 +274,6 @@ export function AudioPlayer() {
               <PrevIcon size={18} />
             </button>
 
-            {/* Giant Circular Play/Pause button with radiant Holiday Gold glow */}
             <button
               type="button"
               onClick={togglePlay}
@@ -326,7 +302,6 @@ export function AudioPlayer() {
               <NextIcon size={18} />
             </button>
 
-            {/* Keep Centered / Continuar escuchando button with Target SVG */}
             <button
               onClick={toggleKeepCentered}
               className={`hidden md:flex h-8 w-8 items-center justify-center rounded-full transition-all active:scale-90 ${
@@ -339,7 +314,6 @@ export function AudioPlayer() {
               <TargetIcon size={17} />
             </button>
 
-            {/* Silenciar button with Volume/Mute SVG */}
             <button
               onClick={toggleMute}
               className={`hidden sm:flex h-8 w-8 items-center justify-center rounded-full transition-all active:scale-90 ${
@@ -352,7 +326,6 @@ export function AudioPlayer() {
               {muted ? <MuteIcon size={18} /> : <VolumeIcon size={18} />}
             </button>
 
-            {/* Sleep Timer SVG Trigger */}
             <button
               onClick={() => setSleepTimerModalOpen(true)}
               className={`hidden sm:flex h-8 w-8 items-center justify-center rounded-full transition-all active:scale-90 ${
@@ -366,7 +339,6 @@ export function AudioPlayer() {
             </button>
           </div>
 
-          {/* Right: Volume with Liquid Waveform */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <div className="hidden md:flex flex-col justify-center w-28">
               <input
@@ -381,13 +353,11 @@ export function AudioPlayer() {
                 aria-label="Volumen"
               />
 
-              {/* Embedded Mini Visualizer under volume slider */}
               <div className="mt-1 h-3 flex items-center justify-center overflow-hidden">
                 <LiquidVisualizer width={110} height={12} interactive={false} />
               </div>
             </div>
 
-            {/* 3D / 2D Perspective Toggle */}
             <button
               onClick={() => setViewMode(viewMode === "globe" ? "map" : "globe")}
               className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-800 text-slate-300 hover:text-white transition-all duration-200 active:scale-95 border border-white/5"
@@ -400,7 +370,6 @@ export function AudioPlayer() {
       </div>
     </footer>
 
-      {/* Technical Station Details Modal */}
       <StationDetailsModal
         station={currentStation}
         isOpen={detailsOpen}

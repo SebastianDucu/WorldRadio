@@ -19,13 +19,12 @@ export const useToastStore = create<ToastState>((set, get) => ({
   toasts: [],
   push: (message, tone = "info", durationMs = 4000) => {
     const id = nextId++;
-    set((s) => ({ toasts: [...s.toasts.slice(-3), { id, message, tone }] })); // máx. 4 visibles
+    set((s) => ({ toasts: [...s.toasts.slice(-3), { id, message, tone }] }));
     window.setTimeout(() => get().dismiss(id), durationMs);
   },
   dismiss: (id) => set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) })),
 }));
 
-/** Atajo para usar fuera de componentes: toast.success("Guardado"). */
 export const toast = {
   info: (m: string) => useToastStore.getState().push(m, "info"),
   success: (m: string) => useToastStore.getState().push(m, "success"),

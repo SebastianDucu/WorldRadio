@@ -15,7 +15,7 @@ export function getStationBaseListeners(station: Station | null): number {
   if (station.listeners && station.listeners > 0) return station.listeners;
 
   const h = hashString(station.id || station.name);
-  // Major stations get 2,500 - 9,500, niche get 280 - 1,800
+
   const isMajor = station.bitrate >= 192 || station.name.length < 12;
   const base = isMajor ? 2800 + (h % 6200) : 340 + (h % 1800);
   return base;
@@ -37,12 +37,10 @@ export function useLiveListeners(station: Station | null) {
 
     if (!station) return;
 
-    // Organic drift every 4.5 seconds to simulate listeners joining & leaving
     const interval = setInterval(() => {
       setListeners((prev) => {
-        const delta = Math.floor(Math.random() * 7) - 3; // -3 to +3
+        const delta = Math.floor(Math.random() * 7) - 3; 
         const updated = prev + delta;
-        // Keep within 15% range of base
         const min = Math.floor(base * 0.85);
         const max = Math.ceil(base * 1.15);
         return Math.max(min, Math.min(max, updated));
@@ -58,4 +56,3 @@ export function useLiveListeners(station: Station | null) {
     fullString: listeners.toLocaleString("es-ES"),
   };
 }
-

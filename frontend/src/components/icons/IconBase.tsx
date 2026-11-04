@@ -1,18 +1,14 @@
 import type { ReactNode, SVGProps } from "react";
 
 export interface IconProps extends Omit<SVGProps<SVGSVGElement>, "children"> {
-  /** Tamaño en px (o cualquier unidad CSS). Por defecto 24. */
+
   size?: number | string;
-  /** Si se pasa, el icono es informativo (role="img"); si no, es decorativo (aria-hidden). */
+
   title?: string;
-  /** Relleno sólido con currentColor (corazón lleno, play, etc.). */
+
   filled?: boolean;
 }
 
-/**
- * Base común de todos los iconos: viewBox 24×24, trazo 1.75 px, extremos redondeados
- * y color heredado con currentColor.
- */
 export function IconBase({ size = 24, title, filled = false, children, ...rest }: IconProps & { children: ReactNode }) {
   const labelled = Boolean(title) || Boolean(rest["aria-label"]);
   return (

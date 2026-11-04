@@ -23,7 +23,6 @@ export function DriveModeModal() {
     favorites,
   } = usePlayerStore();
 
-  // Keyboard shortcut: Esc to exit
   useEffect(() => {
     if (!driveMode) return;
     const onKeyDown = (e: KeyboardEvent) => {
@@ -37,7 +36,6 @@ export function DriveModeModal() {
 
   if (!driveMode) return null;
 
-  // Selected drive pool: Favorites or top 6 curated stations
   const driveStations = favorites.length >= 4
     ? STATIONS.filter((s) => favorites.includes(s.id)).slice(0, 6)
     : STATIONS.slice(0, 6);
@@ -53,7 +51,7 @@ export function DriveModeModal() {
           "radial-gradient(120% 70% at 50% 0%, rgba(30, 107, 255, 0.28), transparent 60%), radial-gradient(90% 60% at 50% 110%, rgba(56, 182, 255, 0.16), transparent 60%)",
       }}
     >
-      {/* Top Header with CarIcon SVG */}
+
       <header className="flex items-center justify-between border-b border-white/10 pb-4">
         <div className="flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-amber-400/20 text-amber-400 border border-amber-400/40 shadow-lg">
@@ -81,7 +79,6 @@ export function DriveModeModal() {
         </button>
       </header>
 
-      {/* Main 6-Tile Grid */}
       <main className="my-auto grid grid-cols-2 sm:grid-cols-3 gap-3.5 sm:gap-5 py-4 max-w-5xl mx-auto w-full">
         {driveStations.map((station) => {
           const isCurrent = station.id === currentStation?.id;
@@ -103,7 +100,6 @@ export function DriveModeModal() {
                   : "bg-slate-900/70 hover:bg-slate-800/80 border-white/10 hover:border-white/25"
               }`}
             >
-              {/* Giant Frequency Badge */}
               <div
                 className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-2xl sm:rounded-3xl shadow-md transition-transform group-hover:scale-105"
                 style={{
@@ -117,7 +113,6 @@ export function DriveModeModal() {
                 </span>
               </div>
 
-              {/* Station Label */}
               <span className="mt-3 text-sm sm:text-base font-semibold text-white text-center line-clamp-1">
                 {station.name}
               </span>
@@ -125,7 +120,6 @@ export function DriveModeModal() {
                 {station.city}, {station.country}
               </span>
 
-              {/* Active Soundwave Indicator */}
               {isCurrentPlaying && (
                 <div className="mt-2 flex items-center gap-1">
                   <span className="h-4 w-1 rounded-full bg-amber-400 animate-[pulse_0.6s_ease-in-out_infinite]" />
@@ -138,7 +132,6 @@ export function DriveModeModal() {
         })}
       </main>
 
-      {/* Bottom Giant Controls */}
       <footer className="flex flex-col items-center justify-center gap-3 border-t border-white/10 pt-4 max-w-xl mx-auto w-full">
         {currentStation && (
           <div className="text-center">

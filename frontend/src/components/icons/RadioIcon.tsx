@@ -11,4 +11,3 @@ export function RadioIcon(props: IconProps) {
     </IconBase>
   );
 }
-

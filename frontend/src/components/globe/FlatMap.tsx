@@ -7,7 +7,6 @@ export function FlatMap() {
   const { currentStation, playStation } = usePlayerStore();
   const isChristmas = useChristmasActive();
 
-  // Convert lat [-90, 90] and lng [-180, 180] to SVG coords [0..1000, 0..500]
   const project = (lat: number, lng: number) => {
     const x = ((lng + 180) / 360) * 1000;
     const y = ((90 - lat) / 180) * 500;
@@ -45,52 +44,47 @@ export function FlatMap() {
               </radialGradient>
             </defs>
 
-            {/* Background Grid */}
             <rect width="1000" height="500" fill="url(#grid)" />
 
-            {/* Equator & Prime Meridian */}
             <line x1="0" y1="250" x2="1000" y2="250" stroke="currentColor" strokeDasharray="4 4" strokeWidth="1" className="text-muted/30" />
             <line x1="500" y1="0" x2="500" y2="500" stroke="currentColor" strokeDasharray="4 4" strokeWidth="1" className="text-muted/30" />
 
-            {/* Continents rough silhouettes */}
-            {/* North America */}
             <path
               d="M 120 70 Q 180 60 260 70 Q 320 100 280 180 Q 240 220 200 240 Q 140 180 120 120 Z"
               fill="currentColor"
               className="text-muted/10 transition-colors"
             />
-            {/* South America */}
+
             <path
               d="M 230 250 Q 340 260 320 360 Q 290 440 250 480 Q 210 400 220 300 Z"
               fill="currentColor"
               className="text-muted/10 transition-colors"
             />
-            {/* Europe */}
+
             <path
               d="M 460 80 Q 550 70 580 140 Q 530 180 470 170 Q 450 120 460 80 Z"
               fill="currentColor"
               className="text-muted/10 transition-colors"
             />
-            {/* Africa */}
+
             <path
               d="M 460 180 Q 580 190 560 300 Q 530 400 480 410 Q 420 320 440 220 Z"
               fill="currentColor"
               className="text-muted/10 transition-colors"
             />
-            {/* Asia */}
+
             <path
               d="M 580 80 Q 820 60 860 160 Q 820 260 700 260 Q 600 200 580 120 Z"
               fill="currentColor"
               className="text-muted/10 transition-colors"
             />
-            {/* Australia */}
+
             <path
               d="M 760 320 Q 890 320 880 400 Q 810 440 760 410 Q 740 360 760 320 Z"
               fill="currentColor"
               className="text-muted/10 transition-colors"
             />
 
-            {/* Station markers */}
             {STATIONS.map((station) => {
               const { x, y } = project(station.lat, station.lng);
               const isCurrent = station.id === currentStation?.id;

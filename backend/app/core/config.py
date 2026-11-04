@@ -1,6 +1,4 @@
-"""Configuración central. Todo se lee de variables de entorno (ver .env.example)."""
 from functools import lru_cache
-
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -11,7 +9,7 @@ class Settings(BaseSettings):
     environment: str = "development"
     database_url: str = "sqlite:///./worldradio.db"
     cors_origins: str = "http://localhost:5173"
-    admin_sync_token: str = Field(default="", repr=False)  # nunca se imprime en logs
+    admin_sync_token: str = Field(default="", repr=False)
     radio_browser_user_agent: str = "WorldRadio/1.0 (contacto del proyecto)"
     rate_limit: str = "120/minute"
     max_page_size: int = 100
@@ -23,5 +21,4 @@ class Settings(BaseSettings):
 
 @lru_cache
 def get_settings() -> Settings:
-    """Instancia única y cacheada (también facilita sustituirla en pruebas)."""
     return Settings()

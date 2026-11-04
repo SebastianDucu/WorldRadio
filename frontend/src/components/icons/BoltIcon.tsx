@@ -7,4 +7,3 @@ export function BoltIcon(props: IconProps) {
     </IconBase>
   );
 }
-

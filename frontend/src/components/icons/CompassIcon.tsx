@@ -8,4 +8,3 @@ export function CompassIcon(props: IconProps) {
     </IconBase>
   );
 }
-

@@ -7,4 +7,3 @@ export function SparklesIcon(props: IconProps) {
     </IconBase>
   );
 }
-

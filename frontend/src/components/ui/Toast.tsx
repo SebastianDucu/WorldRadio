@@ -10,7 +10,6 @@ const tones: Record<ToastTone, { icon: typeof CheckIcon; color: string }> = {
   error: { icon: AlertIcon, color: "text-danger" },
 };
 
-/** Monta una sola vez en la raíz. Los avisos se leen en voz alta (aria-live). */
 export function ToastViewport() {
   const toasts = useToastStore((s) => s.toasts);
   const dismiss = useToastStore((s) => s.dismiss);

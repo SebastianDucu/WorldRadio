@@ -23,8 +23,6 @@ import { STATIONS, COUNTRIES } from "@/data/stations";
 import { usePlayerStore } from "@/store/player";
 import { searchOnlineStations } from "@/services/radioApi";
 import { ChangelogModal } from "@/components/modals/ChangelogModal";
-import { useChristmasActive } from "@/hooks/useApplyUiPreferences";
-import { SnowCap } from "@/components/snow/SnowCap";
 import { getStationBaseListeners, formatListenerCount } from "@/hooks/useLiveListeners";
 import type { Station } from "@/types/radio";
 
@@ -75,13 +73,11 @@ export function StationSidebar() {
   } = usePlayerStore();
 
   const [onlineResults, setOnlineResults] = useState<Station[]>([]);
-  const isChristmas = useChristmasActive();
   const [isSearchingOnline, setIsSearchingOnline] = useState(false);
   const [changelogOpen, setChangelogOpen] = useState(false);
 
   const countryList = countries && countries.length > 0 ? countries : COUNTRIES;
 
-  // Smart Country Match when searching (e.g. typing "colom" -> Colombia)
   const matchedCountry = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
     if (q.length < 2) return null;
@@ -90,7 +86,6 @@ export function StationSidebar() {
     );
   }, [countryList, searchQuery]);
 
-  // Debounced online search for Radio Browser API
   useEffect(() => {
     if (!searchQuery || searchQuery.trim().length < 3) {
       setOnlineResults([]);
@@ -108,7 +103,6 @@ export function StationSidebar() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Available cities in the currently selected country
   const availableCities = useMemo(() => {
     if (!selectedCountryCode) return [];
     const pool = (allStations && allStations.length > 0 ? allStations : STATIONS).filter(
@@ -126,7 +120,6 @@ export function StationSidebar() {
       .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, "es"));
   }, [allStations, selectedCountryCode]);
 
-  // Filtered stations
   const filteredStations = useMemo(() => {
     let list = allStations && allStations.length > 0 ? allStations : STATIONS;
 
@@ -169,7 +162,6 @@ export function StationSidebar() {
           s.tags.some((t) => t.toLowerCase().includes(q)),
       );
 
-      // Append non-duplicate online search results
       if (onlineResults.length > 0) {
         const ids = new Set(list.map((s) => s.id));
         const extra = onlineResults.filter((s) => !ids.has(s.id));
@@ -182,7 +174,7 @@ export function StationSidebar() {
 
   return (
     <>
-      {/* Mobile Backdrop when sidebar is open on small screens */}
+
       {sidebarOpen && (
         <div
           onClick={toggleSidebar}
@@ -191,17 +183,12 @@ export function StationSidebar() {
         />
       )}
 
-      {/* Main Liquid Glass Sidebar Panel */}
       <aside
         className={`fixed top-[max(0.75rem,env(safe-area-inset-top,0px))] bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] left-2 right-2 sm:right-auto sm:left-4 z-30 flex flex-col rounded-3xl liquid-glass shadow-2xl transition-transform duration-300 sm:w-[360px] border border-amber-400/20 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-[120%]"
         }`}
         aria-label="Explorador de emisoras"
       >
-        {/* Winter Snow Cap atop sidebar */}
-        {isChristmas && <SnowCap className="-top-2 inset-x-2" />}
-
-        {/* Header */}
         <header className="flex items-center justify-between border-b border-white/10 px-4 py-3.5">
           <div className="flex items-center gap-3">
             <span className="relative flex h-9 w-9 items-center justify-center rounded-2xl bg-amber-400/20 text-amber-400 border border-amber-400/30 shadow-inner">
@@ -223,9 +210,7 @@ export function StationSidebar() {
             </div>
           </div>
 
-          {/* Clean SVG Action Icons */}
           <div className="flex items-center gap-1">
-            {/* Modo Conducción Car Trigger */}
             <IconButton
               size="sm"
               label="Modo Conducción"
@@ -234,7 +219,6 @@ export function StationSidebar() {
               onClick={() => setDriveMode(true)}
             />
 
-            {/* Random Station */}
             <IconButton
               size="sm"
               label="Sintonizar aleatorio"
@@ -243,7 +227,6 @@ export function StationSidebar() {
               onClick={randomStation}
             />
 
-            {/* Close Sidebar */}
             <IconButton
               size="sm"
               label="Ocultar panel"
@@ -254,7 +237,6 @@ export function StationSidebar() {
           </div>
         </header>
 
-        {/* Navigation Tabs (Explorar, Países (174), Favoritas, Herramientas) */}
         <nav className="flex border-b border-white/10 bg-slate-900/50 p-1.5 gap-1">
           <button
             onClick={() => setActiveTab("explore")}
@@ -298,7 +280,6 @@ export function StationSidebar() {
           </button>
         </nav>
 
-        {/* Universal Quick Search Bar */}
         <div className="p-2.5 pb-1.5 border-b border-white/5">
           <div className="relative flex items-center">
             <SearchIcon size={16} className="absolute left-3 text-slate-400 pointer-events-none" />
@@ -322,7 +303,6 @@ export function StationSidebar() {
             ) : null}
           </div>
         </div>
-        {/* Mood & Quick Genre Chips in Explore Tab */}
         {(activeTab === "explore" || activeTab === "stations") && (
           <div className="flex gap-1.5 overflow-x-auto px-3 py-2 scrollbar-none border-b border-white/5">
             {MOOD_FILTERS.map((cat) => {
@@ -344,12 +324,9 @@ export function StationSidebar() {
           </div>
         )}
 
-        {/* Tab View Content */}
         <div className="flex-1 overflow-y-auto p-3 space-y-2">
           {activeTab === "more" ? (
-            /* Innovative Tools Section with pure SVG icons and sm-bold typography */
             <div className="space-y-2.5 p-1">
-              {/* Dial FM Analog Radio */}
               <button
                 onClick={() => setTunerDialModalOpen(true)}
                 className="w-full flex items-center justify-between p-3.5 rounded-2xl bg-slate-900/80 hover:bg-slate-800/90 border border-amber-400/30 transition-all duration-200 text-left shadow-lg group hover:scale-[1.01] active:scale-98"
@@ -368,7 +345,6 @@ export function StationSidebar() {
                 <span className="text-amber-400 font-bold text-lg group-hover:translate-x-1 transition-transform">›</span>
               </button>
 
-              {/* Audio Equalizer & Sound FX */}
               <button
                 onClick={() => setEqualizerModalOpen(true)}
                 className="w-full flex items-center justify-between p-3.5 rounded-2xl bg-slate-900/80 hover:bg-slate-800/90 border border-sky-400/30 transition-all duration-200 text-left shadow-lg group hover:scale-[1.01] active:scale-98"
@@ -387,7 +363,6 @@ export function StationSidebar() {
                 <span className="text-sky-400 font-bold text-lg group-hover:translate-x-1 transition-transform">›</span>
               </button>
 
-              {/* Sleep Timer */}
               <button
                 onClick={() => setSleepTimerModalOpen(true)}
                 className="w-full flex items-center justify-between p-3.5 rounded-2xl bg-slate-900/80 hover:bg-slate-800/90 border border-indigo-400/30 transition-all duration-200 text-left shadow-lg group hover:scale-[1.01] active:scale-98"
@@ -406,7 +381,6 @@ export function StationSidebar() {
                 <span className="text-indigo-400 font-bold text-lg group-hover:translate-x-1 transition-transform">›</span>
               </button>
 
-              {/* Audio Clip Recorder */}
               <button
                 onClick={() => setRecorderModalOpen(true)}
                 className="w-full flex items-center justify-between p-3.5 rounded-2xl bg-slate-900/80 hover:bg-slate-800/90 border border-rose-400/30 transition-all duration-200 text-left shadow-lg group hover:scale-[1.01] active:scale-98"
@@ -425,7 +399,6 @@ export function StationSidebar() {
                 <span className="text-rose-400 font-bold text-lg group-hover:translate-x-1 transition-transform">›</span>
               </button>
 
-              {/* Drive Mode Tile */}
               <button
                 onClick={() => setDriveMode(true)}
                 className="w-full flex items-center justify-between p-3.5 rounded-2xl bg-slate-900/80 hover:bg-slate-800/90 border border-emerald-400/30 transition-all duration-200 text-left shadow-lg group hover:scale-[1.01] active:scale-98"
@@ -444,7 +417,6 @@ export function StationSidebar() {
                 <span className="text-emerald-400 font-bold text-lg group-hover:translate-x-1 transition-transform">›</span>
               </button>
 
-              {/* Modo Lite Toggle */}
               <div className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-900/80 border border-white/10">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-400/15 text-amber-400 border border-amber-400/30">
@@ -469,7 +441,6 @@ export function StationSidebar() {
                 </button>
               </div>
 
-              {/* Novedades Changelog Button */}
               <button
                 onClick={() => setChangelogOpen(true)}
                 className="w-full flex items-center justify-between p-3.5 rounded-2xl bg-slate-900/80 hover:bg-slate-800/90 border border-white/10 transition-all text-left"
@@ -489,7 +460,6 @@ export function StationSidebar() {
               </button>
             </div>
           ) : activeTab === "countries" ? (
-            /* Países (174) Dedicated Tab matching Image 1 */
             <div className="space-y-2 p-1">
               <div className="flex items-center justify-between px-1 mb-1">
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
@@ -533,9 +503,7 @@ export function StationSidebar() {
               </div>
             </div>
           ) : (
-            /* Station List with active filter pill */
             <>
-              {/* Smart Country Match Banner when searching (e.g. "colom" -> Colombia) */}
               {matchedCountry && selectedCountryCode !== matchedCountry.code && (
                 <button
                   type="button"
@@ -560,12 +528,9 @@ export function StationSidebar() {
                 </button>
               )}
 
-              {/* TWO Hierarchical Filters: País and Ciudad */}
               {selectedCountryCode && (
                 <div className="space-y-1.5 mb-2.5">
-                  {/* Filter Badges: Country Pill + City Pill */}
                   <div className="flex flex-wrap items-center gap-1.5">
-                    {/* Country Pill */}
                     <div className="flex items-center gap-1.5 p-1.5 px-3 rounded-xl bg-amber-400/15 border border-amber-400/35 text-xs font-semibold text-amber-300 shadow-sm">
                       <GlobeIcon size={14} className="text-amber-400 shrink-0" />
                       <span className="text-amber-400 font-bold">País:</span>
@@ -585,7 +550,6 @@ export function StationSidebar() {
                       </button>
                     </div>
 
-                    {/* City Pill (if selected) */}
                     {selectedCity && (
                       <div className="flex items-center gap-1.5 p-1.5 px-3 rounded-xl bg-emerald-400/15 border border-emerald-400/35 text-xs font-semibold text-emerald-300 shadow-sm animate-fadeIn">
                         <LocationIcon size={13} className="text-emerald-400 shrink-0" />
@@ -603,7 +567,6 @@ export function StationSidebar() {
                     )}
                   </div>
 
-                  {/* Filter 2: Cities in selected Country */}
                   {availableCities.length > 0 && (
                     <div className="rounded-xl bg-slate-900/60 border border-white/5 p-2 space-y-1.5">
                       <div className="flex items-center justify-between px-1 text-[11px] font-semibold text-slate-400">
@@ -621,7 +584,6 @@ export function StationSidebar() {
                         )}
                       </div>
 
-                      {/* Horizontal Scrollable City Chips */}
                       <div className="flex gap-1.5 overflow-x-auto py-0.5 scrollbar-none">
                         <button
                           onClick={() => setSelectedCity(null)}
@@ -677,7 +639,6 @@ export function StationSidebar() {
                     }`}
                   >
                     <div className="flex min-w-0 flex-1 items-center gap-3">
-                      {/* Frequency / Initials Badge with Gold Shine */}
                       <div
                         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl font-bold text-xs text-white shadow-sm"
                         style={{
@@ -781,7 +742,6 @@ export function StationSidebar() {
         </div>
       </aside>
 
-      {/* Changelog Modal */}
       <ChangelogModal
         isOpen={changelogOpen}
         onClose={() => setChangelogOpen(false)}

@@ -56,7 +56,6 @@ export function LiquidVisualizer({
       ctx.clearRect(0, 0, width, height);
 
       if (!isPlaying || motionOff) {
-        // Subtle resting baseline
         ctx.beginPath();
         ctx.strokeStyle = "rgba(140, 180, 240, 0.25)";
         ctx.lineWidth = 2;
@@ -64,7 +63,6 @@ export function LiquidVisualizer({
         ctx.lineTo(width, height / 2);
         ctx.stroke();
 
-        // Little center dot
         ctx.beginPath();
         ctx.arc(width / 2, height / 2, 2.5, 0, Math.PI * 2);
         ctx.fillStyle = "rgba(140, 180, 240, 0.4)";
@@ -75,7 +73,6 @@ export function LiquidVisualizer({
       phase += isLoading ? 0.04 : 0.07;
 
       if (visualizerMode === "wave") {
-        // Multi-layered fluid liquid wave with gradient fill & glowing crest
         const numWaves = 3;
         for (let w = 0; w < numWaves; w++) {
           ctx.beginPath();
@@ -85,13 +82,12 @@ export function LiquidVisualizer({
 
           ctx.moveTo(0, height / 2);
           for (let x = 0; x <= width; x += 4) {
-            const envelope = Math.sin((x / width) * Math.PI); // Taper at edges
+            const envelope = Math.sin((x / width) * Math.PI); 
             const y = height / 2 + Math.sin(x * freq + wavePhase) * amp * envelope;
             ctx.lineTo(x, y);
           }
 
           if (w === numWaves - 1) {
-            // Front crest glowing line
             const grad = ctx.createLinearGradient(0, 0, width, 0);
             if (isChristmas) {
               grad.addColorStop(0, "rgba(255, 201, 74, 0.4)");
@@ -120,7 +116,6 @@ export function LiquidVisualizer({
           }
         }
       } else if (visualizerMode === "bars") {
-        // Liquid EQ spectrum bars with rounded caps and gradient glow
         const barCount = 16;
         const barWidth = 4;
         const spacing = (width - barCount * barWidth) / (barCount + 1);
@@ -149,7 +144,6 @@ export function LiquidVisualizer({
           ctx.fill();
         }
       } else {
-        // Pulse mode: concentric liquid rings expanding from center
         const cx = width / 2;
         const cy = height / 2;
         const maxR = Math.min(width, height) / 2 - 2;
@@ -167,7 +161,6 @@ export function LiquidVisualizer({
           ctx.stroke();
         }
 
-        // Center orb
         ctx.beginPath();
         ctx.arc(cx, cy, 3.5, 0, Math.PI * 2);
         ctx.fillStyle = "#ffffff";

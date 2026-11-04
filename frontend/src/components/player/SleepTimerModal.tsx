@@ -57,7 +57,6 @@ export function SleepTimerModal() {
         className="liquid-glass relative w-full max-w-sm overflow-hidden rounded-3xl p-6 text-[#eaf4ff] shadow-2xl border border-white/20"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header with TimerIcon SVG */}
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
           <div className="flex items-center gap-2.5">
             <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-500/20 text-sky-400 border border-sky-400/30 shadow-inner">
@@ -82,13 +81,10 @@ export function SleepTimerModal() {
           </button>
         </div>
 
-        {/* Content */}
         <div className="mt-5 space-y-4">
           {sleepTimerRemaining !== null ? (
-            /* Active Countdown View */
             <div className="flex flex-col items-center text-center py-2">
               <div className="relative flex h-32 w-32 items-center justify-center">
-                {/* Radial progress ring */}
                 <svg className="h-full w-full -rotate-90" viewBox="0 0 100 100">
                   <circle
                     cx="50"
@@ -147,7 +143,6 @@ export function SleepTimerModal() {
               </div>
             </div>
           ) : (
-            /* Configure Presets View */
             <>
               <p className="text-sm font-semibold text-slate-300">
                 Selecciona en cuántos minutos pausar la reproducción:
@@ -166,7 +161,6 @@ export function SleepTimerModal() {
                 ))}
               </div>
 
-              {/* Custom minute slider */}
               <div className="rounded-2xl bg-slate-900/60 p-3.5 border border-white/5 space-y-2">
                 <div className="flex items-center justify-between text-sm">
                   <span className="font-semibold text-slate-300">Personalizado:</span>

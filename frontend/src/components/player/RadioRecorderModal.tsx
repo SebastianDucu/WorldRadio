@@ -115,7 +115,6 @@ export function RadioRecorderModal() {
         className="liquid-glass relative w-full max-w-md overflow-hidden rounded-3xl p-6 text-[#eaf4ff] shadow-2xl border border-white/20"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header with SVG MicIcon */}
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
           <div className="flex items-center gap-2.5">
             <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-rose-500/20 text-rose-400 border border-rose-400/30 shadow-inner">
@@ -140,7 +139,6 @@ export function RadioRecorderModal() {
           </button>
         </div>
 
-        {/* Station info card */}
         <div className="mt-4 flex items-center justify-between rounded-2xl bg-slate-900/60 p-3.5 border border-white/5">
           <div className="min-w-0 flex-1">
             <span className="text-[10px] font-semibold text-sky-400 uppercase tracking-wider block">
@@ -159,7 +157,6 @@ export function RadioRecorderModal() {
           </span>
         </div>
 
-        {/* Recording Visual & Controls */}
         <div className="mt-5 flex flex-col items-center justify-center p-6 rounded-2xl bg-slate-900/40 border border-white/5">
           <div className="text-center">
             <span className="text-4xl font-mono font-bold text-white tracking-tight">
@@ -170,7 +167,6 @@ export function RadioRecorderModal() {
             </span>
           </div>
 
-          {/* Animated sound waves during recording */}
           {isRecording && (
             <div className="flex items-center gap-1.5 h-10 mt-4">
               {Array.from({ length: 12 }).map((_, i) => (
@@ -186,7 +182,6 @@ export function RadioRecorderModal() {
             </div>
           )}
 
-          {/* Trigger button */}
           <div className="mt-5 flex items-center gap-3">
             {!isRecording ? (
               <button
@@ -208,7 +203,6 @@ export function RadioRecorderModal() {
           </div>
         </div>
 
-        {/* Audio Preview & Download */}
         {audioUrl && (
           <div className="mt-4 rounded-2xl bg-sky-500/10 border border-sky-400/30 p-3.5 flex items-center justify-between gap-3">
             <audio

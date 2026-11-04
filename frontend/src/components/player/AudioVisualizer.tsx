@@ -21,7 +21,7 @@ export function AudioVisualizer({ barCount = 18, className = "" }: AudioVisualiz
     const interval = setInterval(() => {
       setBars(
         Array.from({ length: barCount }, (_, i) => {
-          // Create pseudo-rhythmic waveform
+
           const base = 20 + Math.sin(Date.now() / 200 + i) * 15;
           const noise = Math.random() * 60;
           return Math.max(10, Math.min(100, Math.round(base + noise)));

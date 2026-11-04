@@ -15,4 +15,3 @@ export function EqualizerIcon(props: IconProps) {
     </IconBase>
   );
 }
-

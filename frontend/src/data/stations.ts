@@ -1,9 +1,7 @@
 import type { CountryInfo, Station } from "@/types/radio";
 
 export const STATIONS: Station[] = [
-  // ==========================================
-  // ESPECIAL NAVIDAD
-  // ==========================================
+
   {
     id: "xmas-absolut",
     name: "Absolut Christmas",
@@ -90,9 +88,6 @@ export const STATIONS: Station[] = [
     description: "Rock alternativo, punk e indie festivo con temas navideños de Bruce Springsteen, The Killers y The Ramones.",
   },
 
-  // ==========================================
-  // ESPAÑA
-  // ==========================================
   {
     id: "es-los40",
     name: "LOS40 España",
@@ -196,9 +191,6 @@ export const STATIONS: Station[] = [
     description: "L'emissora líder a Catalunya: informació, actualitat i entreteniment.",
   },
 
-  // ==========================================
-  // ESTADOS UNIDOS
-  // ==========================================
   {
     id: "us-kexp",
     name: "KEXP 90.3 FM Seattle",
@@ -302,9 +294,6 @@ export const STATIONS: Station[] = [
     description: "La música oficial de la conferencia hacker DEF CON: sonidos cyberpunk, synthwave y beats futuristas.",
   },
 
-  // ==========================================
-  // REINO UNIDO
-  // ==========================================
   {
     id: "uk-bbc-world",
     name: "BBC World Service",
@@ -408,9 +397,6 @@ export const STATIONS: Station[] = [
     description: "Leading Britain's Conversation: el mayor foro de actualidad, llamadas en directo y debate político.",
   },
 
-  // ==========================================
-  // FRANCIA
-  // ==========================================
   {
     id: "fr-fip",
     name: "FIP Radio France",
@@ -463,9 +449,6 @@ export const STATIONS: Station[] = [
     description: "El gran descubrimiento de tendencias underground de París: hip-hop, rare grooves, afrobeat y electrónica.",
   },
 
-  // ==========================================
-  // ALEMANIA Y SUIZA
-  // ==========================================
   {
     id: "de-1live",
     name: "1LIVE Colonia",
@@ -535,9 +518,6 @@ export const STATIONS: Station[] = [
     description: "Obras maestras de la música clásica europea grabadas con la legendaria precisión técnica suiza.",
   },
 
-  // ==========================================
-  // COLOMBIA
-  // ==========================================
   {
     id: "co-caracol",
     name: "Caracol Radio Bogotá",
@@ -675,9 +655,6 @@ export const STATIONS: Station[] = [
     description: "La más bacana: salsa, champeta y música tropical desde la heroica Cartagena de Indias.",
   },
 
-  // ==========================================
-  // ARGENTINA
-  // ==========================================
   {
     id: "ar-la100",
     name: "La 100 FM 99.9 Buenos Aires",
@@ -747,9 +724,6 @@ export const STATIONS: Station[] = [
     description: "Pura música: los clásicos inolvidables de los 80, 90 y 2000 en inglés sin interrupciones.",
   },
 
-  // ==========================================
-  // MÉXICO
-  // ==========================================
   {
     id: "mx-los40",
     name: "LOS40 México",
@@ -785,9 +759,6 @@ export const STATIONS: Station[] = [
     description: "¡Aquí suena La Ke Buena! La estación líder de música regional mexicana, banda y norteño.",
   },
 
-  // ==========================================
-  // BRASIL
-  // ==========================================
   {
     id: "br-antena1",
     name: "Antena 1 São Paulo",
@@ -823,9 +794,6 @@ export const STATIONS: Station[] = [
     description: "A maior rede de rádio jovem do Brasil com música pop, eletrônica e entretenimento em direto.",
   },
 
-  // ==========================================
-  // ITALIA Y PAÍSES BAJOS
-  // ==========================================
   {
     id: "it-radio105",
     name: "Radio 105 Milano",

@@ -17,7 +17,7 @@ export function ChangelogModal({ isOpen, onClose }: ChangelogModalProps) {
         className="liquid-glass relative w-full max-w-xl max-h-[85vh] flex flex-col overflow-hidden rounded-3xl p-6 text-[#eaf4ff] border border-white/20 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
+
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
           <div>
             <h2 className="text-xl font-black tracking-tight text-white flex items-center gap-2">
@@ -40,9 +40,8 @@ export function ChangelogModal({ isOpen, onClose }: ChangelogModalProps) {
           </button>
         </div>
 
-        {/* Content list */}
         <div className="flex-1 overflow-y-auto py-4 space-y-5 text-xs pr-1">
-          {/* Liquid Glass Highlight Card */}
+
           <div className="rounded-2xl bg-gradient-to-r from-sky-500/20 via-blue-600/10 to-indigo-600/20 p-4 border border-sky-400/30">
             <h3 className="text-sm font-semibold text-sky-300 mb-1.5 flex items-center gap-1.5">
               <span>Liquid Glass Ultra-Fluido Activo</span>
@@ -52,7 +51,6 @@ export function ChangelogModal({ isOpen, onClose }: ChangelogModalProps) {
             </p>
           </div>
 
-          {/* Versions list */}
           <div className="space-y-4">
             <article className="border-l-2 border-sky-400 pl-3.5">
               <h4 className="text-sm font-black text-white">v24 · Liquid Glass & Next-Gen Audio (3 nov 2026)</h4>

@@ -1,7 +1,6 @@
 import type { HTMLAttributes } from "react";
 import { cn } from "@/lib/cn";
 
-/** Bloque «esqueleto» con brillo animado. Decorativo: se oculta a lectores de pantalla. */
 export function Skeleton({ className, ...rest }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div

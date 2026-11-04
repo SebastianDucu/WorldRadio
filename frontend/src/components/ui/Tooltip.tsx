@@ -8,10 +8,6 @@ interface TooltipProps {
   className?: string;
 }
 
-/**
- * Tooltip ligero solo con CSS: aparece al pasar el cursor o al enfocar con teclado.
- * El hijo queda descrito por el tooltip mediante aria-describedby del contenedor.
- */
 export function Tooltip({ label, children, side = "top", className }: TooltipProps) {
   const id = useId();
   return (

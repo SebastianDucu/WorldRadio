@@ -9,4 +9,3 @@ export function TimerIcon(props: IconProps) {
     </IconBase>
   );
 }
-

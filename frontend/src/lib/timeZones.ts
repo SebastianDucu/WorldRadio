@@ -8,10 +8,6 @@ export interface StationTimeInfo {
   utcOffsetString: string;
 }
 
-/**
- * Calculates the real-time local time and solar status of a radio station's city
- * based on coordinates and country timezone mappings.
- */
 export function getStationTimeInfo(station: Station | null): StationTimeInfo {
   if (!station) {
     return {
@@ -23,30 +19,28 @@ export function getStationTimeInfo(station: Station | null): StationTimeInfo {
     };
   }
 
-  // Calculate approximate UTC offset from longitude (15 degrees = 1 hour)
-  // or refined country specific defaults
   let utcOffsetHours = Math.round(station.lng / 15);
 
   const code = station.countryCode?.toUpperCase();
   if (code === "ES" || code === "FR" || code === "DE" || code === "IT" || code === "NL" || code === "CH") {
-    utcOffsetHours = 1; // CET (standard) or CEST
+    utcOffsetHours = 1;
   } else if (code === "GB") {
-    utcOffsetHours = 0; // GMT/BST
+    utcOffsetHours = 0;
   } else if (code === "CO") {
-    utcOffsetHours = -5; // COT
+    utcOffsetHours = -5;
   } else if (code === "AR") {
-    utcOffsetHours = -3; // ART
+    utcOffsetHours = -3;
   } else if (code === "BR") {
-    utcOffsetHours = -3; // BRT
+    utcOffsetHours = -3;
   } else if (code === "MX") {
-    utcOffsetHours = -6; // CST
+    utcOffsetHours = -6;
   } else if (code === "JP") {
-    utcOffsetHours = 9; // JST
+    utcOffsetHours = 9;
   } else if (code === "US") {
-    if (station.lng < -115) utcOffsetHours = -8; // PST
-    else if (station.lng < -100) utcOffsetHours = -7; // MST
-    else if (station.lng < -85) utcOffsetHours = -6; // CST
-    else utcOffsetHours = -5; // EST
+    if (station.lng < -115) utcOffsetHours = -8;
+    else if (station.lng < -100) utcOffsetHours = -7;
+    else if (station.lng < -85) utcOffsetHours = -6;
+    else utcOffsetHours = -5;
   }
 
   const now = new Date();

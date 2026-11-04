@@ -10,10 +10,6 @@ interface BottomSheetProps {
   className?: string;
 }
 
-/**
- * Hoja inferior para móvil: se arrastra hacia abajo para cerrarla.
- * (En la Fase 4 se amplía con puntos de anclaje: mini / medio / completo.)
- */
 export function BottomSheet({ open, onClose, title, children, className }: BottomSheetProps) {
   const titleId = useId();
   const ref = useRef<HTMLDivElement>(null);

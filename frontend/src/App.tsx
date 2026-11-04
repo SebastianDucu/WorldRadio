@@ -10,7 +10,6 @@ import { DriveModeModal } from "@/components/drive/DriveModeModal";
 import { ToastViewport } from "@/components/ui";
 import { BoltIcon } from "@/components/icons";
 
-// Liquid Glass & Innovative Additions
 import { LiquidAmbientBlobs } from "@/components/ambient/LiquidAmbientBlobs";
 import { DynamicIslandHUD } from "@/components/hud/DynamicIslandHUD";
 import { SnapshotBanner } from "@/components/hud/SnapshotBanner";
@@ -32,15 +31,13 @@ export default function App() {
     liteMode,
   } = usePlayerStore();
 
-  // Initialize 174 countries and background world directory snapshot
   useEffect(() => {
     initStationsDirectory();
   }, []);
 
-  // Global Keyboard Shortcuts
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      // Ignore if user is typing in search input
+
       if (
         e.target instanceof HTMLInputElement ||
         e.target instanceof HTMLTextAreaElement
@@ -72,19 +69,15 @@ export default function App() {
 
   return (
     <div className="relative h-[100dvh] w-screen overflow-hidden bg-[#030816] text-[#eaf4ff] select-none">
-      {/* 1. Liquid Glass Fluid Ambient Blobs for authentic dynamic refraction */}
+
       <LiquidAmbientBlobs />
 
-      {/* 2. Christmas Atmospheric Aurora, Snow & Sleigh */}
       <ChristmasAura />
 
-      {/* 3. Floating Dynamic Island Liquid HUD at top center */}
       <DynamicIslandHUD />
 
-      {/* Snapshot progress & completion banner */}
       <SnapshotBanner />
 
-      {/* 4. Main Interactive Stage: 3D WebGL Globe, 2D Map, or Lite Mode */}
       <main className="absolute inset-0 flex items-center justify-center">
         {liteMode ? (
           <div className="liquid-glass flex flex-col items-center justify-center text-center p-8 rounded-3xl border border-white/20 text-slate-300 max-w-md mx-4 shadow-2xl">
@@ -101,22 +94,17 @@ export default function App() {
         )}
       </main>
 
-      {/* 5. Floating Liquid Glass Station Browser Sidebar */}
       <StationSidebar />
 
-      {/* 6. Fixed Bottom Luxury Radio Player Bar */}
       <AudioPlayer />
 
-      {/* 7. Fullscreen Drive Mode Modal */}
       <DriveModeModal />
 
-      {/* 8. Innovative Modals: Sleep Timer, Equalizer, Recorder, Tuner Dial */}
       <SleepTimerModal />
       <AudioEqualizerModal />
       <RadioRecorderModal />
       <FrequencyTunerDial />
 
-      {/* 9. Accessible Notifications Viewport */}
       <ToastViewport />
     </div>
   );

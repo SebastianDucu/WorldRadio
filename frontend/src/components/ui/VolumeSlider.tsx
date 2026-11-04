@@ -3,7 +3,7 @@ import { cn } from "@/lib/cn";
 import { IconButton } from "./IconButton";
 
 interface VolumeSliderProps {
-  /** Volumen de 0 a 1. */
+
   value: number;
   muted: boolean;
   onChange: (value: number) => void;
@@ -11,7 +11,6 @@ interface VolumeSliderProps {
   className?: string;
 }
 
-/** Control de volumen con botón de silencio. Usa <input type="range">: teclado y lectores gratis. */
 export function VolumeSlider({ value, muted, onChange, onToggleMute, className }: VolumeSliderProps) {
   const shown = muted ? 0 : value;
   return (

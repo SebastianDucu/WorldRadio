@@ -12,7 +12,6 @@ interface DrawerProps {
   className?: string;
 }
 
-/** Cierra con Escape y devuelve el foco al elemento que abrió el panel. */
 function useDialogFocus(open: boolean, onClose: () => void) {
   const ref = useRef<HTMLElement>(null);
   useEffect(() => {
@@ -29,7 +28,6 @@ function useDialogFocus(open: boolean, onClose: () => void) {
   return ref;
 }
 
-/** Panel lateral para escritorio. En móvil se usa BottomSheet. */
 export function Drawer({ open, onClose, title, children, className }: DrawerProps) {
   const titleId = useId();
   const ref = useDialogFocus(open, onClose);

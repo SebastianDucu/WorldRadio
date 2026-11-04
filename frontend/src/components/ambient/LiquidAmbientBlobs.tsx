@@ -16,7 +16,7 @@ export function LiquidAmbientBlobs() {
       className="pointer-events-none fixed inset-0 overflow-hidden z-0 select-none"
       aria-hidden="true"
     >
-      {/* Liquid Blob 1: Cyan / Station Hue (Top Left) */}
+
       <div
         className="liquid-blob-1 absolute -top-20 -left-20 h-64 sm:h-96 w-64 sm:w-96 rounded-full opacity-15 sm:opacity-25 blur-[50px] sm:blur-[90px] transition-colors duration-1000 transform-gpu will-change-transform"
         style={{
@@ -26,7 +26,6 @@ export function LiquidAmbientBlobs() {
         }}
       />
 
-      {/* Liquid Blob 2: Deep Neon Indigo (Bottom Right) */}
       <div
         className="liquid-blob-2 absolute -bottom-28 -right-16 h-80 sm:h-[480px] w-80 sm:w-[480px] rounded-full opacity-12 sm:opacity-20 blur-[60px] sm:blur-[110px] transition-all duration-1000 transform-gpu will-change-transform"
         style={{
@@ -38,7 +37,6 @@ export function LiquidAmbientBlobs() {
         }}
       />
 
-      {/* Liquid Blob 3: Center Ambient Glow behind Globe */}
       <div
         className="liquid-blob-3 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-96 sm:h-[560px] w-96 sm:w-[560px] rounded-full opacity-10 sm:opacity-15 blur-[70px] sm:blur-[120px] pointer-events-none transform-gpu will-change-transform"
         style={{
@@ -50,4 +48,3 @@ export function LiquidAmbientBlobs() {
     </div>
   );
 }
-

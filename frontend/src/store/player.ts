@@ -20,7 +20,6 @@ interface PlayerState {
   favorites: string[];
   history: string[];
 
-  // Navigation & View State
   viewMode: ViewMode;
   activeTab: SidebarTab;
   searchQuery: string;
@@ -32,12 +31,10 @@ interface PlayerState {
   liteMode: boolean;
   keepCentered: boolean;
 
-  // Globe Coordinates target [lat, lng]
   targetLocation: [number, number] | null;
 
-  // Liquid Glass & Innovative Audio Additions
-  sleepTimerRemaining: number | null; // Seconds remaining, or null if off
-  sleepTimerInitial: number | null; // Initial duration in seconds
+  sleepTimerRemaining: number | null;
+  sleepTimerInitial: number | null;
   sleepTimerModalOpen: boolean;
   equalizerModalOpen: boolean;
   recorderModalOpen: boolean;
@@ -50,14 +47,12 @@ interface PlayerState {
   visualizerMode: VisualizerMode;
   tunerFrequency: number;
 
-  // 174 countries and full world directory snapshot state
   countries: CountryInfo[];
   allStations: Station[];
   directoryStatus: "idle" | "loading" | "done" | "error";
   directoryProgress: number;
   directoryCount: number;
 
-  // Actions
   playStation: (station: Station) => void;
   togglePlay: () => void;
   pause: () => void;
@@ -86,7 +81,6 @@ interface PlayerState {
   setLiteMode: (val: boolean) => void;
   toggleKeepCentered: () => void;
 
-  // Liquid Audio actions
   setSleepTimer: (minutes: number | null) => void;
   decrementSleepTimer: () => void;
   cancelSleepTimer: () => void;
@@ -149,7 +143,6 @@ export const usePlayerStore = create<PlayerState>()(
 
       targetLocation: [defaultStation.lat, defaultStation.lng],
 
-      // Innovative liquid additions initial states
       sleepTimerRemaining: null,
       sleepTimerInitial: null,
       sleepTimerModalOpen: false,
@@ -176,7 +169,6 @@ export const usePlayerStore = create<PlayerState>()(
           return;
         }
 
-        // Parse numerical frequency if present
         let parsedFreq = 95.0;
         if (station.frequency) {
           const match = station.frequency.match(/([0-9]+\.?[0-9]*)/);
@@ -289,7 +281,6 @@ export const usePlayerStore = create<PlayerState>()(
       setLiteMode: (liteMode: boolean) => set({ liteMode }),
       toggleKeepCentered: () => set((state) => ({ keepCentered: !state.keepCentered })),
 
-      // Liquid Audio Action Implementations
       setSleepTimer: (minutes: number | null) => {
         if (!minutes || minutes <= 0) {
           set({ sleepTimerRemaining: null, sleepTimerInitial: null });
