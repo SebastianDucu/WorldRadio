@@ -98,7 +98,7 @@ export function AudioEqualizerModal() {
               <h3 className="text-sm font-bold tracking-tight text-white leading-none">
                 Ecualizador & Audio FX
               </h3>
-              <p className="mt-1 text-xs font-normal text-slate-400">
+              <p className="mt-1 text-xs font-semibold text-slate-400">
                 Procesador de sonido de alta fidelidad
               </p>
             </div>
@@ -132,7 +132,7 @@ export function AudioEqualizerModal() {
                 >
                   <div className="mb-1.5">{p.icon}</div>
                   <span className="text-sm font-semibold text-white leading-tight">{p.name}</span>
-                  <span className="text-[11px] font-normal text-slate-400 leading-tight mt-0.5 line-clamp-1">{p.desc}</span>
+                  <span className="text-[11px] font-semibold text-slate-400 leading-tight mt-0.5 line-clamp-1">{p.desc}</span>
                 </button>
               );
             })}

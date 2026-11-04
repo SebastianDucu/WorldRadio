@@ -124,7 +124,7 @@ export function RadioRecorderModal() {
               <h3 className="text-sm font-bold tracking-tight text-white leading-none">
                 Grabadora de Radio
               </h3>
-              <p className="mt-1 text-xs font-normal text-slate-400">
+              <p className="mt-1 text-xs font-semibold text-slate-400">
                 Captura clips en vivo de tus canciones favoritas
               </p>
             </div>
@@ -223,7 +223,7 @@ export function RadioRecorderModal() {
               <span className="text-sm font-semibold text-white block">
                 Clip grabado ({formatTime(recordSeconds)})
               </span>
-              <span className="text-xs font-normal text-sky-400">
+              <span className="text-xs font-semibold text-sky-400">
                 Formato audio WebM / MP3
               </span>
             </div>

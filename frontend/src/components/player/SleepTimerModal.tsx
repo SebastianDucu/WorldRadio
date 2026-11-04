@@ -66,7 +66,7 @@ export function SleepTimerModal() {
               <h3 className="text-sm font-bold tracking-tight text-white leading-none">
                 Temporizador
               </h3>
-              <p className="mt-1 text-xs font-normal text-slate-400">
+              <p className="mt-1 text-xs font-semibold text-slate-400">
                 Apagado automático de radio
               </p>
             </div>

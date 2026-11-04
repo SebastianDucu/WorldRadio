@@ -56,7 +56,7 @@ export function FrequencyTunerDial() {
               <h3 className="text-sm font-bold tracking-tight text-white leading-none">
                 Dial FM Analógico
               </h3>
-              <p className="mt-1 text-xs font-normal text-slate-400">
+              <p className="mt-1 text-xs font-semibold text-slate-400">
                 Sintonizador manual de frecuencias mundiales
               </p>
             </div>
@@ -92,7 +92,7 @@ export function FrequencyTunerDial() {
           </div>
 
           {currentStation?.frequency && (
-            <p className="mt-1 text-xs font-normal text-slate-400">
+            <p className="mt-1 text-xs font-semibold text-slate-400">
               Sintonizada: <span className="text-white font-semibold">{currentStation.name}</span>
             </p>
           )}
@@ -165,7 +165,7 @@ export function FrequencyTunerDial() {
                       </span>
                       <div className="min-w-0 truncate">
                         <p className="text-sm font-semibold text-white truncate">{station.name}</p>
-                        <p className="text-xs font-normal text-slate-400 truncate">
+                        <p className="text-xs font-semibold text-slate-400 truncate">
                           {station.city}, {station.country} · {station.genre}
                         </p>
                       </div>

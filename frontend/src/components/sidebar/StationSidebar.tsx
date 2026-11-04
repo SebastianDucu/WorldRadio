@@ -24,6 +24,7 @@ import { STATIONS, COUNTRIES } from "@/data/stations";
 import { usePlayerStore } from "@/store/player";
 import { searchOnlineStations } from "@/services/radioApi";
 import { ChangelogModal } from "@/components/modals/ChangelogModal";
+import { WorldRadioLogo } from "@/components/common/WorldRadioLogo";
 import { getStationBaseListeners, formatListenerCount } from "@/hooks/useLiveListeners";
 import type { Station } from "@/types/radio";
 
@@ -230,21 +231,19 @@ export function StationSidebar() {
         aria-label="Explorador de emisoras"
       >
         <header className="flex items-center justify-between border-b border-white/10 px-4 py-3.5">
-          <div className="flex items-center gap-3">
-            <span className="relative flex h-9 w-9 items-center justify-center rounded-2xl bg-amber-400/20 text-amber-400 border border-amber-400/30 shadow-inner">
-              <GlobeIcon size={20} />
-            </span>
+          <div className="flex items-center gap-2.5">
+            <WorldRadioLogo size="md" />
             <div>
               <div className="flex items-center gap-1.5">
-                <h2 className="text-sm font-bold tracking-tight text-white leading-none">
-                  WorldRadio
+                <h2 className="text-sm font-extrabold tracking-tight text-white leading-none">
+                  World<span className="bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 bg-clip-text text-transparent">Radio</span>
                 </h2>
-                <span className="flex items-center gap-1 rounded-md bg-emerald-400/15 border border-emerald-400/25 px-1.5 py-0.5 text-[10px] font-bold text-emerald-400 uppercase tracking-wide">
+                <span className="flex items-center gap-1 rounded-md bg-emerald-400/15 border border-emerald-400/25 px-1.5 py-0.5 text-[9px] font-bold text-emerald-400 uppercase tracking-wide">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   <span>EN VIVO</span>
                 </span>
               </div>
-              <p className="mt-1 text-xs font-normal text-slate-400">
+              <p className="mt-1 text-xs font-semibold text-slate-400">
                 34.900+ emisoras mundiales
               </p>
             </div>
@@ -377,7 +376,7 @@ export function StationSidebar() {
                   </div>
                   <div>
                     <span className="text-sm font-semibold text-white block">Dial FM Analógico</span>
-                    <span className="text-xs font-normal text-slate-400 block mt-0.5">
+                    <span className="text-xs font-semibold text-slate-400 block mt-0.5">
                       Sintoniza por frecuencia de radio con dial interactivo
                     </span>
                   </div>
@@ -395,7 +394,7 @@ export function StationSidebar() {
                   </div>
                   <div>
                     <span className="text-sm font-semibold text-white block">Ecualizador & Audio FX</span>
-                    <span className="text-xs font-normal text-slate-400 block mt-0.5">
+                    <span className="text-xs font-semibold text-slate-400 block mt-0.5">
                       Mega Bass, Claridad Vocal, Espacial 3D y Vintage
                     </span>
                   </div>
@@ -413,7 +412,7 @@ export function StationSidebar() {
                   </div>
                   <div>
                     <span className="text-sm font-semibold text-white block">Temporizador de Apagado</span>
-                    <span className="text-xs font-normal text-slate-400 block mt-0.5">
+                    <span className="text-xs font-semibold text-slate-400 block mt-0.5">
                       Apaga la radio automáticamente con cuenta regresiva
                     </span>
                   </div>
@@ -431,7 +430,7 @@ export function StationSidebar() {
                   </div>
                   <div>
                     <span className="text-sm font-semibold text-white block">Grabadora de Clips</span>
-                    <span className="text-xs font-normal text-slate-400 block mt-0.5">
+                    <span className="text-xs font-semibold text-slate-400 block mt-0.5">
                       Graba canciones en vivo y descarga el archivo de audio
                     </span>
                   </div>
@@ -449,7 +448,7 @@ export function StationSidebar() {
                   </div>
                   <div>
                     <span className="text-sm font-semibold text-white block">Modo Conducción</span>
-                    <span className="text-xs font-normal text-slate-400 block mt-0.5">
+                    <span className="text-xs font-semibold text-slate-400 block mt-0.5">
                       Interfaz simplificada con controles seguros
                     </span>
                   </div>
@@ -464,7 +463,7 @@ export function StationSidebar() {
                   </div>
                   <div>
                     <span className="text-sm font-semibold text-white block">Modo Lite (Ahorro)</span>
-                    <span className="text-xs font-normal text-slate-400 block mt-0.5">
+                    <span className="text-xs font-semibold text-slate-400 block mt-0.5">
                       Pausa el globo 3D para máximo rendimiento
                     </span>
                   </div>
@@ -491,7 +490,7 @@ export function StationSidebar() {
                   </div>
                   <div>
                     <span className="text-sm font-semibold text-white block">Novedades Liquid Glass</span>
-                    <span className="text-xs font-normal text-slate-400 block mt-0.5">
+                    <span className="text-xs font-semibold text-slate-400 block mt-0.5">
                       Historial y mejoras de la versión
                     </span>
                   </div>
@@ -808,7 +807,7 @@ export function StationSidebar() {
                         >
                           {station.name}
                         </p>
-                        <p className="truncate text-xs font-normal text-slate-400 mt-0.5 flex items-center gap-1.5">
+                        <p className="truncate text-xs font-semibold text-slate-400 mt-0.5 flex items-center gap-1.5">
                           {station.city ? (
                             <button
                               type="button"

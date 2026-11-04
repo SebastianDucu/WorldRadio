@@ -83,7 +83,7 @@ export default function App() {
           <div className="liquid-glass flex flex-col items-center justify-center text-center p-8 rounded-3xl border border-white/20 text-slate-300 max-w-md mx-4 shadow-2xl">
             <BoltIcon size={44} className="text-amber-400 mb-3" />
             <h3 className="text-sm font-bold text-white">Modo Lite Ahorro Activo</h3>
-            <p className="text-xs max-w-sm mt-2 leading-relaxed text-slate-400 font-normal">
+            <p className="text-xs max-w-sm mt-2 leading-relaxed text-slate-400 font-semibold">
               Globo 3D pausado para ahorro máximo de batería y datos móviles. Puedes seleccionar emisoras y usar todas las funciones desde el panel lateral y el reproductor.
             </p>
           </div>

@@ -4,7 +4,6 @@ import {
   CloseIcon,
   RadioTowerIcon,
   SnowflakeIcon,
-  SantaHatIcon,
   SunIcon,
   MoonIcon,
   ShuffleIcon,
@@ -15,6 +14,7 @@ import { usePlayerStore } from "@/store/player";
 import { useUiStore } from "@/store/ui";
 import { useChristmasActive } from "@/hooks/useApplyUiPreferences";
 import { GENRE_CATEGORIES } from "@/data/stations";
+import { WorldRadioLogo } from "@/components/common/WorldRadioLogo";
 
 export function TopNavBar() {
   const {
@@ -40,30 +40,23 @@ export function TopNavBar() {
         <div className="flex items-center gap-3">
           <button
             onClick={toggleSidebar}
-            className="group relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/15 text-accent border border-accent/25 shadow-sm transition-all hover:scale-105 active:scale-95"
+            className="group relative flex shrink-0 items-center justify-center transition-all hover:scale-105 active:scale-95"
             aria-label="Abrir sintonizador"
           >
-            <GlobeIcon size={22} />
-            {isChristmas && (
-              <SantaHatIcon size={16} className="absolute -top-2 -right-1.5 rotate-12 text-xmas-red" />
-            )}
-            <span className="absolute -bottom-1 -right-1 flex h-2.5 w-2.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
-              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-success" />
-            </span>
+            <WorldRadioLogo size="md" />
           </button>
 
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-sm sm:text-base font-extrabold tracking-tight text-fg leading-none">
-                WorldRadio
+              <h1 className="text-sm sm:text-base font-extrabold tracking-tight text-white leading-none">
+                World<span className="bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 bg-clip-text text-transparent">Radio</span>
               </h1>
-              <span className="hidden sm:inline-block rounded-md bg-accent/15 px-2 py-0.5 text-[10px] font-extrabold text-accent">
+              <span className="hidden sm:inline-block rounded-md bg-amber-400/15 border border-amber-400/30 px-2 py-0.5 text-[10px] font-extrabold text-amber-300">
                 GLOBO 3D
               </span>
             </div>
-            <p className="mt-0.5 text-[11px] font-bold text-muted flex items-center gap-1.5">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-success animate-pulse" />
+            <p className="mt-0.5 text-[11px] font-semibold text-slate-400 flex items-center gap-1.5">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span>Emisiones en Vivo Globales</span>
             </p>
           </div>

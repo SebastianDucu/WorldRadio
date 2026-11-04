@@ -227,7 +227,7 @@ export function AudioPlayer() {
                   )}
                 </div>
 
-                <div className="flex items-center gap-1.5 text-[11px] sm:text-xs font-normal text-slate-400 truncate mt-0.5">
+                <div className="flex items-center gap-1.5 text-[11px] sm:text-xs font-semibold text-slate-300 truncate mt-0.5">
                   {currentStation ? (
                     <>
                       <span className="flex items-center gap-1.5 truncate">

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { usePlayerStore } from "@/store/player";
 import { getStationTimeInfo } from "@/lib/timeZones";
 import { useLiveListeners } from "@/hooks/useLiveListeners";
+import { WorldRadioLogo } from "@/components/common/WorldRadioLogo";
 import {
   PlayIcon,
   PauseIcon,
@@ -11,7 +12,6 @@ import {
   TimerIcon,
   CompassIcon,
   UsersIcon,
-  RadioTowerIcon,
 } from "@/components/icons";
 
 export function DynamicIslandHUD() {
@@ -70,11 +70,11 @@ export function DynamicIslandHUD() {
       <div className="relative liquid-glass-pill pointer-events-auto flex items-center justify-between gap-1.5 sm:gap-3 rounded-full px-2 sm:px-3.5 py-1.5 sm:py-2 max-w-full overflow-hidden transition-all duration-300 border border-amber-400/25 shadow-[0_10px_35px_rgba(0,0,0,0.6),0_0_20px_rgba(255,201,74,0.18)]">
         <button
           onClick={toggleSidebar}
-          className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-amber-400/15 hover:bg-amber-400/25 active:scale-95 transition-all text-amber-400 border border-amber-400/30 shrink-0 shadow-sm"
+          className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-amber-400/15 hover:bg-amber-400/25 active:scale-95 transition-all text-amber-400 border border-amber-400/30 shrink-0 shadow-sm"
           aria-label="Abrir explorador de emisoras y países"
           title={`Explorar red de emisoras en ${totalCountries} países`}
         >
-          <RadioTowerIcon size={15} className="text-amber-400 shrink-0" />
+          <WorldRadioLogo size="sm" />
           <span className="text-xs font-bold tracking-tight text-white hidden sm:inline">Explorar</span>
           <span className="rounded-full bg-amber-400/25 px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-[11px] font-bold text-amber-300 whitespace-nowrap">
             {totalCountries} Países
@@ -99,7 +99,7 @@ export function DynamicIslandHUD() {
             <p className="text-xs font-bold text-white truncate leading-tight">
               {currentStation?.name || "WorldRadio"}
             </p>
-            <p className="text-[10px] sm:text-[11px] font-normal text-slate-400 truncate leading-tight mt-0.5">
+            <p className="text-[10px] sm:text-[11px] font-semibold text-slate-300 truncate leading-tight mt-0.5">
               {currentStation?.city ? `${currentStation.city}, ` : ""}{currentStation?.country || "Mundial"}
             </p>
           </div>
@@ -113,7 +113,7 @@ export function DynamicIslandHUD() {
               <MoonIcon size={12} className="text-sky-300 shrink-0" />
             )}
             <span className="font-mono text-xs sm:text-sm font-semibold text-white">{timeInfo.timeString}</span>
-            <span className="text-[11px] text-slate-400 font-normal hidden md:inline">{timeInfo.label}</span>
+            <span className="text-[11px] text-slate-300 font-semibold hidden md:inline">{timeInfo.label}</span>
           </span>
 
           <span

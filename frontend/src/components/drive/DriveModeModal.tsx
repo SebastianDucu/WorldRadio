@@ -64,7 +64,7 @@ export function DriveModeModal() {
                 En marcha
               </span>
             </h2>
-            <p className="text-xs font-normal text-slate-400">
+            <p className="text-xs font-semibold text-slate-400">
               Botones amplios y seguros para cambiar de emisora sin distracciones
             </p>
           </div>
@@ -116,7 +116,7 @@ export function DriveModeModal() {
               <span className="mt-3 text-sm sm:text-base font-semibold text-white text-center line-clamp-1">
                 {station.name}
               </span>
-              <span className="text-xs font-normal text-slate-400 text-center line-clamp-1">
+              <span className="text-xs font-semibold text-slate-400 text-center line-clamp-1">
                 {station.city}, {station.country}
               </span>
 
@@ -138,7 +138,7 @@ export function DriveModeModal() {
             <h3 className="text-base font-semibold text-amber-400">
               {currentStation.name}
             </h3>
-            <p className="text-xs font-normal text-slate-400">
+            <p className="text-xs font-semibold text-slate-400">
               {currentStation.city}, {currentStation.country} · {currentStation.bitrate} kbps · {isPlaying ? "En directo" : "Pausado"}
             </p>
           </div>
