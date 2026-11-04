@@ -81,6 +81,15 @@ export function StationSidebar() {
 
   const countryList = countries && countries.length > 0 ? countries : COUNTRIES;
 
+  // Smart Country Match when searching (e.g. typing "colom" -> Colombia)
+  const matchedCountry = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    if (q.length < 2) return null;
+    return countryList.find(
+      (c) => c.name.toLowerCase().startsWith(q) || c.name.toLowerCase().includes(q),
+    );
+  }, [countryList, searchQuery]);
+
   // Debounced online search for Radio Browser API
   useEffect(() => {
     if (!searchQuery || searchQuery.trim().length < 3) {
@@ -526,29 +535,72 @@ export function StationSidebar() {
           ) : (
             /* Station List with active filter pill */
             <>
+              {/* Smart Country Match Banner when searching (e.g. "colom" -> Colombia) */}
+              {matchedCountry && selectedCountryCode !== matchedCountry.code && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedCountryCode(matchedCountry.code);
+                    setSelectedCity(null);
+                    flyTo(matchedCountry.lat, matchedCountry.lng);
+                    setSearchQuery("");
+                  }}
+                  className="w-full flex items-center justify-between p-2.5 rounded-xl bg-amber-400/20 hover:bg-amber-400/30 border border-amber-400/50 text-amber-300 text-xs font-semibold transition-all group shadow-sm mb-2"
+                >
+                  <span className="flex items-center gap-2 truncate">
+                    <GlobeIcon size={14} className="text-amber-400 shrink-0" />
+                    <span>
+                      Explorar país: <strong className="text-white font-bold">{matchedCountry.name}</strong> ({matchedCountry.stationCount} emisoras)
+                    </span>
+                  </span>
+                  <span className="text-amber-400 text-xs font-bold group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5 shrink-0">
+                    <span>Ver ciudades</span>
+                    <span>›</span>
+                  </span>
+                </button>
+              )}
+
               {/* TWO Hierarchical Filters: País and Ciudad */}
               {selectedCountryCode && (
                 <div className="space-y-1.5 mb-2.5">
-                  {/* Filter 1: Country Pill */}
-                  <div className="flex items-center justify-between p-2 px-3 rounded-xl bg-amber-400/15 border border-amber-400/35 text-xs font-semibold text-amber-300 shadow-sm">
-                    <span className="flex items-center gap-1.5 truncate">
+                  {/* Filter Badges: Country Pill + City Pill */}
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {/* Country Pill */}
+                    <div className="flex items-center gap-1.5 p-1.5 px-3 rounded-xl bg-amber-400/15 border border-amber-400/35 text-xs font-semibold text-amber-300 shadow-sm">
                       <GlobeIcon size={14} className="text-amber-400 shrink-0" />
                       <span className="text-amber-400 font-bold">País:</span>
                       <span className="text-white font-semibold">
                         {countryList.find((c) => c.code === selectedCountryCode)?.name || selectedCountryCode}
                       </span>
-                    </span>
-                    <button
-                      onClick={() => {
-                        setSelectedCountryCode(null);
-                        setSelectedCity(null);
-                      }}
-                      className="p-1 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
-                      title="Quitar filtro de país"
-                      aria-label="Quitar filtro de país"
-                    >
-                      <CloseIcon size={14} />
-                    </button>
+                      <button
+                        onClick={() => {
+                          setSelectedCountryCode(null);
+                          setSelectedCity(null);
+                        }}
+                        className="ml-1 p-0.5 hover:text-white rounded-md hover:bg-white/10 transition-colors"
+                        title="Quitar filtro de país"
+                        aria-label="Quitar filtro de país"
+                      >
+                        <CloseIcon size={12} />
+                      </button>
+                    </div>
+
+                    {/* City Pill (if selected) */}
+                    {selectedCity && (
+                      <div className="flex items-center gap-1.5 p-1.5 px-3 rounded-xl bg-emerald-400/15 border border-emerald-400/35 text-xs font-semibold text-emerald-300 shadow-sm animate-fadeIn">
+                        <LocationIcon size={13} className="text-emerald-400 shrink-0" />
+                        <span className="text-emerald-400 font-bold">Ciudad:</span>
+                        <span className="text-white font-semibold">{selectedCity}</span>
+                        <button
+                          onClick={() => setSelectedCity(null)}
+                          className="ml-1 p-0.5 hover:text-white rounded-md hover:bg-white/10 transition-colors"
+                          title="Quitar filtro de ciudad"
+                          aria-label="Quitar filtro de ciudad"
+                        >
+                          <CloseIcon size={12} />
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   {/* Filter 2: Cities in selected Country */}

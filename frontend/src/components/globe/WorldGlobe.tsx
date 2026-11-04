@@ -18,6 +18,9 @@ interface SatelliteFeature {
 
 // Curated Landmark Broadcasting Nations & Metropolitan Radio Capitals
 const SATELLITE_FEATURES: SatelliteFeature[] = [
+  // North Pole Christmas Landmark
+  { name: "Polo Norte · Taller de Santa", lat: 88.5, lng: 0, type: "city", countryCode: "XMAS" },
+
   // Países de América
   { name: "Colombia", lat: 4.57, lng: -74.29, type: "country", countryCode: "CO" },
   { name: "España", lat: 40.46, lng: -3.74, type: "country", countryCode: "ES" },
@@ -137,6 +140,7 @@ export function WorldGlobe() {
   const targetRotYRef = useRef<number | null>(null);
   const targetRotXRef = useRef<number | null>(null);
   const visibleLabelsRef = useRef<ProjectedScreenLabel[]>([]);
+  const santaScreenPosRef = useRef<{ x: number; y: number; visible: boolean } | null>(null);
 
   // Smooth camera centering on active coordinates
   useEffect(() => {
@@ -203,16 +207,16 @@ export function WorldGlobe() {
     const lightsTexture = textureLoader.load(`${baseUrl}textures/earth_lights_2048.png`);
     const cloudsTexture = textureLoader.load(`${baseUrl}textures/earth_clouds_1024.png`);
 
-    // 4. Satellite Earth Mesh
+    // 4. Satellite Earth Mesh with enhanced ocean glints and night lights
     const earthGeo = new THREE.SphereGeometry(1, 64, 64);
     const earthMat = new THREE.MeshPhongMaterial({
       map: earthTexture,
       specularMap: specularTexture,
-      specular: new THREE.Color(0x334466),
-      shininess: 25,
+      specular: isChristmas ? new THREE.Color(0x446699) : new THREE.Color(0x335577),
+      shininess: isChristmas ? 32 : 25,
       emissiveMap: lightsTexture,
       emissive: isChristmas ? new THREE.Color(0xffe899) : new THREE.Color(0xffddaa),
-      emissiveIntensity: 0.5,
+      emissiveIntensity: isChristmas ? 0.65 : 0.5,
     });
     const earthMesh = new THREE.Mesh(earthGeo, earthMat);
     earthGroup.add(earthMesh);
@@ -222,15 +226,25 @@ export function WorldGlobe() {
     const cloudsMat = new THREE.MeshPhongMaterial({
       map: cloudsTexture,
       transparent: true,
-      opacity: 0.35,
+      opacity: 0.38,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
     });
     const cloudsMesh = new THREE.Mesh(cloudsGeo, cloudsMat);
     earthGroup.add(cloudsMesh);
 
-    // 6. Luminous Rayleigh Scattering Atmosphere Rim
-    const atmosphereGeo = new THREE.SphereGeometry(1.035, 48, 48);
+    // 6. North Pole Star Beacon (Christmas Landmark)
+    let northPoleBeacon: THREE.Mesh | null = null;
+    if (isChristmas) {
+      const beaconGeo = new THREE.CylinderGeometry(0.003, 0.008, 0.12, 8);
+      const beaconMat = new THREE.MeshBasicMaterial({ color: 0xffc94a });
+      northPoleBeacon = new THREE.Mesh(beaconGeo, beaconMat);
+      northPoleBeacon.position.set(0, 1.06, 0);
+      earthGroup.add(northPoleBeacon);
+    }
+
+    // 7. Luminous Rayleigh Scattering Atmosphere Rim
+    const atmosphereGeo = new THREE.SphereGeometry(1.038, 48, 48);
     const atmosphereMat = new THREE.ShaderMaterial({
       vertexShader: `
         varying vec3 vNormal;
@@ -259,7 +273,47 @@ export function WorldGlobe() {
     const atmosphereMesh = new THREE.Mesh(atmosphereGeo, atmosphereMat);
     scene.add(atmosphereMesh);
 
-    // 7. Celestial Starfield Background
+    // 8. 3D Santa Orbital Trajectory & Vessel in Low Earth Orbit
+    const santaOrbitRadius = 1.24;
+    const santaOrbitGroup = new THREE.Group();
+    santaOrbitGroup.rotation.z = (28 * Math.PI) / 180;
+    santaOrbitGroup.rotation.x = (14 * Math.PI) / 180;
+
+    let santaRudolphBeacon: THREE.Mesh | null = null;
+    let santaSleighVessel: THREE.Mesh | null = null;
+
+    if (isChristmas) {
+      // Golden orbit trajectory line
+      const orbitPts: THREE.Vector3[] = [];
+      for (let i = 0; i <= 64; i++) {
+        const th = (i / 64) * Math.PI * 2;
+        orbitPts.push(new THREE.Vector3(santaOrbitRadius * Math.cos(th), 0, santaOrbitRadius * Math.sin(th)));
+      }
+      const orbitGeo = new THREE.BufferGeometry().setFromPoints(orbitPts);
+      const orbitMat = new THREE.LineBasicMaterial({
+        color: 0xffc94a,
+        transparent: true,
+        opacity: 0.38,
+      });
+      const orbitLine = new THREE.Line(orbitGeo, orbitMat);
+      santaOrbitGroup.add(orbitLine);
+
+      // Rudolph Glowing Ruby Nose Beacon
+      const rudolphGeo = new THREE.SphereGeometry(0.016, 8, 8);
+      const rudolphMat = new THREE.MeshBasicMaterial({ color: 0xff1e56 });
+      santaRudolphBeacon = new THREE.Mesh(rudolphGeo, rudolphMat);
+      santaOrbitGroup.add(santaRudolphBeacon);
+
+      // Golden Sleigh Vessel
+      const sleighGeo = new THREE.SphereGeometry(0.02, 8, 8);
+      const sleighMat = new THREE.MeshBasicMaterial({ color: 0xffc94a });
+      santaSleighVessel = new THREE.Mesh(sleighGeo, sleighMat);
+      santaOrbitGroup.add(santaSleighVessel);
+
+      scene.add(santaOrbitGroup);
+    }
+
+    // 9. Celestial Starfield & 3D Space Snow Crystals
     const starsCount = isMobile ? 600 : 1200;
     const starsGeo = new THREE.BufferGeometry();
     const starPositions = new Float32Array(starsCount * 3);
@@ -281,7 +335,32 @@ export function WorldGlobe() {
     const starsField = new THREE.Points(starsGeo, starsMat);
     scene.add(starsField);
 
-    // 8. 3D Broadcast Station Markers on Surface
+    // 3D Space Snow Crystals drifting around Earth
+    let spaceSnowField: THREE.Points | null = null;
+    if (isChristmas) {
+      const snowCrystalsCount = isMobile ? 250 : 450;
+      const snowGeo = new THREE.BufferGeometry();
+      const snowPos = new Float32Array(snowCrystalsCount * 3);
+      for (let i = 0; i < snowCrystalsCount * 3; i += 3) {
+        const rad = 1.08 + Math.random() * 2.0;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(Math.random() * 2 - 1);
+        snowPos[i] = rad * Math.sin(phi) * Math.cos(theta);
+        snowPos[i + 1] = rad * Math.sin(phi) * Math.sin(theta);
+        snowPos[i + 2] = rad * Math.cos(phi);
+      }
+      snowGeo.setAttribute("position", new THREE.BufferAttribute(snowPos, 3));
+      const spaceSnowMat = new THREE.PointsMaterial({
+        size: 0.045,
+        color: 0xfff8e7,
+        transparent: true,
+        opacity: 0.65,
+      });
+      spaceSnowField = new THREE.Points(snowGeo, spaceSnowMat);
+      scene.add(spaceSnowField);
+    }
+
+    // 10. 3D Broadcast Station Markers on Surface
     const pinsGeo = new THREE.SphereGeometry(0.007, 8, 8);
     const pinsMat = new THREE.MeshBasicMaterial({
       color: isChristmas ? 0xffc94a : 0x38b6ff,
@@ -297,15 +376,15 @@ export function WorldGlobe() {
     pinsInstanced.instanceMatrix.needsUpdate = true;
     earthGroup.add(pinsInstanced);
 
-    // 9. Lighting Setup
-    const sunLight = new THREE.DirectionalLight(0xffffff, 1.8);
+    // 11. Lighting Setup
+    const sunLight = new THREE.DirectionalLight(0xffffff, 1.85);
     sunLight.position.set(5, 3, 5);
     scene.add(sunLight);
 
     const ambientLight = new THREE.AmbientLight(0x223355, 0.7);
     scene.add(ambientLight);
 
-    // 10. Broadcast Arcs from current station
+    // 12. Broadcast Arcs from current station
     const arcsGroup = new THREE.Group();
     earthGroup.add(arcsGroup);
 
@@ -343,7 +422,7 @@ export function WorldGlobe() {
         });
     }
 
-    // 11. Synchronize 2D Overlay Canvas
+    // 13. Synchronize 2D Overlay Canvas
     overlayCanvas.width = width * dpr;
     overlayCanvas.height = height * dpr;
     const ctx2d = overlayCanvas.getContext("2d");
@@ -395,13 +474,51 @@ export function WorldGlobe() {
       // Independent slow atmospheric cloud drift
       cloudsMesh.rotation.y += dt * 0.025;
 
+      // 3D Santa Orbit Position Update
+      if (isChristmas && santaRudolphBeacon && santaSleighVessel) {
+        const santaAngle = now * 0.00045;
+        santaRudolphBeacon.position.set(
+          santaOrbitRadius * Math.cos(santaAngle),
+          0,
+          santaOrbitRadius * Math.sin(santaAngle)
+        );
+        santaSleighVessel.position.set(
+          santaOrbitRadius * Math.cos(santaAngle - 0.05),
+          0,
+          santaOrbitRadius * Math.sin(santaAngle - 0.05)
+        );
+
+        // Calculate Santa's projected screen position
+        const santaWorld = santaRudolphBeacon.getWorldPosition(new THREE.Vector3());
+        const normal = santaWorld.clone().normalize();
+        const viewDir = camera.position.clone().sub(santaWorld).normalize();
+        const dot = normal.dot(viewDir);
+
+        if (dot > 0.05) {
+          const screenPos = santaWorld.clone().project(camera);
+          santaScreenPosRef.current = {
+            x: ((screenPos.x * 0.5 + 0.5) * width) * dpr,
+            y: ((-screenPos.y * 0.5 + 0.5) * height) * dpr,
+            visible: true,
+          };
+        } else {
+          santaScreenPosRef.current = null;
+        }
+      }
+
+      // Space Snow Drifting
+      if (spaceSnowField) {
+        spaceSnowField.rotation.y -= dt * 0.015;
+        spaceSnowField.rotation.x += dt * 0.008;
+      }
+
       // Update camera distance smoothly based on zoomLevel
       camera.position.z = 2.85 / zoomLevel;
 
       // Render Three.js Scene
       renderer.render(scene, camera);
 
-      // 12. Render 2D Projected Satellite Labels (Countries, Cities, Active Radio Beacon)
+      // 14. Render 2D Projected Satellite Labels (Countries, Cities, Radio Beacon, Santa)
       if (ctx2d) {
         ctx2d.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
         const currentLabels: ProjectedScreenLabel[] = [];
@@ -430,11 +547,14 @@ export function WorldGlobe() {
             });
 
             const isCountry = item.type === "country";
+            const isNorthPole = item.countryCode === "XMAS";
 
             // Glowing satellite node dot
             ctx2d.beginPath();
-            ctx2d.arc(x, y, (isCountry ? 3.0 : 2.0) * dpr, 0, Math.PI * 2);
-            ctx2d.fillStyle = isCountry
+            ctx2d.arc(x, y, (isNorthPole ? 3.8 : isCountry ? 3.0 : 2.0) * dpr, 0, Math.PI * 2);
+            ctx2d.fillStyle = isNorthPole
+              ? "#FFC94A"
+              : isCountry
               ? isChristmas
                 ? `rgba(255, 201, 74, ${opacity * 0.95})`
                 : `rgba(56, 182, 255, ${opacity * 0.95})`
@@ -442,14 +562,18 @@ export function WorldGlobe() {
             ctx2d.fill();
 
             // Text Typography
-            ctx2d.font = isCountry
+            ctx2d.font = isNorthPole
+              ? `bold ${Math.round(11.5 * dpr)}px -apple-system, system-ui, sans-serif`
+              : isCountry
               ? `bold ${Math.round(11 * dpr)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
               : `600 ${Math.round(9 * dpr)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
 
             ctx2d.shadowColor = "rgba(0, 0, 0, 0.9)";
             ctx2d.shadowBlur = 5 * dpr;
 
-            ctx2d.fillStyle = isCountry
+            ctx2d.fillStyle = isNorthPole
+              ? "#FFD670"
+              : isCountry
               ? isChristmas
                 ? `rgba(255, 235, 175, ${opacity})`
                 : `rgba(240, 249, 255, ${opacity})`
@@ -522,10 +646,36 @@ export function WorldGlobe() {
           }
         }
 
+        // 3D Orbital Santa Vessel Callout Tag on Screen
+        if (isChristmas && santaScreenPosRef.current) {
+          const sx = santaScreenPosRef.current.x;
+          const sy = santaScreenPosRef.current.y;
+
+          ctx2d.beginPath();
+          ctx2d.arc(sx, sy, 3.5 * dpr, 0, Math.PI * 2);
+          ctx2d.fillStyle = "#FF1E56";
+          ctx2d.fill();
+
+          const santaTag = "TRINEO DE SANTA // EN ÓRBITA";
+          ctx2d.font = `bold ${Math.round(8.5 * dpr)}px -apple-system, system-ui, sans-serif`;
+          ctx2d.fillStyle = "rgba(3, 8, 22, 0.85)";
+          ctx2d.strokeStyle = "rgba(255, 201, 74, 0.7)";
+          ctx2d.lineWidth = 1 * dpr;
+
+          const sMetrics = ctx2d.measureText(santaTag);
+          ctx2d.beginPath();
+          ctx2d.roundRect(sx + 8 * dpr, sy - 8 * dpr, sMetrics.width + 10 * dpr, 16 * dpr, 4 * dpr);
+          ctx2d.fill();
+          ctx2d.stroke();
+
+          ctx2d.fillStyle = "#FFC94A";
+          ctx2d.fillText(santaTag, sx + 13 * dpr, sy + 3 * dpr);
+        }
+
         visibleLabelsRef.current = currentLabels;
       }
 
-      // 13. Telemetry HUD Coordinates update
+      // 15. Telemetry HUD Coordinates update
       telemetryCounter++;
       if (telemetryCounter % 8 === 0) {
         const centerLat = (rotationXRef.current * 180) / Math.PI;
@@ -674,7 +824,7 @@ export function WorldGlobe() {
                 const match = stationsList.find((s) => s.countryCode === item.countryCode);
                 if (match) playStation(match);
               } else if (item.type === "city") {
-                if (item.countryCode) {
+                if (item.countryCode && item.countryCode !== "XMAS") {
                   setSelectedCountryCode(item.countryCode);
                 }
                 setSelectedCity(item.name);
@@ -734,7 +884,7 @@ export function WorldGlobe() {
           width: "min(88vw, 840px)",
           height: "min(88vw, 840px)",
           background: isChristmas
-            ? "radial-gradient(circle, rgba(255, 201, 74, 0.18) 0%, rgba(16, 185, 129, 0.08) 45%, transparent 72%)"
+            ? "radial-gradient(circle, rgba(255, 201, 74, 0.22) 0%, rgba(16, 185, 129, 0.10) 45%, transparent 72%)"
             : "radial-gradient(circle, rgba(56, 182, 255, 0.22) 0%, rgba(30, 107, 255, 0.08) 45%, transparent 72%)",
           filter: "blur(36px)",
         }}
@@ -747,12 +897,12 @@ export function WorldGlobe() {
           width: "min(106vw, 960px)",
           height: "min(106vw, 960px)",
           transform: "rotateX(68deg) translateZ(0)",
-          opacity: 0.35,
+          opacity: 0.38,
         }}
       >
-        <div className="absolute inset-0 rounded-full border border-dashed border-[#ffc94a]/30 animate-[spin_80s_linear_infinite]" />
-        <div className="absolute inset-8 rounded-full border border-[#ffc94a]/15" />
-        <div className="absolute inset-20 rounded-full border border-dotted border-[#ffd670]/25 animate-[spin_50s_linear_infinite_reverse]" />
+        <div className="absolute inset-0 rounded-full border border-dashed border-[#ffc94a]/35 animate-[spin_80s_linear_infinite]" />
+        <div className="absolute inset-8 rounded-full border border-[#ffc94a]/20" />
+        <div className="absolute inset-20 rounded-full border border-dotted border-[#ffd670]/30 animate-[spin_50s_linear_infinite_reverse]" />
       </div>
 
       {/* 3. Three.js High-Performance 3D Satellite Earth Canvas */}
@@ -771,19 +921,19 @@ export function WorldGlobe() {
 
       {/* 5. Satellite HUD Telemetry Badges */}
       <div className="pointer-events-none absolute top-14 left-4 z-20 hidden md:flex flex-col gap-1 text-[11px] font-mono text-slate-400">
-        <span className="flex items-center gap-1.5 bg-black/45 backdrop-blur-md border border-white/10 px-2.5 py-1 rounded-md shadow-lg">
+        <span className="flex items-center gap-1.5 bg-black/50 backdrop-blur-md border border-white/10 px-2.5 py-1 rounded-md shadow-lg">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
           <span className="text-white font-bold">SAT-NAV LEO</span>
           <span>// ORBIT: 780 KM // INCL: 51.6°</span>
         </span>
-        <span className="bg-black/35 backdrop-blur-md border border-white/5 px-2.5 py-0.5 rounded-md text-[10px] text-amber-300">
-          MAPA SATELITAL 3D · 174 NACIONES // HQ
+        <span className="bg-black/40 backdrop-blur-md border border-white/5 px-2.5 py-0.5 rounded-md text-[10px] text-amber-300">
+          MAPA SATELITAL 3D · 174 NACIONES // HQ {isChristmas ? "· EDICIÓN NAVIDAD" : ""}
         </span>
       </div>
 
       {/* Live Viewport Coordinates HUD Telemetry */}
       <div className="pointer-events-none absolute top-14 right-4 z-20 hidden md:flex">
-        <span className="bg-black/45 backdrop-blur-md border border-white/10 px-2.5 py-1 rounded-md text-[11px] font-mono font-semibold text-slate-300 shadow-lg">
+        <span className="bg-black/50 backdrop-blur-md border border-white/10 px-2.5 py-1 rounded-md text-[11px] font-mono font-semibold text-slate-300 shadow-lg">
           {telemetryCoords}
         </span>
       </div>

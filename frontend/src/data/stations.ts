@@ -900,7 +900,7 @@ export const COUNTRIES: CountryInfo[] = [
   { code: "DE", name: "Alemania", flag: "DE", lat: 50.9375, lng: 6.9603, stationCount: 3 },
   { code: "AR", name: "Argentina", flag: "AR", lat: -34.6037, lng: -58.3816, stationCount: 4 },
   { code: "BR", name: "Brasil", flag: "BR", lat: -23.5505, lng: -46.6333, stationCount: 2 },
-  { code: "CO", name: "Colombia", flag: "CO", lat: 4.711, lng: -74.0721, stationCount: 4 },
+  { code: "CO", name: "Colombia", flag: "CO", lat: 4.711, lng: -74.0721, stationCount: 8 },
   { code: "ES", name: "España", flag: "ES", lat: 40.4168, lng: -3.7038, stationCount: 6 },
   { code: "US", name: "Estados Unidos", flag: "US", lat: 47.6062, lng: -122.3321, stationCount: 9 },
   { code: "FR", name: "Francia", flag: "FR", lat: 48.8566, lng: 2.3522, stationCount: 3 },
