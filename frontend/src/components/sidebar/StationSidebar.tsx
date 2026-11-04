@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import {
   GlobeIcon,
   SearchIcon,
@@ -17,6 +17,7 @@ import {
   SparklesIcon,
   UsersIcon,
   LocationIcon,
+  ChevronDownIcon,
 } from "@/components/icons";
 import { IconButton } from "@/components/ui/IconButton";
 import { STATIONS, COUNTRIES } from "@/data/stations";
@@ -75,6 +76,39 @@ export function StationSidebar() {
   const [onlineResults, setOnlineResults] = useState<Station[]>([]);
   const [isSearchingOnline, setIsSearchingOnline] = useState(false);
   const [changelogOpen, setChangelogOpen] = useState(false);
+  const [isCityPickerExpanded, setIsCityPickerExpanded] = useState(false);
+  const [citySearchQuery, setCitySearchQuery] = useState("");
+  const cityScrollRef = useRef<HTMLDivElement>(null);
+  const [isDraggingCity, setIsDraggingCity] = useState(false);
+  const dragStartX = useRef(0);
+  const dragScrollLeft = useRef(0);
+
+  const handleCityMouseDown = (e: React.MouseEvent) => {
+    if (!cityScrollRef.current) return;
+    setIsDraggingCity(true);
+    dragStartX.current = e.pageX - cityScrollRef.current.offsetLeft;
+    dragScrollLeft.current = cityScrollRef.current.scrollLeft;
+  };
+
+  const handleCityMouseMove = (e: React.MouseEvent) => {
+    if (!isDraggingCity || !cityScrollRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - cityScrollRef.current.offsetLeft;
+    const walk = (x - dragStartX.current) * 1.5;
+    cityScrollRef.current.scrollLeft = dragScrollLeft.current - walk;
+  };
+
+  const handleCityMouseUpOrLeave = () => {
+    setIsDraggingCity(false);
+  };
+
+  const scrollCityLeft = () => {
+    cityScrollRef.current?.scrollBy({ left: -200, behavior: "smooth" });
+  };
+
+  const scrollCityRight = () => {
+    cityScrollRef.current?.scrollBy({ left: 200, behavior: "smooth" });
+  };
 
   const countryList = countries && countries.length > 0 ? countries : COUNTRIES;
 
@@ -119,6 +153,12 @@ export function StationSidebar() {
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, "es"));
   }, [allStations, selectedCountryCode]);
+
+  const filteredCities = useMemo(() => {
+    if (!citySearchQuery.trim()) return availableCities;
+    const q = citySearchQuery.toLowerCase().trim();
+    return availableCities.filter((c) => c.name.toLowerCase().includes(q));
+  }, [availableCities, citySearchQuery]);
 
   const filteredStations = useMemo(() => {
     let list = allStations && allStations.length > 0 ? allStations : STATIONS;
@@ -568,57 +608,166 @@ export function StationSidebar() {
                   </div>
 
                   {availableCities.length > 0 && (
-                    <div className="rounded-xl bg-slate-900/60 border border-white/5 p-2 space-y-1.5">
-                      <div className="flex items-center justify-between px-1 text-[11px] font-semibold text-slate-400">
-                        <span className="flex items-center gap-1">
-                          <LocationIcon size={12} className="text-amber-400" />
-                          <span>Filtro de Ciudades ({availableCities.length}):</span>
+                    <div className="rounded-2xl liquid-glass-card border border-white/10 p-2.5 space-y-2">
+                      <div className="flex items-center justify-between px-1 text-xs font-semibold text-slate-300">
+                        <span className="flex items-center gap-1.5">
+                          <LocationIcon size={13} className="text-amber-400" />
+                          <span className="text-white font-bold">Filtro de Ciudades</span>
+                          <span className="text-[11px] text-amber-400/90 font-mono">({availableCities.length})</span>
                         </span>
-                        {selectedCity && (
+                        <div className="flex items-center gap-1.5">
+                          {selectedCity && (
+                            <button
+                              onClick={() => setSelectedCity(null)}
+                              className="text-amber-400 hover:text-amber-300 text-[11px] font-bold px-1.5 py-0.5 rounded-md hover:bg-amber-400/10 transition-colors"
+                            >
+                              Ver todas
+                            </button>
+                          )}
                           <button
-                            onClick={() => setSelectedCity(null)}
-                            className="text-amber-400 hover:text-amber-300 text-[10px] font-bold"
+                            onClick={() => setIsCityPickerExpanded(!isCityPickerExpanded)}
+                            className="flex items-center gap-1 text-[11px] font-bold text-amber-400 hover:text-amber-300 bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/30 px-2 py-0.5 rounded-lg transition-all active:scale-95"
+                            title={isCityPickerExpanded ? "Plegar vista" : "Desplegar todas las ciudades"}
                           >
-                            Ver todas
+                            <span>{isCityPickerExpanded ? "Plegar" : "Desplegar"}</span>
+                            <ChevronDownIcon
+                              size={12}
+                              className={`transition-transform duration-200 ${isCityPickerExpanded ? "rotate-180" : ""}`}
+                            />
                           </button>
-                        )}
+                        </div>
                       </div>
 
-                      <div className="flex gap-1.5 overflow-x-auto py-0.5 scrollbar-none">
-                        <button
-                          onClick={() => setSelectedCity(null)}
-                          className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all ${
-                            !selectedCity
-                              ? "bg-amber-400 text-slate-950 font-bold shadow-xs shadow-amber-400/30 scale-105"
-                              : "bg-slate-800 text-slate-300 hover:text-white border border-white/10"
-                          }`}
-                        >
-                          Todas las ciudades ({availableCities.reduce((acc, c) => acc + c.count, 0)})
-                        </button>
-                        {availableCities.map((c) => {
-                          const isCityActive = selectedCity?.toLowerCase() === c.name.toLowerCase();
-                          return (
+                      {isCityPickerExpanded ? (
+                        <div className="space-y-2 pt-1 animate-fadeIn">
+                          <div className="relative flex items-center">
+                            <SearchIcon size={14} className="absolute left-2.5 text-slate-400 pointer-events-none" />
+                            <input
+                              type="text"
+                              value={citySearchQuery}
+                              onChange={(e) => setCitySearchQuery(e.target.value)}
+                              placeholder={`Buscar ciudad (${availableCities.length})...`}
+                              className="w-full rounded-xl border border-white/10 bg-slate-950/80 py-1 pl-8 pr-7 text-xs text-white placeholder:text-slate-500 focus:border-amber-400 focus:outline-none transition-all"
+                              autoFocus
+                            />
+                            {citySearchQuery && (
+                              <button
+                                onClick={() => setCitySearchQuery("")}
+                                className="absolute right-2 text-slate-400 hover:text-white"
+                              >
+                                <CloseIcon size={12} />
+                              </button>
+                            )}
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-1.5 max-h-52 overflow-y-auto pr-1 scrollbar-thin">
                             <button
-                              key={c.name}
-                              onClick={() => setSelectedCity(isCityActive ? null : c.name)}
-                              className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all flex items-center gap-1 ${
-                                isCityActive
-                                  ? "bg-amber-400 text-slate-950 font-bold shadow-xs shadow-amber-400/30 scale-105"
-                                  : "bg-slate-800 text-slate-300 hover:text-white border border-white/10"
+                              onClick={() => {
+                                setSelectedCity(null);
+                              }}
+                              className={`rounded-xl p-2 text-left text-xs font-semibold transition-all border ${
+                                !selectedCity
+                                  ? "bg-amber-400 text-slate-950 font-bold border-amber-400 shadow-sm"
+                                  : "bg-slate-900/80 text-slate-300 hover:text-white border-white/5 hover:border-white/20"
                               }`}
                             >
-                              <span>{c.name}</span>
-                              <span
-                                className={`text-[10px] ${
-                                  isCityActive ? "text-slate-950/80 font-bold" : "text-amber-400 font-bold"
-                                }`}
-                              >
-                                ({c.count})
-                              </span>
+                              <div className="truncate">Todas las ciudades</div>
+                              <div className={`text-[10px] font-mono mt-0.5 ${!selectedCity ? "text-slate-950/80" : "text-amber-400"}`}>
+                                {availableCities.reduce((acc, c) => acc + c.count, 0)} emisoras
+                              </div>
                             </button>
-                          );
-                        })}
-                      </div>
+                            {filteredCities.map((c) => {
+                              const isCityActive = selectedCity?.toLowerCase() === c.name.toLowerCase();
+                              return (
+                                <button
+                                  key={c.name}
+                                  onClick={() => setSelectedCity(isCityActive ? null : c.name)}
+                                  className={`rounded-xl p-2 text-left text-xs font-semibold transition-all border flex flex-col justify-between ${
+                                    isCityActive
+                                      ? "bg-amber-400 text-slate-950 font-bold border-amber-400 shadow-sm"
+                                      : "bg-slate-900/80 text-slate-300 hover:text-white border-white/5 hover:border-white/20"
+                                  }`}
+                                >
+                                  <span className="truncate">{c.name}</span>
+                                  <span
+                                    className={`text-[10px] font-mono mt-0.5 ${
+                                      isCityActive ? "text-slate-950/80" : "text-amber-400 font-bold"
+                                    }`}
+                                  >
+                                    {c.count} {c.count === 1 ? "emisora" : "emisoras"}
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="relative flex items-center group">
+                          <button
+                            onClick={scrollCityLeft}
+                            className="absolute left-0 z-10 flex h-7 w-5 items-center justify-center rounded-l-xl bg-slate-950/85 hover:bg-slate-800 text-amber-400 hover:text-amber-300 border-y border-l border-white/10 shadow-md backdrop-blur-xs transition-opacity"
+                            aria-label="Deslizar a la izquierda"
+                          >
+                            ‹
+                          </button>
+
+                          <div
+                            ref={cityScrollRef}
+                            onMouseDown={handleCityMouseDown}
+                            onMouseMove={handleCityMouseMove}
+                            onMouseUp={handleCityMouseUpOrLeave}
+                            onMouseLeave={handleCityMouseUpOrLeave}
+                            onWheel={(e) => {
+                              if (e.deltaY !== 0) {
+                                e.currentTarget.scrollLeft += e.deltaY;
+                              }
+                            }}
+                            className="flex gap-1.5 overflow-x-auto py-1 px-6 scrollbar-none select-none cursor-grab active:cursor-grabbing w-full"
+                          >
+                            <button
+                              onClick={() => setSelectedCity(null)}
+                              className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all ${
+                                !selectedCity
+                                  ? "bg-amber-400 text-slate-950 font-bold shadow-xs shadow-amber-400/30 scale-105"
+                                  : "bg-slate-900/80 text-slate-300 hover:text-white border border-white/10"
+                              }`}
+                            >
+                              Todas las ciudades ({availableCities.reduce((acc, c) => acc + c.count, 0)})
+                            </button>
+                            {availableCities.map((c) => {
+                              const isCityActive = selectedCity?.toLowerCase() === c.name.toLowerCase();
+                              return (
+                                <button
+                                  key={c.name}
+                                  onClick={() => setSelectedCity(isCityActive ? null : c.name)}
+                                  className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all flex items-center gap-1 ${
+                                    isCityActive
+                                      ? "bg-amber-400 text-slate-950 font-bold shadow-xs shadow-amber-400/30 scale-105"
+                                      : "bg-slate-900/80 text-slate-300 hover:text-white border border-white/10"
+                                  }`}
+                                >
+                                  <span>{c.name}</span>
+                                  <span
+                                    className={`text-[10px] ${
+                                      isCityActive ? "text-slate-950/80 font-bold" : "text-amber-400 font-bold"
+                                    }`}
+                                  >
+                                    ({c.count})
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+
+                          <button
+                            onClick={scrollCityRight}
+                            className="absolute right-0 z-10 flex h-7 w-5 items-center justify-center rounded-r-xl bg-slate-950/85 hover:bg-slate-800 text-amber-400 hover:text-amber-300 border-y border-r border-white/10 shadow-md backdrop-blur-xs transition-opacity"
+                            aria-label="Deslizar a la derecha"
+                          >
+                            ›
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
