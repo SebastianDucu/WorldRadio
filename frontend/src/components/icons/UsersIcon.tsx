@@ -10,3 +10,4 @@ export function UsersIcon(props: IconProps) {
     </IconBase>
   );
 }
+

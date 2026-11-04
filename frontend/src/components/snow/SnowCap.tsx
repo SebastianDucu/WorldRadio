@@ -23,3 +23,4 @@ export function SnowCap({ className = "" }: SnowCapProps) {
     </div>
   );
 }
+

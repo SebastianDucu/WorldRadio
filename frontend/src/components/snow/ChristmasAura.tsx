@@ -206,9 +206,9 @@ export function ChristmasAura() {
         })}
       </div>
 
-      {/* Santa's Flying Sleigh with Rudolph and Reindeer Team */}
+      {/* Santa's Flying Sleigh with Rudolph and Reindeer Team (Responsively scaled for phone & desktop) */}
       <div
-        className="absolute top-14 sm:top-18 flex items-center gap-1.5 transition-transform will-change-transform opacity-95 pointer-events-none transform-gpu"
+        className="absolute top-14 sm:top-20 flex items-center gap-1.5 transition-transform will-change-transform opacity-95 pointer-events-none transform-gpu scale-85 sm:scale-100 origin-left"
         style={{
           transform: `translate3d(${sleighProgress}px, ${Math.sin(sleighProgress / 65) * 16}px, 0)`,
         }}
@@ -216,33 +216,33 @@ export function ChristmasAura() {
         <div className="flex items-center gap-1.5 drop-shadow-[0_0_16px_rgba(255,201,74,0.9)]">
           {/* Rudolph in the Lead with glowing Red Nose */}
           <div className="relative flex items-center">
-            <svg className="w-6 h-6 fill-amber-300" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6 fill-amber-300" viewBox="0 0 24 24">
               <path d="M19 3l-1.5 2h-2L14 3h-1l.5 3-1.5 1.5L9 7v2l2 1v3l-2 2-1 4h2l1-3 2-1v-2l2-1.5 3-1 2-3.5L21 4l-2-1z" />
             </svg>
             {/* Rudolph's Glowing Ruby Nose Beacon */}
-            <span className="absolute top-[8px] right-[2px] h-2 w-2 rounded-full bg-rose-500 shadow-[0_0_10px_#f43f5e] animate-ping" />
-            <span className="absolute top-[8px] right-[2px] h-2 w-2 rounded-full bg-rose-500 shadow-[0_0_6px_#f43f5e]" />
+            <span className="absolute top-[6px] sm:top-[8px] right-[1px] sm:right-[2px] h-2 w-2 rounded-full bg-rose-500 shadow-[0_0_10px_#f43f5e] animate-ping" />
+            <span className="absolute top-[6px] sm:top-[8px] right-[1px] sm:right-[2px] h-2 w-2 rounded-full bg-rose-500 shadow-[0_0_6px_#f43f5e]" />
           </div>
 
           {/* Reindeers 2, 3 & 4 in convoy */}
-          <svg className="w-5 h-5 fill-amber-300 -ml-1.5 opacity-90" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 sm:w-5 sm:h-5 fill-amber-300 -ml-1 sm:-ml-1.5 opacity-90" viewBox="0 0 24 24">
             <path d="M19 3l-1.5 2h-2L14 3h-1l.5 3-1.5 1.5L9 7v2l2 1v3l-2 2-1 4h2l1-3 2-1v-2l2-1.5 3-1 2-3.5L21 4l-2-1z" />
           </svg>
-          <svg className="w-5 h-5 fill-amber-300 -ml-1.5 opacity-85" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 sm:w-5 sm:h-5 fill-amber-300 -ml-1 sm:-ml-1.5 opacity-85" viewBox="0 0 24 24">
             <path d="M19 3l-1.5 2h-2L14 3h-1l.5 3-1.5 1.5L9 7v2l2 1v3l-2 2-1 4h2l1-3 2-1v-2l2-1.5 3-1 2-3.5L21 4l-2-1z" />
           </svg>
-          <svg className="w-5 h-5 fill-amber-300 -ml-1.5 opacity-80" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 sm:w-5 sm:h-5 fill-amber-300 -ml-1 sm:-ml-1.5 opacity-80" viewBox="0 0 24 24">
             <path d="M19 3l-1.5 2h-2L14 3h-1l.5 3-1.5 1.5L9 7v2l2 1v3l-2 2-1 4h2l1-3 2-1v-2l2-1.5 3-1 2-3.5L21 4l-2-1z" />
           </svg>
 
           {/* Golden Reins Line */}
-          <svg className="w-5 h-3 text-amber-300/80 -ml-1" viewBox="0 0 24 10" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <svg className="w-4 h-3 sm:w-5 sm:h-3 text-amber-300/80 -ml-1" viewBox="0 0 24 10" fill="none" stroke="currentColor" strokeWidth="1.5">
             <path d="M0 5 Q 12 9 24 4" />
           </svg>
 
           {/* Santa Claus in his Festive Sleigh */}
           <div className="relative -ml-1">
-            <svg className="w-8 h-8 sm:w-9 sm:h-9 fill-amber-400" viewBox="0 0 32 32">
+            <svg className="w-7 h-7 sm:w-9 sm:h-9 fill-amber-400" viewBox="0 0 32 32">
               <path d="M4 22c2 0 4-1.3 5.5-3.3l7 .7c2.5 0 5-2 5.8-4.5l1.2-6H21l-.7 3.3c-.4 1.3-1.6 2-2.7 2H11l-2-3c-.7-1.3-2-2-3.3-2H3v2.7h3.3c.4 0 1 .3 1.1.7l1.9 3.7c-2 2.7-4 4-5.3 4v2zm1.3 2.7c4.7 0 8.7-2.7 10.7-6l8 .7c2 0 4-1.1 5.1-2.7l-2.1-1.2c-.7 1.1-1.7 1.9-3 1.9l-8.3-.7C14 21.3 10 24 5.3 24v2.7H4.7c-1.1 0-2-.9-2-2s.9-2 2-2H6.7v2.7h-1.4z" />
               {/* Santa Figure with Red Cap */}
               <circle cx="16" cy="11" r="2.8" fill="#E11D48" />
@@ -253,14 +253,14 @@ export function ChristmasAura() {
 
         {/* Shimmering Golden Cometary Trail & Sparkles */}
         <div className="flex items-center -ml-2">
-          <span className="h-1.5 w-32 sm:w-48 bg-gradient-to-l from-amber-400/90 via-amber-300/40 to-transparent blur-[1.5px] rounded-full" />
-          <span className="h-1 w-16 -ml-8 bg-gradient-to-l from-white/90 to-transparent blur-[0.5px] rounded-full" />
+          <span className="h-1.5 w-24 sm:w-48 bg-gradient-to-l from-amber-400/90 via-amber-300/40 to-transparent blur-[1.5px] rounded-full" />
+          <span className="h-1 w-12 sm:w-16 -ml-6 sm:-ml-8 bg-gradient-to-l from-white/90 to-transparent blur-[0.5px] rounded-full" />
         </div>
       </div>
 
-      {/* Decorative frosted pine branches in bottom corners (SVG paths, zero emojis) */}
-      <div className="absolute bottom-2 left-2 pointer-events-none opacity-40 hover:opacity-75 transition-opacity">
-        <svg className="w-16 h-16 text-emerald-500/50" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2.5">
+      {/* Decorative frosted pine branches above player bar (SVG paths, zero emojis) */}
+      <div className="absolute bottom-20 sm:bottom-24 left-2 sm:left-4 pointer-events-none opacity-45 hover:opacity-80 transition-opacity">
+        <svg className="w-12 h-12 sm:w-16 sm:h-16 text-emerald-500/50" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2.5">
           <path d="M10 90 Q 30 70 50 40 M20 80 Q 40 75 55 60 M25 65 Q 45 55 60 35 M15 75 Q 35 60 45 45" strokeLinecap="round" />
           <circle cx="52" cy="38" r="3" fill="#FFC94A" />
           <circle cx="57" cy="58" r="2.5" fill="#E11D48" />
@@ -268,8 +268,8 @@ export function ChristmasAura() {
         </svg>
       </div>
 
-      <div className="absolute bottom-2 right-2 pointer-events-none opacity-40 hover:opacity-75 transition-opacity transform -scale-x-100">
-        <svg className="w-16 h-16 text-emerald-500/50" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2.5">
+      <div className="absolute bottom-20 sm:bottom-24 right-2 sm:right-4 pointer-events-none opacity-45 hover:opacity-80 transition-opacity transform -scale-x-100">
+        <svg className="w-12 h-12 sm:w-16 sm:h-16 text-emerald-500/50" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2.5">
           <path d="M10 90 Q 30 70 50 40 M20 80 Q 40 75 55 60 M25 65 Q 45 55 60 35 M15 75 Q 35 60 45 45" strokeLinecap="round" />
           <circle cx="52" cy="38" r="3" fill="#FFC94A" />
           <circle cx="57" cy="58" r="2.5" fill="#E11D48" />

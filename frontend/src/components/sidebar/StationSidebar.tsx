@@ -5,7 +5,6 @@ import {
   HeartIcon,
   PlayIcon,
   PauseIcon,
-  RadioTowerIcon,
   CloseIcon,
   ShuffleIcon,
   SpinnerIcon,
@@ -156,21 +155,6 @@ export function StationSidebar() {
           className="fixed inset-0 z-20 bg-black/60 backdrop-blur-xs sm:hidden transition-opacity"
           aria-hidden="true"
         />
-      )}
-
-      {/* Floating Toggle button when sidebar is collapsed */}
-      {!sidebarOpen && (
-        <button
-          onClick={toggleSidebar}
-          className="liquid-glass fixed top-[max(0.75rem,env(safe-area-inset-top,0px))] left-3 sm:left-4 z-30 flex items-center gap-2 sm:gap-2.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-2xl shadow-2xl transition-all duration-200 hover:scale-105 active:scale-95 border border-amber-400/30"
-          aria-label="Abrir explorador de emisoras"
-        >
-          <RadioTowerIcon size={18} className="text-amber-400" />
-          <span className="text-xs font-bold tracking-tight text-white">Explorar</span>
-          <span className="rounded-full bg-amber-400/20 px-2 py-0.5 text-[11px] font-bold text-amber-400">
-            {countryList.length} Países
-          </span>
-        </button>
       )}
 
       {/* Main Liquid Glass Sidebar Panel */}

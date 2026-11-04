@@ -1,5 +1,5 @@
 import { usePlayerStore } from "@/store/player";
-import { STATIONS } from "@/data/stations";
+import { STATIONS, COUNTRIES } from "@/data/stations";
 import type { Station, CountryInfo } from "@/types/radio";
 
 const DB_NAME = "worldradio_cache_v1";
@@ -66,12 +66,14 @@ export async function initStationsDirectory() {
 
   const store = usePlayerStore.getState();
 
-  // 1. Initial Instant Bootstrap: Load 174 countries from local JSON
+  // 1. Initial Instant Bootstrap: Load 174 canonical countries from local JSON
+  let base174Countries: CountryInfo[] = [];
   try {
     const res = await fetch("./data/countries.json");
     if (res.ok) {
       const localCountries: CountryInfo[] = await res.json();
       if (Array.isArray(localCountries) && localCountries.length > 0) {
+        base174Countries = localCountries;
         store.setCountries(localCountries);
       }
     }
@@ -86,7 +88,14 @@ export async function initStationsDirectory() {
     const merged = [...STATIONS, ...cached.stations.filter((s) => !STATIONS.some((cur) => cur.id === s.id))];
     store.setAllStations(merged);
     if (cached.countries && cached.countries.length > 0) {
-      store.setCountries(cached.countries);
+      // Ensure strictly 174 countries from cache or fallback
+      const canonical = base174Countries.length > 0 ? base174Countries : COUNTRIES;
+      const cachedMap = new Map(cached.countries.map((c) => [c.code.toUpperCase(), c]));
+      const sanitizedCountries = canonical.map((base: CountryInfo) => {
+        const found = cachedMap.get(base.code.toUpperCase());
+        return found ? { ...base, stationCount: Math.max(base.stationCount, found.stationCount) } : base;
+      }).sort((a: CountryInfo, b: CountryInfo) => a.name.localeCompare(b.name, "es"));
+      store.setCountries(sanitizedCountries);
     }
     store.setDirectoryStatus("done", 1, cached.stations.length);
     return;
@@ -132,7 +141,13 @@ export async function initStationsDirectory() {
 
     const cn: Record<string, string> = parsed.cn || {};
     const rows: unknown[][] = parsed.rows;
+
+    // Seed countryMap strictly with the canonical 174 countries
+    const canonicalCountries = base174Countries.length > 0 ? base174Countries : COUNTRIES;
     const countryMap = new Map<string, CountryInfo>();
+    for (const c of canonicalCountries) {
+      countryMap.set(c.code.toUpperCase(), { ...c, stationCount: 0 });
+    }
 
     const dn = typeof Intl !== "undefined" && Intl.DisplayNames ? new Intl.DisplayNames(["es"], { type: "region" }) : null;
 
@@ -189,17 +204,7 @@ export async function initStationsDirectory() {
         }
       }
 
-      if (cc && cc.length === 2) {
-        if (!countryMap.has(cc)) {
-          countryMap.set(cc, {
-            code: cc,
-            name: countryName,
-            flag: cc,
-            lat,
-            lng,
-            stationCount: 0,
-          });
-        }
+      if (cc && cc.length === 2 && countryMap.has(cc)) {
         countryMap.get(cc)!.stationCount++;
       }
 
@@ -225,7 +230,6 @@ export async function initStationsDirectory() {
 
     // Sort 174 countries alphabetically in Spanish
     const sortedCountries = [...countryMap.values()]
-      .filter((c) => c.stationCount >= 1)
       .sort((a, b) => a.name.localeCompare(b.name, "es"));
 
     const mergedAll = [...STATIONS, ...parsedStations];
