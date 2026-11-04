@@ -120,6 +120,45 @@ export function WorldGlobe() {
   const [autoRotate, setAutoRotate] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [globeTheme, setGlobeTheme] = useState<"sapphire" | "obsidian" | "classic">("sapphire");
+
+  const earthMatRef = useRef<THREE.MeshPhongMaterial | null>(null);
+  const borderMatRef = useRef<THREE.LineBasicMaterial | null>(null);
+  const atmosphereMatRef = useRef<THREE.ShaderMaterial | null>(null);
+
+  useEffect(() => {
+    const earthMat = earthMatRef.current;
+    const borderMat = borderMatRef.current;
+    const atmoMat = atmosphereMatRef.current;
+    if (!earthMat || !borderMat || !atmoMat) return;
+
+    const glow = atmoMat.uniforms.glowColor?.value;
+    if (globeTheme === "sapphire") {
+      earthMat.color.setHex(0xffffff);
+      earthMat.specular.setHex(0x38bdf8);
+      earthMat.emissive.setHex(0xffb84d);
+      earthMat.emissiveIntensity = 0.85;
+      borderMat.color.setHex(0x38bdf8);
+      borderMat.opacity = 0.35;
+      if (glow) glow.setHex(0x38bdf8);
+    } else if (globeTheme === "obsidian") {
+      earthMat.color.setHex(0x708090);
+      earthMat.specular.setHex(0xfbbf24);
+      earthMat.emissive.setHex(0xf59e0b);
+      earthMat.emissiveIntensity = 0.95;
+      borderMat.color.setHex(0xfbbf24);
+      borderMat.opacity = 0.45;
+      if (glow) glow.setHex(0xfbbf24);
+    } else {
+      earthMat.color.setHex(0xffffff);
+      earthMat.specular.setHex(0x60a5fa);
+      earthMat.emissive.setHex(0xffd54f);
+      earthMat.emissiveIntensity = 0.4;
+      borderMat.color.setHex(0x94a3b8);
+      borderMat.opacity = 0.25;
+      if (glow) glow.setHex(0x7dd3fc);
+    }
+  }, [globeTheme]);
 
   const rotationYRef = useRef(0);
   const rotationXRef = useRef(0.2);
@@ -189,36 +228,53 @@ export function WorldGlobe() {
     const baseUrl = import.meta.env.BASE_URL || "./";
     const textureLoader = new THREE.TextureLoader();
 
-    const earthTexture = textureLoader.load(`${baseUrl}textures/earth_atmos_2048.jpg`);
+    const earthTexture = textureLoader.load(`${baseUrl}textures/earth_day_2048.jpg`);
     earthTexture.colorSpace = THREE.SRGBColorSpace;
 
     const specularTexture = textureLoader.load(`${baseUrl}textures/earth_specular_2048.jpg`);
-    const lightsTexture = textureLoader.load(`${baseUrl}textures/earth_lights_2048.png`);
-    const cloudsTexture = textureLoader.load(`${baseUrl}textures/earth_clouds_1024.png`);
+    const lightsTexture = textureLoader.load(`${baseUrl}textures/earth_night_2048.jpg`);
 
     const earthGeo = new THREE.SphereGeometry(1, 64, 64);
     const earthMat = new THREE.MeshPhongMaterial({
       map: earthTexture,
       specularMap: specularTexture,
-      specular: isChristmas ? new THREE.Color(0x446699) : new THREE.Color(0x335577),
-      shininess: isChristmas ? 32 : 25,
+      specular: new THREE.Color(0x38bdf8),
+      shininess: 45,
       emissiveMap: lightsTexture,
-      emissive: isChristmas ? new THREE.Color(0xffe899) : new THREE.Color(0xffddaa),
-      emissiveIntensity: isChristmas ? 0.65 : 0.5,
+      emissive: new THREE.Color(0xffb84d),
+      emissiveIntensity: 0.85,
     });
+    earthMatRef.current = earthMat;
     const earthMesh = new THREE.Mesh(earthGeo, earthMat);
     earthGroup.add(earthMesh);
 
-    const cloudsGeo = new THREE.SphereGeometry(1.012, 64, 64);
-    const cloudsMat = new THREE.MeshPhongMaterial({
-      map: cloudsTexture,
+    const borderMat = new THREE.LineBasicMaterial({
+      color: 0x38bdf8,
       transparent: true,
-      opacity: 0.38,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
+      opacity: 0.35,
     });
-    const cloudsMesh = new THREE.Mesh(cloudsGeo, cloudsMat);
-    earthGroup.add(cloudsMesh);
+    borderMatRef.current = borderMat;
+
+    fetch(`${baseUrl}data/world_borders.json`)
+      .then((res) => res.json())
+      .then((borders: [number, number][][]) => {
+        const coords: number[] = [];
+        for (const ring of borders) {
+          for (let i = 0; i < ring.length - 1; i++) {
+            const p1 = ring[i];
+            const p2 = ring[i + 1];
+            if (!p1 || !p2) continue;
+            const v1 = latLngToVector3(p1[0], p1[1], 1.0025);
+            const v2 = latLngToVector3(p2[0], p2[1], 1.0025);
+            coords.push(v1.x, v1.y, v1.z, v2.x, v2.y, v2.z);
+          }
+        }
+        const borderGeo = new THREE.BufferGeometry();
+        borderGeo.setAttribute("position", new THREE.Float32BufferAttribute(coords, 3));
+        const borderLines = new THREE.LineSegments(borderGeo, borderMat);
+        earthGroup.add(borderLines);
+      })
+      .catch(() => {});
 
     const atmosphereGeo = new THREE.SphereGeometry(1.018, 64, 64);
     const atmosphereMat = new THREE.ShaderMaterial({
@@ -246,6 +302,7 @@ export function WorldGlobe() {
       side: THREE.BackSide,
       transparent: true,
     });
+    atmosphereMatRef.current = atmosphereMat;
     const atmosphereMesh = new THREE.Mesh(atmosphereGeo, atmosphereMat);
     scene.add(atmosphereMesh);
 
@@ -315,11 +372,11 @@ export function WorldGlobe() {
         });
     }
 
-    const sunLight = new THREE.DirectionalLight(0xffffff, 1.85);
+    const sunLight = new THREE.DirectionalLight(0xffffff, 2.2);
     sunLight.position.set(5, 3, 5);
     scene.add(sunLight);
 
-    const ambientLight = new THREE.AmbientLight(0x223355, 0.7);
+    const ambientLight = new THREE.AmbientLight(0x0a1628, 0.9);
     scene.add(ambientLight);
 
     const arcsGroup = new THREE.Group();
@@ -327,13 +384,13 @@ export function WorldGlobe() {
 
     if (currentStation && isPlaying) {
       const hubs: [number, number][] = [
-        [51.5074, -0.1278], // London
-        [40.7128, -74.006], // New York
-        [35.6762, 139.6503], // Tokyo
-        [48.8566, 2.3522], // Paris
-        [-34.6037, -58.3816], // Buenos Aires
-        [4.711, -74.0721], // Bogotá
-        [-23.5505, -46.6333], // São Paulo
+        [51.5074, -0.1278],
+        [40.7128, -74.006],
+        [35.6762, 139.6503],
+        [48.8566, 2.3522],
+        [-34.6037, -58.3816],
+        [4.711, -74.0721],
+        [-23.5505, -46.6333],
       ];
 
       const start = latLngToVector3(currentStation.lat, currentStation.lng, 1.005);
@@ -399,8 +456,6 @@ export function WorldGlobe() {
 
       earthGroup.rotation.y = rotationYRef.current;
       earthGroup.rotation.x = rotationXRef.current;
-
-      cloudsMesh.rotation.y += dt * 0.025;
 
       camera.position.z = 2.85 / zoomLevel;
 
@@ -550,8 +605,6 @@ export function WorldGlobe() {
       renderer.dispose();
       earthGeo.dispose();
       earthMat.dispose();
-      cloudsGeo.dispose();
-      cloudsMat.dispose();
       atmosphereGeo.dispose();
       atmosphereMat.dispose();
       starsGeo.dispose();
@@ -786,6 +839,26 @@ export function WorldGlobe() {
       />
 
       <div className="absolute right-5 bottom-24 z-20 flex flex-col gap-2 p-1.5 rounded-2xl liquid-glass border border-white/10 shadow-xl">
+        <IconButton
+          size="sm"
+          label={
+            globeTheme === "sapphire"
+              ? "Estilo: Zafiro Satelital HD (Pulsar para Obsidiana)"
+              : globeTheme === "obsidian"
+              ? "Estilo: Obsidiana & Oro Cyber (Pulsar para NASA Clásico)"
+              : "Estilo: NASA Fotorrealista (Pulsar para Zafiro)"
+          }
+          icon={
+            <span className="text-[10px] font-black font-mono tracking-tighter text-amber-400">
+              {globeTheme === "sapphire" ? "HD" : globeTheme === "obsidian" ? "CY" : "NA"}
+            </span>
+          }
+          onClick={() => {
+            setGlobeTheme((prev) =>
+              prev === "sapphire" ? "obsidian" : prev === "obsidian" ? "classic" : "sapphire",
+            );
+          }}
+        />
         <IconButton
           size="sm"
           label={autoRotate ? "Detener rotación" : "Girar automáticamente"}

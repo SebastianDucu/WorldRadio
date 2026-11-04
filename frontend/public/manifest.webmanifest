@@ -1,5 +1,5 @@
 {
-  "name": "WorldRadio · 174 Países",
+  "name": "WorldRadio",
   "short_name": "WorldRadio",
   "description": "Escucha más de 34.900 emisoras de radio mundiales en un globo 3D interactivo con temática navideña.",
   "start_url": "./",
@@ -8,7 +8,11 @@
   "background_color": "#030816",
   "theme_color": "#030816",
   "orientation": "portrait-primary",
-  "categories": ["music", "entertainment", "news"],
+  "categories": [
+    "music",
+    "entertainment",
+    "news"
+  ],
   "icons": [
     {
       "src": "./pwa-icon.svg",
@@ -24,4 +28,3 @@
     }
   ]
 }
-

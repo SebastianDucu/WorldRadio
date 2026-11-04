@@ -73,7 +73,7 @@ export function AudioPlayer() {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: currentStation.name,
         artist: `${currentStation.city ? `${currentStation.city}, ` : ""}${currentStation.country} · ${currentStation.bitrate} kbps`,
-        album: "WorldRadio · 174 Países",
+        album: "WorldRadio",
         artwork: [
           {
             src: "./pwa-icon.svg",
@@ -232,9 +232,8 @@ export function AudioPlayer() {
                     <>
                       <span className="flex items-center gap-1.5 truncate">
                         <span
-                          className={`inline-block h-2 w-2 shrink-0 rounded-full ${
-                            isPlaying ? "bg-emerald-400 shadow-[0_0_8px_#3df59a] animate-pulse" : "bg-slate-600"
-                          }`}
+                          className={`inline-block h-2 w-2 shrink-0 rounded-full ${isPlaying ? "bg-emerald-400 shadow-[0_0_8px_#3df59a] animate-pulse" : "bg-slate-600"
+                            }`}
                         />
                         <span className="truncate">{currentStation.city}, {currentStation.country}</span>
                       </span>
@@ -265,110 +264,106 @@ export function AudioPlayer() {
               </div>
             </div>
 
-          <div className="flex items-center justify-center gap-1.5 sm:gap-2 shrink-0">
-            <button
-              onClick={prevStation}
-              className="flex h-9 w-9 items-center justify-center rounded-full text-slate-300 hover:text-white hover:bg-slate-800 transition-all active:scale-90"
-              aria-label="Emisora anterior"
-            >
-              <PrevIcon size={18} />
-            </button>
+            <div className="flex items-center justify-center gap-1.5 sm:gap-2 shrink-0">
+              <button
+                onClick={prevStation}
+                className="flex h-9 w-9 items-center justify-center rounded-full text-slate-300 hover:text-white hover:bg-slate-800 transition-all active:scale-90"
+                aria-label="Emisora anterior"
+              >
+                <PrevIcon size={18} />
+              </button>
 
-            <button
-              type="button"
-              onClick={togglePlay}
-              disabled={!currentStation}
-              className={`flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-full text-white transition-all duration-200 active:scale-95 shadow-xl ${
-                isPlaying
-                  ? "bg-gradient-to-tr from-amber-400 via-amber-500 to-amber-600 shadow-[0_0_28px_rgba(255,201,74,0.7)] animate-[pulse_2.8s_ease-out_infinite] text-slate-950 font-bold"
-                  : "bg-slate-800 hover:bg-slate-700 border border-white/10"
-              }`}
-              aria-label={isPlaying ? "Pausar" : "Reproducir"}
-            >
-              {isLoading ? (
-                <SpinnerIcon size={18} className="animate-spin text-white" />
-              ) : isPlaying ? (
-                <PauseIcon size={18} />
-              ) : (
-                <PlayIcon size={18} className="translate-x-0.5" />
-              )}
-            </button>
+              <button
+                type="button"
+                onClick={togglePlay}
+                disabled={!currentStation}
+                className={`flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-full text-white transition-all duration-200 active:scale-95 shadow-xl ${isPlaying
+                    ? "bg-gradient-to-tr from-amber-400 via-amber-500 to-amber-600 shadow-[0_0_28px_rgba(255,201,74,0.7)] animate-[pulse_2.8s_ease-out_infinite] text-slate-950 font-bold"
+                    : "bg-slate-800 hover:bg-slate-700 border border-white/10"
+                  }`}
+                aria-label={isPlaying ? "Pausar" : "Reproducir"}
+              >
+                {isLoading ? (
+                  <SpinnerIcon size={18} className="animate-spin text-white" />
+                ) : isPlaying ? (
+                  <PauseIcon size={18} />
+                ) : (
+                  <PlayIcon size={18} className="translate-x-0.5" />
+                )}
+              </button>
 
-            <button
-              onClick={nextStation}
-              className="flex h-9 w-9 items-center justify-center rounded-full text-slate-300 hover:text-white hover:bg-slate-800 transition-all active:scale-90"
-              aria-label="Siguiente emisora"
-            >
-              <NextIcon size={18} />
-            </button>
+              <button
+                onClick={nextStation}
+                className="flex h-9 w-9 items-center justify-center rounded-full text-slate-300 hover:text-white hover:bg-slate-800 transition-all active:scale-90"
+                aria-label="Siguiente emisora"
+              >
+                <NextIcon size={18} />
+              </button>
 
-            <button
-              onClick={toggleKeepCentered}
-              className={`hidden md:flex h-8 w-8 items-center justify-center rounded-full transition-all active:scale-90 ${
-                keepCentered
-                  ? "text-amber-400 bg-amber-400/15 border border-amber-400/30"
-                  : "text-slate-400 hover:text-white hover:bg-white/5"
-              }`}
-              title={keepCentered ? "Centrado automático activado" : "Centrado automático desactivado"}
-            >
-              <TargetIcon size={17} />
-            </button>
+              <button
+                onClick={toggleKeepCentered}
+                className={`hidden md:flex h-8 w-8 items-center justify-center rounded-full transition-all active:scale-90 ${keepCentered
+                    ? "text-amber-400 bg-amber-400/15 border border-amber-400/30"
+                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                  }`}
+                title={keepCentered ? "Centrado automático activado" : "Centrado automático desactivado"}
+              >
+                <TargetIcon size={17} />
+              </button>
 
-            <button
-              onClick={toggleMute}
-              className={`hidden sm:flex h-8 w-8 items-center justify-center rounded-full transition-all active:scale-90 ${
-                muted
-                  ? "text-rose-400 bg-rose-500/15 border border-rose-500/30"
-                  : "text-slate-300 hover:text-white hover:bg-white/5"
-              }`}
-              title={muted ? "Activar sonido" : "Silenciar"}
-            >
-              {muted ? <MuteIcon size={18} /> : <VolumeIcon size={18} />}
-            </button>
+              <button
+                onClick={toggleMute}
+                className={`hidden sm:flex h-8 w-8 items-center justify-center rounded-full transition-all active:scale-90 ${muted
+                    ? "text-rose-400 bg-rose-500/15 border border-rose-500/30"
+                    : "text-slate-300 hover:text-white hover:bg-white/5"
+                  }`}
+                title={muted ? "Activar sonido" : "Silenciar"}
+              >
+                {muted ? <MuteIcon size={18} /> : <VolumeIcon size={18} />}
+              </button>
 
-            <button
-              onClick={() => setSleepTimerModalOpen(true)}
-              className={`hidden sm:flex h-8 w-8 items-center justify-center rounded-full transition-all active:scale-90 ${
-                sleepTimerRemaining !== null
-                  ? "text-amber-400 bg-amber-400/15 border border-amber-400/30"
-                  : "text-slate-400 hover:text-white hover:bg-white/5"
-              }`}
-              title={sleepTimerRemaining !== null ? `Temporizador: ${Math.ceil(sleepTimerRemaining / 60)} min` : "Temporizador de apagado"}
-            >
-              <TimerIcon size={17} />
-            </button>
-          </div>
-
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <div className="hidden md:flex flex-col justify-center w-28">
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={muted ? 0 : volume}
-                onChange={(e) => setVolume(parseFloat(e.target.value))}
-                className="liquid-slider w-full"
-                style={{ "--fill": `${(muted ? 0 : volume) * 100}%` } as React.CSSProperties}
-                aria-label="Volumen"
-              />
-
-              <div className="mt-1 h-3 flex items-center justify-center overflow-hidden">
-                <LiquidVisualizer width={110} height={12} interactive={false} />
-              </div>
+              <button
+                onClick={() => setSleepTimerModalOpen(true)}
+                className={`hidden sm:flex h-8 w-8 items-center justify-center rounded-full transition-all active:scale-90 ${sleepTimerRemaining !== null
+                    ? "text-amber-400 bg-amber-400/15 border border-amber-400/30"
+                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                  }`}
+                title={sleepTimerRemaining !== null ? `Temporizador: ${Math.ceil(sleepTimerRemaining / 60)} min` : "Temporizador de apagado"}
+              >
+                <TimerIcon size={17} />
+              </button>
             </div>
 
-            <button
-              onClick={() => setViewMode(viewMode === "globe" ? "map" : "globe")}
-              className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-800 text-slate-300 hover:text-white transition-all duration-200 active:scale-95 border border-white/5"
-              title={viewMode === "globe" ? "Ver mapa plano" : "Ver globo 3D"}
-            >
-              {viewMode === "globe" ? <MapIcon size={18} /> : <GlobeIcon size={18} />}
-            </button>
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              <div className="hidden md:flex flex-col justify-center w-28">
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={muted ? 0 : volume}
+                  onChange={(e) => setVolume(parseFloat(e.target.value))}
+                  className="liquid-slider w-full"
+                  style={{ "--fill": `${(muted ? 0 : volume) * 100}%` } as React.CSSProperties}
+                  aria-label="Volumen"
+                />
+
+                <div className="mt-1 h-3 flex items-center justify-center overflow-hidden">
+                  <LiquidVisualizer width={110} height={12} interactive={false} />
+                </div>
+              </div>
+
+              <button
+                onClick={() => setViewMode(viewMode === "globe" ? "map" : "globe")}
+                className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-800 text-slate-300 hover:text-white transition-all duration-200 active:scale-95 border border-white/5"
+                title={viewMode === "globe" ? "Ver mapa plano" : "Ver globo 3D"}
+              >
+                {viewMode === "globe" ? <MapIcon size={18} /> : <GlobeIcon size={18} />}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    </footer>
+      </footer>
 
       <StationDetailsModal
         station={currentStation}
