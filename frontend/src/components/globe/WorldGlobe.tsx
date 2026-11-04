@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useMemo } from "react";
-import createGlobe, { type Arc } from "cobe";
+import * as THREE from "three";
 import { STATIONS } from "@/data/stations";
 import { useChristmasActive } from "@/hooks/useApplyUiPreferences";
 import { usePlayerStore } from "@/store/player";
@@ -16,7 +16,7 @@ interface SatelliteFeature {
   countryCode?: string;
 }
 
-// Landmark world broadcasting nations and metropolitan radio capitals
+// Curated Landmark Broadcasting Nations & Metropolitan Radio Capitals
 const SATELLITE_FEATURES: SatelliteFeature[] = [
   // Países de América
   { name: "Colombia", lat: 4.57, lng: -74.29, type: "country", countryCode: "CO" },
@@ -56,10 +56,17 @@ const SATELLITE_FEATURES: SatelliteFeature[] = [
 
   // Ciudades emisoras clave
   { name: "Bogotá", lat: 4.71, lng: -74.07, type: "city", countryCode: "CO" },
+  { name: "Medellín", lat: 6.25, lng: -75.56, type: "city", countryCode: "CO" },
+  { name: "Cali", lat: 3.45, lng: -76.53, type: "city", countryCode: "CO" },
+  { name: "Barranquilla", lat: 10.97, lng: -74.78, type: "city", countryCode: "CO" },
+  { name: "Cartagena", lat: 10.39, lng: -75.48, type: "city", countryCode: "CO" },
   { name: "Madrid", lat: 40.41, lng: -3.70, type: "city", countryCode: "ES" },
+  { name: "Barcelona", lat: 41.38, lng: 2.17, type: "city", countryCode: "ES" },
   { name: "Buenos Aires", lat: -34.60, lng: -58.38, type: "city", countryCode: "AR" },
   { name: "Ciudad de México", lat: 19.43, lng: -99.13, type: "city", countryCode: "MX" },
   { name: "Nueva York", lat: 40.71, lng: -74.00, type: "city", countryCode: "US" },
+  { name: "Los Ángeles", lat: 34.05, lng: -118.24, type: "city", countryCode: "US" },
+  { name: "Miami", lat: 25.76, lng: -80.19, type: "city", countryCode: "US" },
   { name: "Londres", lat: 51.50, lng: -0.12, type: "city", countryCode: "GB" },
   { name: "París", lat: 48.85, lng: 2.35, type: "city", countryCode: "FR" },
   { name: "Tokio", lat: 35.67, lng: 139.65, type: "city", countryCode: "JP" },
@@ -73,53 +80,30 @@ const SATELLITE_FEATURES: SatelliteFeature[] = [
   { name: "Seúl", lat: 37.56, lng: 126.97, type: "city", countryCode: "KR" },
   { name: "Dubái", lat: 25.20, lng: 55.27, type: "city", countryCode: "AE" },
   { name: "Ámsterdam", lat: 52.36, lng: 4.90, type: "city", countryCode: "NL" },
-  { name: "Los Ángeles", lat: 34.05, lng: -118.24, type: "city", countryCode: "US" },
-  { name: "Miami", lat: 25.76, lng: -80.19, type: "city", countryCode: "US" },
-  { name: "Medellín", lat: 6.24, lng: -75.58, type: "city", countryCode: "CO" },
-  { name: "Barcelona", lat: 41.38, lng: 2.17, type: "city", countryCode: "ES" },
 ];
 
-interface ProjectedLabel extends SatelliteFeature {
+interface ProjectedScreenLabel extends SatelliteFeature {
   x: number;
   y: number;
-  depth: number;
   opacity: number;
 }
 
-// Mathematical 3D-to-2D projection mapping matching cobe WebGL shaders
-function projectToGlobe(lat: number, lng: number, phi: number, theta: number, size: number) {
-  const r = (lat * Math.PI) / 180;
-  const a = (lng * Math.PI) / 180 - Math.PI;
-  const cosLat = Math.cos(r);
-  const px = -cosLat * Math.cos(a) * 0.8;
-  const py = Math.sin(r) * 0.8;
-  const pz = cosLat * Math.sin(a) * 0.8;
-
-  const cosTheta = Math.cos(theta);
-  const sinTheta = Math.sin(theta);
-  const cosPhi = Math.cos(phi);
-  const sinPhi = Math.sin(phi);
-
-  const c = cosPhi * px + sinPhi * pz;
-  const s = sinPhi * sinTheta * px + cosTheta * py - cosPhi * sinTheta * pz;
-  const depth = -sinPhi * cosTheta * px + sinTheta * py + cosPhi * cosTheta * pz;
-
-  const x = ((c + 1) / 2) * size;
-  const y = ((-s + 1) / 2) * size;
-
-  // depth < -0.15 is visible on the front face of the Earth towards the camera
-  const visible = depth < -0.15;
-  const opacity = Math.max(0, Math.min(1, (-depth - 0.15) / 0.35));
-
-  return { x, y, depth, visible, opacity };
+// Convert geographic latitude and longitude to 3D Cartesian coordinates matching Three.js Sphere UVs
+function latLngToVector3(lat: number, lng: number, radius = 1.0): THREE.Vector3 {
+  const theta = (90 - lat) * (Math.PI / 180);
+  const phi = (lng + 180) * (Math.PI / 180);
+  const x = -radius * Math.cos(phi) * Math.sin(theta);
+  const y = radius * Math.cos(theta);
+  const z = radius * Math.sin(phi) * Math.sin(theta);
+  return new THREE.Vector3(x, y, z);
 }
 
 export function WorldGlobe() {
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const overlayCanvasRef = useRef<HTMLCanvasElement | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const { theme, motionOff } = useUiStore();
+  const { motionOff } = useUiStore();
   const isChristmas = useChristmasActive();
   const {
     currentStation,
@@ -129,283 +113,403 @@ export function WorldGlobe() {
     flyTo,
     allStations,
     setSelectedCountryCode,
+    setSelectedCity,
     playStation,
   } = usePlayerStore();
 
   const [autoRotate, setAutoRotate] = useState(true);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
-  const [telemetryCoords, setTelemetryCoords] = useState("LAT 04.6°N · LNG 74.1°W");
+  const [telemetryCoords, setTelemetryCoords] = useState("LAT 04.7°N · LNG 74.1°W");
 
-  // High-Performance 240 FPS Physics & Inertia Engine
-  const phiRef = useRef(0);
-  const thetaRef = useRef(0.22);
-  const velocityPhiRef = useRef(0);
-  const velocityThetaRef = useRef(0);
+  // Inertia and Rotation State
+  const rotationYRef = useRef(0);
+  const rotationXRef = useRef(0.2);
+  const velocityYRef = useRef(0);
+  const velocityXRef = useRef(0);
   const isDraggingRef = useRef(false);
   const lastPointerPos = useRef<{ x: number; y: number } | null>(null);
   const pointerDownPos = useRef<{ x: number; y: number } | null>(null);
   const activePointersRef = useRef<Map<number, { x: number; y: number }>>(new Map());
   const pinchDistRef = useRef<number | null>(null);
 
-  const targetPhiRef = useRef<number | null>(null);
-  const targetThetaRef = useRef<number | null>(null);
-  const visibleLabelsRef = useRef<ProjectedLabel[]>([]);
+  // Target Camera Lerping for flyTo
+  const targetRotYRef = useRef<number | null>(null);
+  const targetRotXRef = useRef<number | null>(null);
+  const visibleLabelsRef = useRef<ProjectedScreenLabel[]>([]);
 
   // Smooth camera centering on active coordinates
   useEffect(() => {
     if (targetLocation) {
       const [lat, lng] = targetLocation;
-      const targetPhi = (-lng * Math.PI) / 180 + Math.PI / 2;
-      const targetTheta = (lat * Math.PI) / 180;
-      targetPhiRef.current = targetPhi;
-      targetThetaRef.current = Math.max(-0.85, Math.min(0.85, targetTheta));
+      targetRotYRef.current = -(lng + 90) * (Math.PI / 180);
+      targetRotXRef.current = Math.max(-0.85, Math.min(0.85, (lat * Math.PI) / 180));
     }
   }, [targetLocation]);
 
-  // Planetary broadcast markers across all countries
-  const markers = useMemo(() => {
+  // Station Sample Pool for 3D Surface Pins
+  const stationPins = useMemo(() => {
     const list = allStations && allStations.length > 0 ? allStations : STATIONS;
     const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-    const maxMarkers = isMobile ? 1100 : 1850;
+    const maxPins = isMobile ? 800 : 1500;
     const sampled =
-      list.length <= maxMarkers ? list : list.filter((_, i) => i % Math.ceil(list.length / maxMarkers) === 0);
+      list.length <= maxPins ? list : list.filter((_, i) => i % Math.ceil(list.length / maxPins) === 0);
     const hasCurrent = sampled.some((s) => s.id === currentStation?.id);
-    const pool = hasCurrent || !currentStation ? sampled : [currentStation, ...sampled];
-
-    return pool.map((station) => {
-      const isCurrent = station.id === currentStation?.id;
-      return {
-        location: [station.lat, station.lng] as [number, number],
-        size: isCurrent ? 0.058 : 0.022,
-      };
-    });
+    return hasCurrent || !currentStation ? sampled : [currentStation, ...sampled];
   }, [allStations, currentStation]);
 
-  // Planetary broadcast arcs
-  const arcs = useMemo((): Arc[] => {
-    if (!currentStation || !isPlaying) return [];
-    const fromCoord: [number, number] = [currentStation.lat, currentStation.lng];
-
-    const hubs: [number, number][] = [
-      [51.5074, -0.1278], // London
-      [40.7128, -74.006], // New York
-      [35.6762, 139.6503], // Tokyo
-      [48.8566, 2.3522], // Paris
-      [-34.6037, -58.3816], // Buenos Aires
-      [4.711, -74.0721], // Bogotá
-      [50.9375, 6.9603], // Cologne
-    ];
-
-    return hubs
-      .filter(([hLat, hLng]) => Math.abs(hLat - currentStation.lat) > 3 || Math.abs(hLng - currentStation.lng) > 3)
-      .slice(0, 5)
-      .map((toCoord, i) => ({
-        from: fromCoord,
-        to: toCoord,
-        color: isChristmas
-          ? ([1.0, 0.79, 0.29] as [number, number, number]) // Warm Holiday Gold
-          : ([0.22, 0.71, 1.0] as [number, number, number]), // Electric Cyan
-        id: `arc-${i}`,
-      }));
-  }, [currentStation, isPlaying, isChristmas]);
-
-  // 120+ FPS Hardware-Accelerated WebGL Engine + 2D Satellite Overlays
+  // Three.js Photorealistic 3D Satellite Earth Engine
   useEffect(() => {
+    const container = containerRef.current;
     const canvas = canvasRef.current;
     const overlayCanvas = overlayCanvasRef.current;
-    if (!canvas || !overlayCanvas) return;
+    if (!container || !canvas || !overlayCanvas) return;
 
-    let width = canvas.offsetWidth;
-    const isDark = theme === "dark";
-    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+    let width = container.clientWidth || window.innerWidth;
+    let height = container.clientHeight || window.innerHeight;
+    const isMobile = width < 768;
     const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2);
-    const globeSize = Math.round(width * dpr);
 
-    // Synchronize 2D overlay canvas buffer
-    overlayCanvas.width = globeSize;
-    overlayCanvas.height = globeSize;
-    const ctx2d = overlayCanvas.getContext("2d");
+    // 1. Scene, Camera & Renderer
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
+    camera.position.set(0, 0, 2.85 / zoomLevel);
 
-    const globe = createGlobe(canvas, {
-      devicePixelRatio: dpr,
-      width: globeSize,
-      height: globeSize,
-      phi: phiRef.current,
-      theta: thetaRef.current,
-      dark: isDark ? 1 : 0.75,
-      diffuse: 1.5,
-      mapSamples: isMobile ? 13000 : 18500,
-      mapBrightness: isDark ? 7.8 : 9.0,
-      baseColor: isDark
-        ? isChristmas
-          ? [0.03, 0.06, 0.14]
-          : [0.02, 0.05, 0.12]
-        : [0.93, 0.95, 0.98],
-      markerColor: isChristmas ? [1.0, 0.82, 0.35] : [0.22, 0.71, 1.0],
-      glowColor: isChristmas ? [0.65, 0.45, 0.12] : [0.12, 0.35, 0.72],
-      markers,
-      arcs,
-      arcColor: isChristmas ? [1.0, 0.82, 0.35] : [0.22, 0.71, 1.0],
-      arcWidth: 0.85,
-      arcHeight: 0.34,
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      alpha: true,
+      antialias: true,
+      powerPreference: "high-performance",
     });
+    renderer.setPixelRatio(dpr);
+    renderer.setSize(width, height);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+    // 2. Earth Group (Rotates with inertia/touch)
+    const earthGroup = new THREE.Group();
+    earthGroup.rotation.order = "YXZ";
+    earthGroup.rotation.y = rotationYRef.current;
+    earthGroup.rotation.x = rotationXRef.current;
+    scene.add(earthGroup);
+
+    // 3. Texture Loading (NASA Satellite Blue Marble, Specular & Night Lights)
+    const baseUrl = import.meta.env.BASE_URL || "./";
+    const textureLoader = new THREE.TextureLoader();
+
+    const earthTexture = textureLoader.load(`${baseUrl}textures/earth_atmos_2048.jpg`);
+    earthTexture.colorSpace = THREE.SRGBColorSpace;
+
+    const specularTexture = textureLoader.load(`${baseUrl}textures/earth_specular_2048.jpg`);
+    const lightsTexture = textureLoader.load(`${baseUrl}textures/earth_lights_2048.png`);
+    const cloudsTexture = textureLoader.load(`${baseUrl}textures/earth_clouds_1024.png`);
+
+    // 4. Satellite Earth Mesh
+    const earthGeo = new THREE.SphereGeometry(1, 64, 64);
+    const earthMat = new THREE.MeshPhongMaterial({
+      map: earthTexture,
+      specularMap: specularTexture,
+      specular: new THREE.Color(0x334466),
+      shininess: 25,
+      emissiveMap: lightsTexture,
+      emissive: isChristmas ? new THREE.Color(0xffe899) : new THREE.Color(0xffddaa),
+      emissiveIntensity: 0.5,
+    });
+    const earthMesh = new THREE.Mesh(earthGeo, earthMat);
+    earthGroup.add(earthMesh);
+
+    // 5. Atmospheric Cloud Layer
+    const cloudsGeo = new THREE.SphereGeometry(1.012, 64, 64);
+    const cloudsMat = new THREE.MeshPhongMaterial({
+      map: cloudsTexture,
+      transparent: true,
+      opacity: 0.35,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    const cloudsMesh = new THREE.Mesh(cloudsGeo, cloudsMat);
+    earthGroup.add(cloudsMesh);
+
+    // 6. Luminous Rayleigh Scattering Atmosphere Rim
+    const atmosphereGeo = new THREE.SphereGeometry(1.035, 48, 48);
+    const atmosphereMat = new THREE.ShaderMaterial({
+      vertexShader: `
+        varying vec3 vNormal;
+        void main() {
+          vNormal = normalize(normalMatrix * normal);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        varying vec3 vNormal;
+        uniform vec3 glowColor;
+        void main() {
+          float intensity = pow(0.68 - dot(vNormal, vec3(0, 0, 1.0)), 2.2);
+          gl_FragColor = vec4(glowColor, intensity * 0.75);
+        }
+      `,
+      uniforms: {
+        glowColor: {
+          value: isChristmas ? new THREE.Color(0xffc94a) : new THREE.Color(0x38b6ff),
+        },
+      },
+      blending: THREE.AdditiveBlending,
+      side: THREE.BackSide,
+      transparent: true,
+    });
+    const atmosphereMesh = new THREE.Mesh(atmosphereGeo, atmosphereMat);
+    scene.add(atmosphereMesh);
+
+    // 7. Celestial Starfield Background
+    const starsCount = isMobile ? 600 : 1200;
+    const starsGeo = new THREE.BufferGeometry();
+    const starPositions = new Float32Array(starsCount * 3);
+    for (let i = 0; i < starsCount * 3; i += 3) {
+      const radius = 18 + Math.random() * 25;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(Math.random() * 2 - 1);
+      starPositions[i] = radius * Math.sin(phi) * Math.cos(theta);
+      starPositions[i + 1] = radius * Math.sin(phi) * Math.sin(theta);
+      starPositions[i + 2] = radius * Math.cos(phi);
+    }
+    starsGeo.setAttribute("position", new THREE.BufferAttribute(starPositions, 3));
+    const starsMat = new THREE.PointsMaterial({
+      size: 0.08,
+      color: isChristmas ? 0xfff0aa : 0xddeeff,
+      transparent: true,
+      opacity: 0.7,
+    });
+    const starsField = new THREE.Points(starsGeo, starsMat);
+    scene.add(starsField);
+
+    // 8. 3D Broadcast Station Markers on Surface
+    const pinsGeo = new THREE.SphereGeometry(0.007, 8, 8);
+    const pinsMat = new THREE.MeshBasicMaterial({
+      color: isChristmas ? 0xffc94a : 0x38b6ff,
+    });
+    const pinsInstanced = new THREE.InstancedMesh(pinsGeo, pinsMat, stationPins.length);
+    const dummy = new THREE.Object3D();
+    stationPins.forEach((st, i) => {
+      const vec = latLngToVector3(st.lat, st.lng, 1.002);
+      dummy.position.copy(vec);
+      dummy.updateMatrix();
+      pinsInstanced.setMatrixAt(i, dummy.matrix);
+    });
+    pinsInstanced.instanceMatrix.needsUpdate = true;
+    earthGroup.add(pinsInstanced);
+
+    // 9. Lighting Setup
+    const sunLight = new THREE.DirectionalLight(0xffffff, 1.8);
+    sunLight.position.set(5, 3, 5);
+    scene.add(sunLight);
+
+    const ambientLight = new THREE.AmbientLight(0x223355, 0.7);
+    scene.add(ambientLight);
+
+    // 10. Broadcast Arcs from current station
+    const arcsGroup = new THREE.Group();
+    earthGroup.add(arcsGroup);
+
+    if (currentStation && isPlaying) {
+      const hubs: [number, number][] = [
+        [51.5074, -0.1278], // London
+        [40.7128, -74.006], // New York
+        [35.6762, 139.6503], // Tokyo
+        [48.8566, 2.3522], // Paris
+        [-34.6037, -58.3816], // Buenos Aires
+        [4.711, -74.0721], // Bogotá
+        [-23.5505, -46.6333], // São Paulo
+      ];
+
+      const start = latLngToVector3(currentStation.lat, currentStation.lng, 1.005);
+      hubs
+        .filter(([hLat, hLng]) => Math.hypot(hLat - currentStation.lat, hLng - currentStation.lng) > 8)
+        .slice(0, 5)
+        .forEach(([hLat, hLng]) => {
+          const end = latLngToVector3(hLat, hLng, 1.005);
+          const mid = start.clone().add(end).multiplyScalar(0.5);
+          const distance = start.distanceTo(end);
+          mid.normalize().multiplyScalar(1.0 + distance * 0.28);
+
+          const curve = new THREE.QuadraticBezierCurve3(start, mid, end);
+          const points = curve.getPoints(36);
+          const arcGeo = new THREE.BufferGeometry().setFromPoints(points);
+          const arcMat = new THREE.LineBasicMaterial({
+            color: isChristmas ? 0xffc94a : 0x38b6ff,
+            transparent: true,
+            opacity: 0.65,
+          });
+          const arcLine = new THREE.Line(arcGeo, arcMat);
+          arcsGroup.add(arcLine);
+        });
+    }
+
+    // 11. Synchronize 2D Overlay Canvas
+    overlayCanvas.width = width * dpr;
+    overlayCanvas.height = height * dpr;
+    const ctx2d = overlayCanvas.getContext("2d");
 
     let animationId: number;
     let lastTime = performance.now();
-    let telemetryFrame = 0;
+    let telemetryCounter = 0;
 
+    // Render Loop (120 FPS hardware accelerated)
     const render = (now: number) => {
       const dt = Math.min((now - lastTime) / 1000, 0.05);
       lastTime = now;
 
-      // 1. Inertia / Momentum physics
+      // Inertia Physics
       if (!isDraggingRef.current) {
-        phiRef.current += velocityPhiRef.current;
-        thetaRef.current += velocityThetaRef.current;
-        velocityPhiRef.current *= 0.94;
-        velocityThetaRef.current *= 0.94;
+        rotationYRef.current += velocityYRef.current;
+        rotationXRef.current += velocityXRef.current;
+        velocityYRef.current *= 0.94;
+        velocityXRef.current *= 0.94;
 
-        if (Math.abs(velocityPhiRef.current) < 0.00005) velocityPhiRef.current = 0;
-        if (Math.abs(velocityThetaRef.current) < 0.00005) velocityThetaRef.current = 0;
+        if (Math.abs(velocityYRef.current) < 0.00005) velocityYRef.current = 0;
+        if (Math.abs(velocityXRef.current) < 0.00005) velocityXRef.current = 0;
       }
 
-      // 2. Camera tracking to active station
-      if (targetPhiRef.current !== null && targetThetaRef.current !== null) {
-        let diffPhi = targetPhiRef.current - phiRef.current;
-        diffPhi = Math.atan2(Math.sin(diffPhi), Math.cos(diffPhi));
+      // Camera FlyTo Interpolation
+      if (targetRotYRef.current !== null && targetRotXRef.current !== null) {
+        let diffY = targetRotYRef.current - rotationYRef.current;
+        diffY = Math.atan2(Math.sin(diffY), Math.cos(diffY));
 
-        const diffTheta = targetThetaRef.current - thetaRef.current;
+        const diffX = targetRotXRef.current - rotationXRef.current;
         const lerpFactor = Math.min(dt * 7.5, 0.2);
-        phiRef.current += diffPhi * lerpFactor;
-        thetaRef.current += diffTheta * lerpFactor;
+        rotationYRef.current += diffY * lerpFactor;
+        rotationXRef.current += diffX * lerpFactor;
 
-        if (Math.abs(diffPhi) < 0.002 && Math.abs(diffTheta) < 0.002) {
-          targetPhiRef.current = null;
-          targetThetaRef.current = null;
+        if (Math.abs(diffY) < 0.002 && Math.abs(diffX) < 0.002) {
+          targetRotYRef.current = null;
+          targetRotXRef.current = null;
         }
-      } else if (autoRotate && !isDraggingRef.current && !motionOff && velocityPhiRef.current === 0) {
-        phiRef.current += dt * 0.11;
+      } else if (autoRotate && !isDraggingRef.current && !motionOff && velocityYRef.current === 0) {
+        rotationYRef.current += dt * 0.09;
       }
 
-      // Keep theta within visible bounds
-      thetaRef.current = Math.max(-0.85, Math.min(0.85, thetaRef.current));
+      // Clamp X tilt
+      rotationXRef.current = Math.max(-0.85, Math.min(0.85, rotationXRef.current));
 
-      // Update WebGL globe
-      globe.update({
-        phi: phiRef.current,
-        theta: thetaRef.current,
-        markers,
-        arcs,
-      });
+      earthGroup.rotation.y = rotationYRef.current;
+      earthGroup.rotation.x = rotationXRef.current;
 
-      // 3. Render 3D Projected Satellite Labels & Broadcast Beacon
+      // Independent slow atmospheric cloud drift
+      cloudsMesh.rotation.y += dt * 0.025;
+
+      // Update camera distance smoothly based on zoomLevel
+      camera.position.z = 2.85 / zoomLevel;
+
+      // Render Three.js Scene
+      renderer.render(scene, camera);
+
+      // 12. Render 2D Projected Satellite Labels (Countries, Cities, Active Radio Beacon)
       if (ctx2d) {
-        ctx2d.clearRect(0, 0, globeSize, globeSize);
-        const currentLabels: ProjectedLabel[] = [];
+        ctx2d.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+        const currentLabels: ProjectedScreenLabel[] = [];
 
         // Project Country & City Satellite Names
         for (const item of SATELLITE_FEATURES) {
-          const proj = projectToGlobe(item.lat, item.lng, phiRef.current, thetaRef.current, globeSize);
+          const localVec = latLngToVector3(item.lat, item.lng, 1.004);
+          const worldPos = localVec.clone().applyEuler(earthGroup.rotation);
 
-          if (proj.visible && proj.opacity > 0.04) {
+          // Horizon culling via dot product
+          const normal = worldPos.clone().normalize();
+          const viewDir = camera.position.clone().sub(worldPos).normalize();
+          const dot = normal.dot(viewDir);
+
+          if (dot > 0.08) {
+            const screenPos = worldPos.clone().project(camera);
+            const x = ((screenPos.x * 0.5 + 0.5) * width) * dpr;
+            const y = ((-screenPos.y * 0.5 + 0.5) * height) * dpr;
+            const opacity = Math.min(1, Math.max(0, dot * 3.0));
+
             currentLabels.push({
               ...item,
-              x: proj.x,
-              y: proj.y,
-              depth: proj.depth,
-              opacity: proj.opacity,
+              x,
+              y,
+              opacity,
             });
 
             const isCountry = item.type === "country";
-            const alpha = proj.opacity;
 
-            // Satellite node point
+            // Glowing satellite node dot
             ctx2d.beginPath();
-            ctx2d.arc(proj.x, proj.y, isCountry ? 3.0 * dpr : 2.0 * dpr, 0, Math.PI * 2);
-            if (isChristmas) {
-              ctx2d.fillStyle = isCountry
-                ? `rgba(255, 201, 74, ${alpha * 0.95})`
-                : `rgba(255, 230, 150, ${alpha * 0.8})`;
-            } else {
-              ctx2d.fillStyle = isCountry
-                ? `rgba(56, 182, 255, ${alpha * 0.95})`
-                : `rgba(186, 230, 253, ${alpha * 0.8})`;
-            }
+            ctx2d.arc(x, y, (isCountry ? 3.0 : 2.0) * dpr, 0, Math.PI * 2);
+            ctx2d.fillStyle = isCountry
+              ? isChristmas
+                ? `rgba(255, 201, 74, ${opacity * 0.95})`
+                : `rgba(56, 182, 255, ${opacity * 0.95})`
+              : `rgba(186, 230, 253, ${opacity * 0.8})`;
             ctx2d.fill();
 
-            // Satellite text label with shadow
+            // Text Typography
             ctx2d.font = isCountry
-              ? `bold ${Math.round(10.5 * dpr)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
-              : `600 ${Math.round(8.5 * dpr)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+              ? `bold ${Math.round(11 * dpr)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
+              : `600 ${Math.round(9 * dpr)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
 
-            ctx2d.shadowColor = "rgba(0, 0, 0, 0.85)";
-            ctx2d.shadowBlur = 4 * dpr;
+            ctx2d.shadowColor = "rgba(0, 0, 0, 0.9)";
+            ctx2d.shadowBlur = 5 * dpr;
 
-            if (isCountry) {
-              ctx2d.fillStyle = isChristmas
-                ? `rgba(255, 235, 175, ${alpha * 0.95})`
-                : `rgba(240, 249, 255, ${alpha * 0.95})`;
-            } else {
-              ctx2d.fillStyle = `rgba(186, 230, 253, ${alpha * 0.75})`;
-            }
+            ctx2d.fillStyle = isCountry
+              ? isChristmas
+                ? `rgba(255, 235, 175, ${opacity})`
+                : `rgba(240, 249, 255, ${opacity})`
+              : `rgba(186, 230, 253, ${opacity * 0.85})`;
 
-            ctx2d.fillText(item.name, proj.x + 5 * dpr, proj.y + (isCountry ? 3.5 : 3.0) * dpr);
+            ctx2d.fillText(item.name, x + 6 * dpr, y + (isCountry ? 3.5 : 3.0) * dpr);
             ctx2d.shadowBlur = 0;
           }
         }
 
-        // Active Playing Station Live Radar Beacon Callout
+        // Active Station Pulsing Beacon & Satellite Callout
         if (currentStation) {
-          const stProj = projectToGlobe(
-            currentStation.lat,
-            currentStation.lng,
-            phiRef.current,
-            thetaRef.current,
-            globeSize,
-          );
+          const stLocal = latLngToVector3(currentStation.lat, currentStation.lng, 1.004);
+          const stWorld = stLocal.clone().applyEuler(earthGroup.rotation);
+          const stNormal = stWorld.clone().normalize();
+          const stView = camera.position.clone().sub(stWorld).normalize();
+          const stDot = stNormal.dot(stView);
 
-          if (stProj.visible && stProj.opacity > 0.05) {
-            const alpha = stProj.opacity;
+          if (stDot > 0.06) {
+            const screenPos = stWorld.clone().project(camera);
+            const x = ((screenPos.x * 0.5 + 0.5) * width) * dpr;
+            const y = ((-screenPos.y * 0.5 + 0.5) * height) * dpr;
+            const opacity = Math.min(1, Math.max(0, stDot * 3.0));
             const pulse = (now % 1600) / 1600;
 
             // Radar ripple ring
             ctx2d.beginPath();
-            ctx2d.arc(stProj.x, stProj.y, (5 + pulse * 22) * dpr, 0, Math.PI * 2);
+            ctx2d.arc(x, y, (5 + pulse * 24) * dpr, 0, Math.PI * 2);
             ctx2d.strokeStyle = isChristmas
-              ? `rgba(255, 201, 74, ${(1 - pulse) * alpha * 0.8})`
-              : `rgba(52, 211, 153, ${(1 - pulse) * alpha * 0.8})`;
+              ? `rgba(255, 201, 74, ${(1 - pulse) * opacity * 0.85})`
+              : `rgba(52, 211, 153, ${(1 - pulse) * opacity * 0.85})`;
             ctx2d.lineWidth = 1.5 * dpr;
             ctx2d.stroke();
 
             // Core beacon dot
             ctx2d.beginPath();
-            ctx2d.arc(stProj.x, stProj.y, 4.5 * dpr, 0, Math.PI * 2);
-            ctx2d.fillStyle = isChristmas ? `rgba(225, 29, 72, ${alpha})` : `rgba(16, 185, 129, ${alpha})`;
+            ctx2d.arc(x, y, 4.5 * dpr, 0, Math.PI * 2);
+            ctx2d.fillStyle = isChristmas ? `rgba(225, 29, 72, ${opacity})` : `rgba(16, 185, 129, ${opacity})`;
             ctx2d.fill();
 
-            // Live Station Callout Flag
-            const flagX = stProj.x + 14 * dpr;
-            const flagY = stProj.y - 12 * dpr;
+            // Satellite live callout tag
+            const flagX = x + 14 * dpr;
+            const flagY = y - 12 * dpr;
 
-            // Connecting angled vector line
             ctx2d.beginPath();
-            ctx2d.moveTo(stProj.x, stProj.y);
-            ctx2d.lineTo(stProj.x + 8 * dpr, stProj.y - 8 * dpr);
+            ctx2d.moveTo(x, y);
+            ctx2d.lineTo(x + 8 * dpr, y - 8 * dpr);
             ctx2d.lineTo(flagX, flagY);
             ctx2d.strokeStyle = "rgba(255, 255, 255, 0.5)";
             ctx2d.lineWidth = 1 * dpr;
             ctx2d.stroke();
 
-            // Pill tag
             const labelText = `EN VIVO · ${currentStation.name} (${currentStation.frequency || "FM"})`;
             ctx2d.font = `bold ${Math.round(9 * dpr)}px -apple-system, system-ui, sans-serif`;
             const textMetrics = ctx2d.measureText(labelText);
             const tagW = textMetrics.width + 12 * dpr;
-            const tagH = 16 * dpr;
+            const tagH = 17 * dpr;
 
             ctx2d.fillStyle = "rgba(3, 8, 22, 0.85)";
-            ctx2d.strokeStyle = isChristmas ? "rgba(255, 201, 74, 0.5)" : "rgba(52, 211, 153, 0.5)";
+            ctx2d.strokeStyle = isChristmas ? "rgba(255, 201, 74, 0.6)" : "rgba(52, 211, 153, 0.6)";
             ctx2d.lineWidth = 1 * dpr;
 
             ctx2d.beginPath();
@@ -421,11 +525,11 @@ export function WorldGlobe() {
         visibleLabelsRef.current = currentLabels;
       }
 
-      // 4. Update HUD Telemetry coordinates every 8 frames (~15 updates/sec)
-      telemetryFrame++;
-      if (telemetryFrame % 8 === 0) {
-        const centerLat = (thetaRef.current * 180) / Math.PI;
-        const centerLng = ((-phiRef.current + Math.PI / 2) * 180) / Math.PI;
+      // 13. Telemetry HUD Coordinates update
+      telemetryCounter++;
+      if (telemetryCounter % 8 === 0) {
+        const centerLat = (rotationXRef.current * 180) / Math.PI;
+        const centerLng = (-rotationYRef.current * 180) / Math.PI - 90;
         const normLng = (((centerLng % 360) + 540) % 360) - 180;
         const latStr = `${Math.abs(centerLat).toFixed(1)}°${centerLat >= 0 ? "N" : "S"}`;
         const lngStr = `${Math.abs(normLng).toFixed(1)}°${normLng >= 0 ? "E" : "W"}`;
@@ -437,51 +541,68 @@ export function WorldGlobe() {
 
     animationId = requestAnimationFrame(render);
 
+    // Resize Handler
     const onResize = () => {
-      if (canvas && overlayCanvas) {
-        width = canvas.offsetWidth;
-        const newDpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.5 : 2);
-        const newSize = Math.round(width * newDpr);
-        overlayCanvas.width = newSize;
-        overlayCanvas.height = newSize;
-      }
+      if (!container) return;
+      width = container.clientWidth || window.innerWidth;
+      height = container.clientHeight || window.innerHeight;
+      const currentDpr = Math.min(window.devicePixelRatio || 1, width < 768 ? 1.5 : 2);
+
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+
+      renderer.setPixelRatio(currentDpr);
+      renderer.setSize(width, height);
+
+      overlayCanvas.width = width * currentDpr;
+      overlayCanvas.height = height * currentDpr;
     };
     window.addEventListener("resize", onResize, { passive: true });
 
     return () => {
       cancelAnimationFrame(animationId);
-      globe.destroy();
       window.removeEventListener("resize", onResize);
+      renderer.dispose();
+      earthGeo.dispose();
+      earthMat.dispose();
+      cloudsGeo.dispose();
+      cloudsMat.dispose();
+      atmosphereGeo.dispose();
+      atmosphereMat.dispose();
+      starsGeo.dispose();
+      starsMat.dispose();
+      pinsGeo.dispose();
+      pinsMat.dispose();
     };
-  }, [theme, isChristmas, markers, arcs, autoRotate, motionOff, currentStation]);
+  }, [isChristmas, motionOff, zoomLevel, stationPins, autoRotate, currentStation, isPlaying]);
 
-  // Native Passive Pointer Listeners with 240 FPS Inertia & Interactive Satellite Tap
+  // Pointer & Gesture Engine (240 FPS Inertia + Tap to Select)
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     const onPointerDown = (e: PointerEvent) => {
       activePointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
-      targetPhiRef.current = null;
-      targetThetaRef.current = null;
+      targetRotYRef.current = null;
+      targetRotXRef.current = null;
       pointerDownPos.current = { x: e.clientX, y: e.clientY };
 
       try {
         container.setPointerCapture(e.pointerId);
       } catch {
-        // Pointer capture fallback
+        // Fallback
       }
 
       if (activePointersRef.current.size === 1) {
         isDraggingRef.current = true;
         lastPointerPos.current = { x: e.clientX, y: e.clientY };
-        velocityPhiRef.current = 0;
-        velocityThetaRef.current = 0;
+        velocityYRef.current = 0;
+        velocityXRef.current = 0;
         pinchDistRef.current = null;
       } else if (activePointersRef.current.size === 2) {
         isDraggingRef.current = false;
-        velocityPhiRef.current = 0;
-        velocityThetaRef.current = 0;
+        velocityYRef.current = 0;
+        velocityXRef.current = 0;
         const pts = Array.from(activePointersRef.current.values());
         if (pts.length >= 2 && pts[0] && pts[1]) {
           pinchDistRef.current = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
@@ -493,34 +614,33 @@ export function WorldGlobe() {
       if (!activePointersRef.current.has(e.pointerId)) return;
       activePointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
-      // Two-finger pinch-to-zoom on iOS & Android
+      // Two-Finger Pinch to Zoom (iOS Safari & Android)
       if (activePointersRef.current.size >= 2) {
         const pts = Array.from(activePointersRef.current.values());
         if (pts.length >= 2 && pts[0] && pts[1]) {
           const currentDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
-
           if (pinchDistRef.current !== null && pinchDistRef.current > 0) {
             const delta = currentDist - pinchDistRef.current;
             const zoomDelta = delta * 0.0035;
-            setZoomLevel((z) => Math.max(0.65, Math.min(1.5, z + zoomDelta)));
+            setZoomLevel((z) => Math.max(0.65, Math.min(1.6, z + zoomDelta)));
           }
           pinchDistRef.current = currentDist;
         }
         return;
       }
 
-      // Single-finger rotation drag
+      // Single-Finger Globe Rotation Drag
       if (!isDraggingRef.current || !lastPointerPos.current) return;
       const dx = e.clientX - lastPointerPos.current.x;
       const dy = e.clientY - lastPointerPos.current.y;
       lastPointerPos.current = { x: e.clientX, y: e.clientY };
 
       const factor = 0.0035 / zoomLevel;
-      phiRef.current += dx * factor;
-      thetaRef.current -= dy * factor;
+      rotationYRef.current += dx * factor;
+      rotationXRef.current += dy * factor;
 
-      velocityPhiRef.current = dx * factor * 0.8;
-      velocityThetaRef.current = -dy * factor * 0.8;
+      velocityYRef.current = dx * factor * 0.75;
+      velocityXRef.current = dy * factor * 0.75;
     };
 
     const onPointerUp = (e: PointerEvent) => {
@@ -528,7 +648,7 @@ export function WorldGlobe() {
       try {
         container.releasePointerCapture(e.pointerId);
       } catch {
-        // Pointer was already released
+        // Fallback
       }
 
       // Interactive Click/Tap Detection for Satellite Labels
@@ -550,9 +670,14 @@ export function WorldGlobe() {
               const stationsList = allStations && allStations.length > 0 ? allStations : STATIONS;
               if (item.type === "country" && item.countryCode) {
                 setSelectedCountryCode(item.countryCode);
+                setSelectedCity(null);
                 const match = stationsList.find((s) => s.countryCode === item.countryCode);
                 if (match) playStation(match);
               } else if (item.type === "city") {
+                if (item.countryCode) {
+                  setSelectedCountryCode(item.countryCode);
+                }
+                setSelectedCity(item.name);
                 const match = stationsList.find((s) => s.city.toLowerCase().includes(item.name.toLowerCase()));
                 if (match) playStation(match);
               }
@@ -579,7 +704,7 @@ export function WorldGlobe() {
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
       const delta = -e.deltaY * 0.0012;
-      setZoomLevel((z) => Math.max(0.65, Math.min(1.5, z + delta)));
+      setZoomLevel((z) => Math.max(0.65, Math.min(1.6, z + delta)));
     };
 
     container.addEventListener("pointerdown", onPointerDown, { passive: true });
@@ -595,20 +720,19 @@ export function WorldGlobe() {
       container.removeEventListener("pointercancel", onPointerUp);
       container.removeEventListener("wheel", onWheel);
     };
-  }, [zoomLevel, allStations, flyTo, playStation, setSelectedCountryCode]);
+  }, [zoomLevel, allStations, flyTo, playStation, setSelectedCountryCode, setSelectedCity]);
 
   return (
     <div
       ref={containerRef}
       className="relative flex h-full w-full items-center justify-center overflow-hidden select-none touch-none cursor-grab active:cursor-grabbing"
     >
-      {/* 1. Atmospheric Rayleigh Scattering Glow (Earth from satellite view) */}
+      {/* 1. Atmospheric Space Backdrop Glow */}
       <div
         className="pointer-events-none absolute rounded-full transition-transform duration-300 will-change-transform"
         style={{
           width: "min(88vw, 840px)",
           height: "min(88vw, 840px)",
-          transform: `scale(${zoomLevel}) translateZ(0)`,
           background: isChristmas
             ? "radial-gradient(circle, rgba(255, 201, 74, 0.18) 0%, rgba(16, 185, 129, 0.08) 45%, transparent 72%)"
             : "radial-gradient(circle, rgba(56, 182, 255, 0.22) 0%, rgba(30, 107, 255, 0.08) 45%, transparent 72%)",
@@ -620,9 +744,9 @@ export function WorldGlobe() {
       <div
         className="pointer-events-none absolute flex items-center justify-center will-change-transform"
         style={{
-          width: "min(108vw, 980px)",
-          height: "min(108vw, 980px)",
-          transform: `scale(${zoomLevel}) rotateX(68deg) translateZ(0)`,
+          width: "min(106vw, 960px)",
+          height: "min(106vw, 960px)",
+          transform: "rotateX(68deg) translateZ(0)",
           opacity: 0.35,
         }}
       >
@@ -631,50 +755,40 @@ export function WorldGlobe() {
         <div className="absolute inset-20 rounded-full border border-dotted border-[#ffd670]/25 animate-[spin_50s_linear_infinite_reverse]" />
       </div>
 
-      {/* 3. High-Performance WebGL Canvas + 2D Satellite Labels Overlay */}
-      <div
-        className="relative flex items-center justify-center will-change-transform"
-        style={{
-          width: "min(92vw, 860px)",
-          height: "min(92vw, 860px)",
-          transform: `scale(${zoomLevel}) translateZ(0)`,
-        }}
-      >
-        {/* WebGL Globe */}
-        <canvas
-          ref={canvasRef}
-          className="h-full w-full outline-none"
-          style={{ width: "100%", height: "100%", contain: "layout paint size" }}
-        />
+      {/* 3. Three.js High-Performance 3D Satellite Earth Canvas */}
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 h-full w-full outline-none"
+        style={{ width: "100%", height: "100%", contain: "strict" }}
+      />
 
-        {/* 2D Satellite Overlays (Country/City Names & Radio Pulse) */}
-        <canvas
-          ref={overlayCanvasRef}
-          className="absolute inset-0 h-full w-full pointer-events-none"
-          style={{ width: "100%", height: "100%" }}
-        />
-      </div>
+      {/* 4. 2D Projected Satellite Labels Overlay (Countries & Cities) */}
+      <canvas
+        ref={overlayCanvasRef}
+        className="absolute inset-0 h-full w-full pointer-events-none"
+        style={{ width: "100%", height: "100%" }}
+      />
 
-      {/* 4. Satellite HUD Telemetry Badges */}
+      {/* 5. Satellite HUD Telemetry Badges */}
       <div className="pointer-events-none absolute top-14 left-4 z-20 hidden md:flex flex-col gap-1 text-[11px] font-mono text-slate-400">
-        <span className="flex items-center gap-1.5 bg-black/40 backdrop-blur-md border border-white/10 px-2.5 py-1 rounded-md">
+        <span className="flex items-center gap-1.5 bg-black/45 backdrop-blur-md border border-white/10 px-2.5 py-1 rounded-md shadow-lg">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-white font-bold">SAT-NAV</span>
-          <span>// ORBIT: 780 KM LEO // INCL: 51.6°</span>
+          <span className="text-white font-bold">SAT-NAV LEO</span>
+          <span>// ORBIT: 780 KM // INCL: 51.6°</span>
         </span>
-        <span className="bg-black/30 backdrop-blur-md border border-white/5 px-2.5 py-0.5 rounded-md text-[10px] text-amber-300">
-          RED SATELITAL 174 NACIONES // HQ BITRATE
+        <span className="bg-black/35 backdrop-blur-md border border-white/5 px-2.5 py-0.5 rounded-md text-[10px] text-amber-300">
+          MAPA SATELITAL 3D · 174 NACIONES // HQ
         </span>
       </div>
 
       {/* Live Viewport Coordinates HUD Telemetry */}
       <div className="pointer-events-none absolute top-14 right-4 z-20 hidden md:flex">
-        <span className="bg-black/40 backdrop-blur-md border border-white/10 px-2.5 py-1 rounded-md text-[11px] font-mono font-semibold text-slate-300">
+        <span className="bg-black/45 backdrop-blur-md border border-white/10 px-2.5 py-1 rounded-md text-[11px] font-mono font-semibold text-slate-300 shadow-lg">
           {telemetryCoords}
         </span>
       </div>
 
-      {/* 5. Sleek Floating Zoom & Rotate controls at bottom right */}
+      {/* 6. Sleek Floating Zoom & Rotate controls at bottom right */}
       <div className="absolute right-5 bottom-24 z-20 hidden sm:flex flex-col gap-2 p-1.5 rounded-2xl liquid-glass border border-white/10 shadow-xl">
         <IconButton
           size="sm"
@@ -702,17 +816,17 @@ export function WorldGlobe() {
           size="sm"
           label="Acercar globo 3D"
           icon={<span className="text-lg font-bold leading-none">+</span>}
-          onClick={() => setZoomLevel((z) => Math.min(1.5, z + 0.12))}
+          onClick={() => setZoomLevel((z) => Math.min(1.6, z + 0.15))}
         />
         <IconButton
           size="sm"
           label="Alejar globo 3D"
           icon={<span className="text-lg font-bold leading-none">−</span>}
-          onClick={() => setZoomLevel((z) => Math.max(0.65, z - 0.12))}
+          onClick={() => setZoomLevel((z) => Math.max(0.65, z - 0.15))}
         />
       </div>
 
-      {/* 6. Technical details modal */}
+      {/* 7. Technical details modal */}
       <StationDetailsModal
         station={currentStation}
         isOpen={detailsModalOpen}

@@ -26,6 +26,7 @@ interface PlayerState {
   searchQuery: string;
   selectedGenre: string;
   selectedCountryCode: string | null;
+  selectedCity: string | null;
   sidebarOpen: boolean;
   driveMode: boolean;
   liteMode: boolean;
@@ -78,6 +79,7 @@ interface PlayerState {
   setSearchQuery: (q: string) => void;
   setSelectedGenre: (genre: string) => void;
   setSelectedCountryCode: (code: string | null) => void;
+  setSelectedCity: (city: string | null) => void;
   setSidebarOpen: (open: boolean) => void;
   toggleSidebar: () => void;
   setDriveMode: (val: boolean) => void;
@@ -139,6 +141,7 @@ export const usePlayerStore = create<PlayerState>()(
       searchQuery: "",
       selectedGenre: "Todas",
       selectedCountryCode: null,
+      selectedCity: null,
       sidebarOpen: false,
       driveMode: false,
       liteMode: false,
@@ -277,8 +280,9 @@ export const usePlayerStore = create<PlayerState>()(
       setViewMode: (viewMode: ViewMode) => set({ viewMode }),
       setActiveTab: (activeTab: SidebarTab) => set({ activeTab }),
       setSearchQuery: (searchQuery: string) => set({ searchQuery }),
-      setSelectedGenre: (selectedGenre: string) => set({ selectedGenre, selectedCountryCode: null }),
-      setSelectedCountryCode: (code: string | null) => set({ selectedCountryCode: code, activeTab: "explore" }),
+      setSelectedGenre: (selectedGenre: string) => set({ selectedGenre, selectedCountryCode: null, selectedCity: null }),
+      setSelectedCountryCode: (code: string | null) => set({ selectedCountryCode: code, selectedCity: null, activeTab: "explore" }),
+      setSelectedCity: (city: string | null) => set({ selectedCity: city }),
       setSidebarOpen: (sidebarOpen: boolean) => set({ sidebarOpen }),
       toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
       setDriveMode: (driveMode: boolean) => set({ driveMode }),

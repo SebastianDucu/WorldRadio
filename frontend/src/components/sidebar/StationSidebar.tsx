@@ -16,6 +16,7 @@ import {
   BoltIcon,
   SparklesIcon,
   UsersIcon,
+  LocationIcon,
 } from "@/components/icons";
 import { IconButton } from "@/components/ui/IconButton";
 import { STATIONS, COUNTRIES } from "@/data/stations";
@@ -53,6 +54,8 @@ export function StationSidebar() {
     setSelectedGenre,
     selectedCountryCode,
     setSelectedCountryCode,
+    selectedCity,
+    setSelectedCity,
     favorites,
     toggleFavorite,
     isFavorite,
@@ -96,6 +99,24 @@ export function StationSidebar() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
+  // Available cities in the currently selected country
+  const availableCities = useMemo(() => {
+    if (!selectedCountryCode) return [];
+    const pool = (allStations && allStations.length > 0 ? allStations : STATIONS).filter(
+      (s) => s.countryCode === selectedCountryCode,
+    );
+    const cityMap = new Map<string, number>();
+    for (const s of pool) {
+      const city = s.city?.trim() || "";
+      if (city) {
+        cityMap.set(city, (cityMap.get(city) || 0) + 1);
+      }
+    }
+    return Array.from(cityMap.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, "es"));
+  }, [allStations, selectedCountryCode]);
+
   // Filtered stations
   const filteredStations = useMemo(() => {
     let list = allStations && allStations.length > 0 ? allStations : STATIONS;
@@ -106,6 +127,10 @@ export function StationSidebar() {
 
     if (selectedCountryCode) {
       list = list.filter((s) => s.countryCode === selectedCountryCode);
+    }
+
+    if (selectedCity) {
+      list = list.filter((s) => s.city.toLowerCase() === selectedCity.toLowerCase());
     }
 
     if (selectedGenre !== "Todas") {
@@ -144,7 +169,7 @@ export function StationSidebar() {
     }
 
     return list;
-  }, [allStations, activeTab, favorites, selectedCountryCode, selectedGenre, searchQuery, onlineResults]);
+  }, [allStations, activeTab, favorites, selectedCountryCode, selectedCity, selectedGenre, searchQuery, onlineResults]);
 
   return (
     <>
@@ -501,16 +526,87 @@ export function StationSidebar() {
           ) : (
             /* Station List with active filter pill */
             <>
+              {/* TWO Hierarchical Filters: País and Ciudad */}
               {selectedCountryCode && (
-                <div className="flex items-center justify-between p-2 px-3 rounded-xl bg-amber-400/15 border border-amber-400/30 text-xs font-semibold text-amber-300 mb-1">
-                  <span>País: {countryList.find((c) => c.code === selectedCountryCode)?.name || selectedCountryCode}</span>
-                  <button
-                    onClick={() => setSelectedCountryCode(null)}
-                    className="p-0.5 hover:text-white"
-                    title="Quitar filtro de país"
-                  >
-                    <CloseIcon size={14} />
-                  </button>
+                <div className="space-y-1.5 mb-2.5">
+                  {/* Filter 1: Country Pill */}
+                  <div className="flex items-center justify-between p-2 px-3 rounded-xl bg-amber-400/15 border border-amber-400/35 text-xs font-semibold text-amber-300 shadow-sm">
+                    <span className="flex items-center gap-1.5 truncate">
+                      <GlobeIcon size={14} className="text-amber-400 shrink-0" />
+                      <span className="text-amber-400 font-bold">País:</span>
+                      <span className="text-white font-semibold">
+                        {countryList.find((c) => c.code === selectedCountryCode)?.name || selectedCountryCode}
+                      </span>
+                    </span>
+                    <button
+                      onClick={() => {
+                        setSelectedCountryCode(null);
+                        setSelectedCity(null);
+                      }}
+                      className="p-1 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
+                      title="Quitar filtro de país"
+                      aria-label="Quitar filtro de país"
+                    >
+                      <CloseIcon size={14} />
+                    </button>
+                  </div>
+
+                  {/* Filter 2: Cities in selected Country */}
+                  {availableCities.length > 0 && (
+                    <div className="rounded-xl bg-slate-900/60 border border-white/5 p-2 space-y-1.5">
+                      <div className="flex items-center justify-between px-1 text-[11px] font-semibold text-slate-400">
+                        <span className="flex items-center gap-1">
+                          <LocationIcon size={12} className="text-amber-400" />
+                          <span>Filtro de Ciudades ({availableCities.length}):</span>
+                        </span>
+                        {selectedCity && (
+                          <button
+                            onClick={() => setSelectedCity(null)}
+                            className="text-amber-400 hover:text-amber-300 text-[10px] font-bold"
+                          >
+                            Ver todas
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Horizontal Scrollable City Chips */}
+                      <div className="flex gap-1.5 overflow-x-auto py-0.5 scrollbar-none">
+                        <button
+                          onClick={() => setSelectedCity(null)}
+                          className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all ${
+                            !selectedCity
+                              ? "bg-amber-400 text-slate-950 font-bold shadow-xs shadow-amber-400/30 scale-105"
+                              : "bg-slate-800 text-slate-300 hover:text-white border border-white/10"
+                          }`}
+                        >
+                          Todas las ciudades ({availableCities.reduce((acc, c) => acc + c.count, 0)})
+                        </button>
+                        {availableCities.map((c) => {
+                          const isCityActive = selectedCity?.toLowerCase() === c.name.toLowerCase();
+                          return (
+                            <button
+                              key={c.name}
+                              onClick={() => setSelectedCity(isCityActive ? null : c.name)}
+                              className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all flex items-center gap-1 ${
+                                isCityActive
+                                  ? "bg-amber-400 text-slate-950 font-bold shadow-xs shadow-amber-400/30 scale-105"
+                                  : "bg-slate-800 text-slate-300 hover:text-white border border-white/10"
+                              }`}
+                            >
+                              <span>{c.name}</span>
+                              <span
+                                className={`text-[10px] ${
+                                  isCityActive ? "text-slate-950/80 font-bold" : "text-amber-400 font-bold"
+                                }`}
+                              >
+                                ({c.count})
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
               {filteredStations.slice(0, 120).map((station) => {
@@ -551,7 +647,25 @@ export function StationSidebar() {
                           {station.name}
                         </p>
                         <p className="truncate text-xs font-normal text-slate-400 mt-0.5 flex items-center gap-1.5">
-                          <span className="truncate">{station.city ? `${station.city}, ` : ""}{station.country}</span>
+                          {station.city ? (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (station.countryCode && station.countryCode !== selectedCountryCode) {
+                                  setSelectedCountryCode(station.countryCode);
+                                }
+                                setSelectedCity(station.city);
+                              }}
+                              className="truncate text-slate-300 hover:text-amber-300 hover:underline flex items-center gap-0.5 transition-colors"
+                              title={`Filtrar emisoras de ${station.city}`}
+                            >
+                              <LocationIcon size={11} className="text-amber-400/80 shrink-0" />
+                              <span className="truncate">{station.city}</span>
+                            </button>
+                          ) : null}
+                          {station.city && station.country ? <span>·</span> : null}
+                          <span className="truncate">{station.country}</span>
                           <span>·</span>
                           <span className="text-emerald-400 font-semibold shrink-0 flex items-center gap-0.5">
                             <UsersIcon size={11} className="text-emerald-400" />
