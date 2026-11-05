@@ -230,7 +230,8 @@ export function StationSidebar() {
         }`}
         aria-label="Explorador de emisoras"
       >
-        <header className="flex items-center justify-between border-b border-white/10 px-4 py-3.5">
+        <div className="w-12 h-1 rounded-full bg-white/25 mx-auto mt-2.5 shrink-0" />
+        <header className="flex items-center justify-between border-b border-white/10 px-4 py-3">
           <div className="flex items-center gap-2.5">
             <WorldRadioLogo size="md" />
             <div>
@@ -265,6 +266,20 @@ export function StationSidebar() {
               icon={<ShuffleIcon size={18} />}
               onClick={randomStation}
             />
+
+            <button
+              type="button"
+              onClick={() => setActiveTab(activeTab === "more" ? "explore" : "more")}
+              className={`flex h-8 w-8 items-center justify-center rounded-full transition-all duration-200 active:scale-90 ${
+                activeTab === "more"
+                  ? "bg-amber-400 text-slate-950 font-bold"
+                  : "text-slate-300 hover:text-white hover:bg-white/10"
+              }`}
+              title="Más herramientas y opciones"
+              aria-label="Más opciones"
+            >
+              <span className="text-sm font-black tracking-widest leading-none">•••</span>
+            </button>
 
             <IconButton
               size="sm"
@@ -847,17 +862,17 @@ export function StationSidebar() {
                             playStation(station);
                           }
                         }}
-                        className={`flex h-8 w-8 items-center justify-center rounded-lg transition-all active:scale-90 ${
+                        className={`liquid-glass-action-circle ${
                           isCurrentPlaying
-                            ? "bg-amber-400 text-slate-950 shadow-md shadow-amber-400/40"
-                            : "bg-slate-800 text-slate-300 hover:text-white"
+                            ? "!bg-amber-400 !text-slate-950 !border-amber-300 shadow-md shadow-amber-400/40"
+                            : ""
                         }`}
                         aria-label={isCurrentPlaying ? "Pausar" : "Reproducir"}
                       >
                         {isCurrentPlaying ? (
-                          <PauseIcon size={16} />
+                          <PauseIcon size={14} />
                         ) : (
-                          <PlayIcon size={16} className="translate-x-0.5" />
+                          <PlayIcon size={14} className="translate-x-0.5" />
                         )}
                       </button>
 
@@ -888,6 +903,10 @@ export function StationSidebar() {
             </>
           )}
         </div>
+        <footer className="px-4 py-2 border-t border-white/10 bg-slate-950/40 flex items-center justify-between text-[11px] font-semibold text-slate-400 shrink-0">
+          <span className="truncate">Sintonizador Liquid Glass · 174 Naciones</span>
+          <span className="text-amber-400 font-mono text-[10px] shrink-0 font-bold ml-2">60-120 FPS</span>
+        </footer>
       </aside>
 
       <ChangelogModal

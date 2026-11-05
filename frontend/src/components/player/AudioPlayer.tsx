@@ -279,7 +279,7 @@ export function AudioPlayer() {
                 disabled={!currentStation}
                 className={`flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-full text-white transition-all duration-200 active:scale-95 shadow-xl ${isPlaying
                     ? "bg-gradient-to-tr from-amber-400 via-amber-500 to-amber-600 shadow-[0_0_28px_rgba(255,201,74,0.7)] animate-[pulse_2.8s_ease-out_infinite] text-slate-950 font-bold"
-                    : "bg-slate-800 hover:bg-slate-700 border border-white/10"
+                    : "liquid-glass-action-circle !w-10 !h-10 sm:!w-11 sm:!h-11"
                   }`}
                 aria-label={isPlaying ? "Pausar" : "Reproducir"}
               >

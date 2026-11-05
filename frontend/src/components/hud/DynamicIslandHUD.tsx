@@ -159,7 +159,7 @@ export function DynamicIslandHUD() {
             onClick={togglePlay}
             className={`flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full transition-all duration-200 active:scale-90 ${isPlaying
                 ? "bg-gradient-to-tr from-amber-400 via-amber-500 to-amber-600 text-slate-950 font-bold shadow-md shadow-amber-400/50 hover:brightness-110"
-                : "bg-slate-800 hover:bg-slate-700 text-white border border-white/10"
+                : "liquid-glass-action-circle !h-7 !w-7 sm:!h-8 sm:!w-8"
               }`}
             title={isPlaying ? "Pausar emisión" : "Reproducir emisión"}
           >

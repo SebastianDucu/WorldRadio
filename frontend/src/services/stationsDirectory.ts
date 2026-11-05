@@ -192,9 +192,7 @@ export async function initStationsDirectory() {
         try {
           const localized = dn.of(cc);
           if (localized) countryName = localized;
-        } catch {
-          // ignore
-        }
+        } catch {}
       }
 
       if (cc && cc.length === 2 && countryMap.has(cc)) {

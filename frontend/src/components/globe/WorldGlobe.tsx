@@ -135,7 +135,8 @@ export function WorldGlobe() {
     const glow = atmoMat.uniforms.glowColor?.value;
     if (globeTheme === "sapphire") {
       earthMat.color.setHex(0xffffff);
-      earthMat.specular.setHex(0x38bdf8);
+      earthMat.specular.setHex(0x1a2e4a);
+      earthMat.shininess = 90;
       earthMat.emissive.setHex(0xffb84d);
       earthMat.emissiveIntensity = 0.85;
       borderMat.color.setHex(0x38bdf8);
@@ -143,7 +144,8 @@ export function WorldGlobe() {
       if (glow) glow.setHex(0x38bdf8);
     } else if (globeTheme === "obsidian") {
       earthMat.color.setHex(0x708090);
-      earthMat.specular.setHex(0xfbbf24);
+      earthMat.specular.setHex(0x332211);
+      earthMat.shininess = 90;
       earthMat.emissive.setHex(0xf59e0b);
       earthMat.emissiveIntensity = 0.95;
       borderMat.color.setHex(0xfbbf24);
@@ -151,7 +153,8 @@ export function WorldGlobe() {
       if (glow) glow.setHex(0xfbbf24);
     } else {
       earthMat.color.setHex(0xffffff);
-      earthMat.specular.setHex(0x60a5fa);
+      earthMat.specular.setHex(0x1a2e4a);
+      earthMat.shininess = 90;
       earthMat.emissive.setHex(0xffd54f);
       earthMat.emissiveIntensity = 0.4;
       borderMat.color.setHex(0x94a3b8);
@@ -238,8 +241,8 @@ export function WorldGlobe() {
     const earthMat = new THREE.MeshPhongMaterial({
       map: earthTexture,
       specularMap: specularTexture,
-      specular: new THREE.Color(0x38bdf8),
-      shininess: 45,
+      specular: new THREE.Color(0x1a2e4a),
+      shininess: 90,
       emissiveMap: lightsTexture,
       emissive: new THREE.Color(0xffb84d),
       emissiveIntensity: 0.85,
@@ -372,11 +375,11 @@ export function WorldGlobe() {
         });
     }
 
-    const sunLight = new THREE.DirectionalLight(0xffffff, 2.2);
-    sunLight.position.set(5, 3, 5);
+    const sunLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    sunLight.position.set(4, 3, 5);
     scene.add(sunLight);
 
-    const ambientLight = new THREE.AmbientLight(0x0a1628, 0.9);
+    const ambientLight = new THREE.AmbientLight(0x0f172a, 1.1);
     scene.add(ambientLight);
 
     const arcsGroup = new THREE.Group();
@@ -626,9 +629,7 @@ export function WorldGlobe() {
 
       try {
         container.setPointerCapture(e.pointerId);
-      } catch {
-        // Fallback
-      }
+      } catch {}
 
       if (activePointersRef.current.size === 1) {
         isDraggingRef.current = true;
@@ -682,9 +683,7 @@ export function WorldGlobe() {
       activePointersRef.current.delete(e.pointerId);
       try {
         container.releasePointerCapture(e.pointerId);
-      } catch {
-        // Fallback
-      }
+      } catch {}
 
       if (pointerDownPos.current) {
         const moveDist = Math.hypot(e.clientX - pointerDownPos.current.x, e.clientY - pointerDownPos.current.y);
