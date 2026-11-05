@@ -18,14 +18,25 @@ import {
   UsersIcon,
   LocationIcon,
   ChevronDownIcon,
+  PrevIcon,
+  NextIcon,
+  VolumeIcon,
+  MuteIcon,
+  CompassIcon,
+  ShareIcon,
+  SunIcon,
+  MoonIcon,
 } from "@/components/icons";
 import { IconButton } from "@/components/ui/IconButton";
 import { STATIONS, COUNTRIES } from "@/data/stations";
 import { usePlayerStore } from "@/store/player";
 import { searchOnlineStations } from "@/services/radioApi";
 import { ChangelogModal } from "@/components/modals/ChangelogModal";
+import { StationDetailsModal } from "@/components/player/StationDetailsModal";
 import { WorldRadioLogo } from "@/components/common/WorldRadioLogo";
-import { getStationBaseListeners, formatListenerCount } from "@/hooks/useLiveListeners";
+import { getStationBaseListeners, formatListenerCount, useLiveListeners } from "@/hooks/useLiveListeners";
+import { getStationTimeInfo } from "@/lib/timeZones";
+import { toast } from "@/store/toast";
 import type { Station } from "@/types/radio";
 
 const MOOD_FILTERS = [
@@ -44,8 +55,15 @@ export function StationSidebar() {
   const {
     currentStation,
     isPlaying,
+    isLoading,
     playStation,
     togglePlay,
+    nextStation,
+    prevStation,
+    volume,
+    setVolume,
+    muted,
+    toggleMute,
     activeTab,
     setActiveTab,
     searchQuery,
@@ -72,17 +90,29 @@ export function StationSidebar() {
     setTunerDialModalOpen,
     countries,
     allStations,
+    isTourActive,
+    setTourActive,
+    tourCountdown,
+    sleepTimerRemaining,
   } = usePlayerStore();
 
   const [onlineResults, setOnlineResults] = useState<Station[]>([]);
   const [isSearchingOnline, setIsSearchingOnline] = useState(false);
   const [changelogOpen, setChangelogOpen] = useState(false);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [isCityPickerExpanded, setIsCityPickerExpanded] = useState(false);
   const [citySearchQuery, setCitySearchQuery] = useState("");
   const cityScrollRef = useRef<HTMLDivElement>(null);
   const [isDraggingCity, setIsDraggingCity] = useState(false);
   const dragStartX = useRef(0);
   const dragScrollLeft = useRef(0);
+
+  const liveListeners = useLiveListeners(currentStation);
+  const [timeInfo, setTimeInfo] = useState(() => getStationTimeInfo(currentStation));
+
+  useEffect(() => {
+    setTimeInfo(getStationTimeInfo(currentStation));
+  }, [currentStation]);
 
   const handleCityMouseDown = (e: React.MouseEvent) => {
     if (!cityScrollRef.current) return;
@@ -213,8 +243,105 @@ export function StationSidebar() {
     return list;
   }, [allStations, activeTab, favorites, selectedCountryCode, selectedCity, selectedGenre, searchQuery, onlineResults]);
 
+  const getStationBadge = (station: Station) => {
+    if (station.frequency && station.frequency.length <= 5) return station.frequency;
+    const parts = station.name.trim().split(/\s+/);
+    const first = parts[0];
+    const second = parts[1];
+    if (first && second && first[0] && second[0]) {
+      return (first[0] + second[0]).toUpperCase();
+    }
+    return station.name.slice(0, 2).toUpperCase();
+  };
+
+  const handleNearMe = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          let closest = countryList[0];
+          let minDistance = Infinity;
+          for (const c of countryList) {
+            const dist = Math.hypot(c.lat - latitude, c.lng - longitude);
+            if (dist < minDistance) {
+              minDistance = dist;
+              closest = c;
+            }
+          }
+          if (closest) {
+            setSelectedCountryCode(closest.code);
+            setSelectedCity(null);
+            flyTo(closest.lat, closest.lng);
+            setActiveTab("explore");
+            toast.info(`Cerca de ti: Sintonizando ${closest.name}`);
+          }
+        },
+        () => {
+          const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+          const found = countryList.find((c) => tz.toLowerCase().includes(c.name.toLowerCase()));
+          if (found) {
+            setSelectedCountryCode(found.code);
+            flyTo(found.lat, found.lng);
+            setActiveTab("explore");
+            toast.info(`Región detectada: ${found.name}`);
+          } else {
+            toast.info("Activa la ubicación para sintonizar emisoras cercanas");
+          }
+        },
+        { timeout: 4000 }
+      );
+    }
+  };
+
+  const handleSurprise = () => {
+    randomStation();
+    toast.info("¡Sorpresa! Sintonizando emisora mundial");
+  };
+
+  const handleTour = () => {
+    setTourActive(!isTourActive);
+    if (!isTourActive) {
+      toast.info("Tour Mundial activado: cambiando de frecuencia cada 15s");
+    } else {
+      toast.info("Tour Mundial pausado");
+    }
+  };
+
+  const handleShare = (station: Station) => {
+    if (navigator.share) {
+      navigator.share({
+        title: `${station.name} · WorldRadio`,
+        text: `Escuchando ${station.name} (${station.city ? `${station.city}, ` : ""}${station.country}) en vivo en WorldRadio`,
+        url: window.location.href,
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      toast.success("Enlace copiado al portapapeles");
+    }
+  };
+
+  const formatTimer = (secs: number) => {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
+
   return (
     <>
+      {!sidebarOpen && (
+        <button
+          onClick={toggleSidebar}
+          className="fixed top-3 left-3 sm:top-4 sm:left-4 z-30 liquid-glass-pill px-3.5 py-2 flex items-center gap-2.5 rounded-full border border-amber-400/30 text-white shadow-xl hover:scale-105 active:scale-95 transition-all pointer-events-auto"
+          aria-label="Abrir explorador de emisoras"
+          title="Abrir explorador de emisoras"
+        >
+          <WorldRadioLogo size="sm" />
+          <span className="text-xs font-bold text-white">Explorar</span>
+          <span className="rounded-full bg-amber-400/20 px-2 py-0.5 text-[10px] font-bold text-amber-300">
+            {countryList.length} Países
+          </span>
+        </button>
+      )}
 
       {sidebarOpen && (
         <div
@@ -225,13 +352,14 @@ export function StationSidebar() {
       )}
 
       <aside
-        className={`fixed top-[max(0.75rem,env(safe-area-inset-top,0px))] bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] left-2 right-2 sm:right-auto sm:left-4 z-30 flex flex-col rounded-3xl liquid-glass shadow-2xl transition-transform duration-300 sm:w-[360px] border border-amber-400/20 ${
+        className={`fixed top-2 sm:top-3 bottom-2 sm:bottom-3 left-2 sm:left-3 z-30 flex flex-col rounded-3xl liquid-glass shadow-2xl transition-transform duration-300 w-[calc(100vw-1rem)] sm:w-[380px] lg:w-[410px] border border-amber-400/20 overflow-hidden ${
           sidebarOpen ? "translate-x-0" : "-translate-x-[120%]"
         }`}
-        aria-label="Explorador de emisoras"
+        aria-label="Consola de exploración y sintonización"
       >
         <div className="w-12 h-1 rounded-full bg-white/25 mx-auto mt-2.5 shrink-0" />
-        <header className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+
+        <header className="flex items-center justify-between border-b border-white/10 px-4 py-3 shrink-0">
           <div className="flex items-center gap-2.5">
             <WorldRadioLogo size="md" />
             <div>
@@ -245,7 +373,7 @@ export function StationSidebar() {
                 </span>
               </div>
               <p className="mt-1 text-xs font-semibold text-slate-400">
-                34.900+ emisoras mundiales
+                34.900+ emisoras · {countryList.length} naciones
               </p>
             </div>
           </div>
@@ -264,7 +392,7 @@ export function StationSidebar() {
               label="Sintonizar aleatorio"
               className="text-slate-300 hover:text-amber-400 hover:bg-amber-400/15 transition-all duration-200 active:scale-90"
               icon={<ShuffleIcon size={18} />}
-              onClick={randomStation}
+              onClick={handleSurprise}
             />
 
             <button
@@ -275,7 +403,7 @@ export function StationSidebar() {
                   ? "bg-amber-400 text-slate-950 font-bold"
                   : "text-slate-300 hover:text-white hover:bg-white/10"
               }`}
-              title="Más herramientas y opciones"
+              title="Herramientas y opciones de audio"
               aria-label="Más opciones"
             >
               <span className="text-sm font-black tracking-widest leading-none">•••</span>
@@ -283,7 +411,7 @@ export function StationSidebar() {
 
             <IconButton
               size="sm"
-              label="Ocultar panel"
+              label="Minimizar panel"
               className="text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200 active:scale-90"
               icon={<CloseIcon size={18} />}
               onClick={toggleSidebar}
@@ -291,58 +419,15 @@ export function StationSidebar() {
           </div>
         </header>
 
-        <nav className="flex border-b border-white/10 bg-slate-900/50 p-1.5 gap-1">
-          <button
-            onClick={() => setActiveTab("explore")}
-            className={`flex-1 rounded-xl py-2 text-center text-xs font-bold transition-all duration-200 ${
-              activeTab === "explore" || activeTab === "stations"
-                ? "bg-gradient-to-tr from-amber-400 via-amber-500 to-amber-600 text-slate-950 font-bold shadow-md shadow-amber-400/35"
-                : "text-slate-400 hover:text-white hover:bg-white/5"
-            }`}
-          >
-            Explorar
-          </button>
-          <button
-            onClick={() => setActiveTab("countries")}
-            className={`flex-1 rounded-xl py-2 text-center text-xs font-bold transition-all duration-200 ${
-              activeTab === "countries"
-                ? "bg-gradient-to-tr from-amber-400 via-amber-500 to-amber-600 text-slate-950 font-bold shadow-md shadow-amber-400/35"
-                : "text-slate-400 hover:text-white hover:bg-white/5"
-            }`}
-          >
-            Países ({countryList.length})
-          </button>
-          <button
-            onClick={() => setActiveTab("favorites")}
-            className={`flex-1 rounded-xl py-2 text-center text-xs font-bold transition-all duration-200 ${
-              activeTab === "favorites"
-                ? "bg-gradient-to-tr from-amber-400 via-amber-500 to-amber-600 text-slate-950 font-bold shadow-md shadow-amber-400/35"
-                : "text-slate-400 hover:text-white hover:bg-white/5"
-            }`}
-          >
-            Favoritas ({favorites.length})
-          </button>
-          <button
-            onClick={() => setActiveTab("more")}
-            className={`flex-1 rounded-xl py-2 text-center text-xs font-bold transition-all duration-200 ${
-              activeTab === "more"
-                ? "bg-gradient-to-tr from-amber-400 via-amber-500 to-amber-600 text-slate-950 font-bold shadow-md shadow-amber-400/35"
-                : "text-slate-400 hover:text-white hover:bg-white/5"
-            }`}
-          >
-            Herramientas
-          </button>
-        </nav>
-
-        <div className="p-2.5 pb-1.5 border-b border-white/5">
+        <div className="p-3 pb-2 border-b border-white/5 shrink-0">
           <div className="relative flex items-center">
             <SearchIcon size={16} className="absolute left-3 text-slate-400 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Buscar emisora, artista o lugar..."
-              className="w-full rounded-xl border border-white/10 bg-slate-900/80 py-1.5 pl-9 pr-8 text-xs font-semibold placeholder:text-slate-500 focus:border-amber-400 focus:outline-none transition-all"
+              placeholder="Buscar emisora, país, ciudad o género..."
+              className="w-full rounded-xl border border-white/10 bg-slate-900/80 py-2 pl-9 pr-8 text-xs font-semibold placeholder:text-slate-500 focus:border-amber-400 focus:outline-none transition-all shadow-inner"
             />
             {isSearchingOnline ? (
               <SpinnerIcon size={14} className="absolute right-3 animate-spin text-amber-400" />
@@ -357,8 +442,9 @@ export function StationSidebar() {
             ) : null}
           </div>
         </div>
+
         {(activeTab === "explore" || activeTab === "stations") && (
-          <div className="flex gap-1.5 overflow-x-auto px-3 py-2 scrollbar-none border-b border-white/5">
+          <div className="flex gap-1.5 overflow-x-auto px-3 py-2 scrollbar-none border-b border-white/5 shrink-0">
             {MOOD_FILTERS.map((cat) => {
               const isSelected = selectedGenre === cat.value;
               return (
@@ -377,6 +463,44 @@ export function StationSidebar() {
             })}
           </div>
         )}
+
+        <div className="grid grid-cols-3 gap-2 px-3 py-2 border-b border-white/5 shrink-0">
+          <button
+            onClick={handleNearMe}
+            className="flex flex-col items-center justify-center gap-1 p-2 rounded-2xl bg-slate-900/60 hover:bg-white/10 border border-white/10 active:scale-95 transition-all text-center group"
+            title="Sintonizar emisoras cercanas a tu ubicación"
+          >
+            <LocationIcon size={18} className="text-amber-400 group-hover:scale-110 transition-transform" />
+            <span className="text-[11px] font-bold text-slate-200">Cerca de mí</span>
+          </button>
+
+          <button
+            onClick={handleSurprise}
+            className="flex flex-col items-center justify-center gap-1 p-2 rounded-2xl bg-slate-900/60 hover:bg-white/10 border border-white/10 active:scale-95 transition-all text-center group"
+            title="Sintonizar una frecuencia aleatoria del planeta"
+          >
+            <SparklesIcon size={18} className="text-amber-400 group-hover:scale-110 transition-transform" />
+            <span className="text-[11px] font-bold text-slate-200">Sorpréndeme</span>
+          </button>
+
+          <button
+            onClick={handleTour}
+            className={`flex flex-col items-center justify-center gap-1 p-2 rounded-2xl border active:scale-95 transition-all text-center group ${
+              isTourActive
+                ? "bg-amber-400/25 border-amber-400/70 text-amber-300 shadow-md shadow-amber-400/25"
+                : "bg-slate-900/60 hover:bg-white/10 border-white/10 text-slate-200"
+            }`}
+            title={isTourActive ? "Pausar tour mundial" : "Iniciar viaje automático por las capitales"}
+          >
+            <CompassIcon
+              size={18}
+              className={`${isTourActive ? "text-amber-400 animate-spin" : "text-amber-400"} group-hover:scale-110 transition-transform`}
+            />
+            <span className="text-[11px] font-bold">
+              {isTourActive ? `Viaje (${tourCountdown}s)` : "Viaje"}
+            </span>
+          </button>
+        </div>
 
         <div className="flex-1 overflow-y-auto p-3 space-y-2">
           {activeTab === "more" ? (
@@ -454,53 +578,45 @@ export function StationSidebar() {
               </button>
 
               <button
-                onClick={() => setDriveMode(true)}
-                className="w-full flex items-center justify-between p-3.5 rounded-2xl bg-slate-900/80 hover:bg-slate-800/90 border border-emerald-400/30 transition-all duration-200 text-left shadow-lg group hover:scale-[1.01] active:scale-98"
+                onClick={() => setLiteMode(!liteMode)}
+                className={`w-full flex items-center justify-between p-3.5 rounded-2xl border transition-all duration-200 text-left shadow-lg group hover:scale-[1.01] active:scale-98 ${
+                  liteMode
+                    ? "bg-amber-400/20 border-amber-400 text-white"
+                    : "bg-slate-900/80 hover:bg-slate-800/90 border-white/10 text-slate-300"
+                }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-400/15 text-emerald-400 border border-emerald-400/30">
-                    <CarIcon size={20} />
-                  </div>
-                  <div>
-                    <span className="text-sm font-semibold text-white block">Modo Conducción</span>
-                    <span className="text-xs font-semibold text-slate-400 block mt-0.5">
-                      Interfaz simplificada con controles seguros
-                    </span>
-                  </div>
-                </div>
-                <span className="text-emerald-400 font-bold text-lg group-hover:translate-x-1 transition-transform">›</span>
-              </button>
-
-              <div className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-900/80 border border-white/10">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-400/15 text-amber-400 border border-amber-400/30">
+                  <div
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
+                      liteMode ? "bg-amber-400 text-slate-950" : "bg-white/5 text-amber-400 border border-white/10"
+                    }`}
+                  >
                     <BoltIcon size={20} />
                   </div>
                   <div>
-                    <span className="text-sm font-semibold text-white block">Modo Lite (Ahorro)</span>
+                    <span className="text-sm font-semibold text-white block">
+                      Modo Lite {liteMode ? "(Activado)" : "(Desactivado)"}
+                    </span>
                     <span className="text-xs font-semibold text-slate-400 block mt-0.5">
-                      Pausa el globo 3D para máximo rendimiento
+                      Pausa el globo 3D para ahorro extremo de batería
                     </span>
                   </div>
                 </div>
-                <button
-                  onClick={() => setLiteMode(!liteMode)}
-                  className={`rounded-full px-3 py-1 text-xs font-semibold transition-all ${
-                    liteMode
-                      ? "bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/30"
-                      : "bg-slate-800 text-slate-400 border border-white/10"
+                <span
+                  className={`text-xs font-bold px-2.5 py-1 rounded-full ${
+                    liteMode ? "bg-amber-400 text-slate-950" : "bg-white/10 text-slate-400"
                   }`}
                 >
-                  {liteMode ? "Activo" : "Inactivo"}
-                </button>
-              </div>
+                  {liteMode ? "ON" : "OFF"}
+                </span>
+              </button>
 
               <button
                 onClick={() => setChangelogOpen(true)}
-                className="w-full flex items-center justify-between p-3.5 rounded-2xl bg-slate-900/80 hover:bg-slate-800/90 border border-white/10 transition-all text-left"
+                className="w-full flex items-center justify-between p-3.5 rounded-2xl bg-slate-900/80 hover:bg-slate-800/90 border border-white/10 transition-all duration-200 text-left shadow-lg group hover:scale-[1.01] active:scale-98"
               >
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-400/15 text-amber-400 border border-amber-400/30">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/5 text-white border border-white/10">
                     <SparklesIcon size={20} />
                   </div>
                   <div>
@@ -596,7 +712,7 @@ export function StationSidebar() {
                           setSelectedCountryCode(null);
                           setSelectedCity(null);
                         }}
-                        className="ml-1 p-0.5 hover:text-white rounded-md hover:bg-white/10 transition-colors"
+                        className="ml-1 text-amber-400 hover:text-white p-0.5 rounded-full hover:bg-white/10"
                         title="Quitar filtro de país"
                         aria-label="Quitar filtro de país"
                       >
@@ -605,13 +721,13 @@ export function StationSidebar() {
                     </div>
 
                     {selectedCity && (
-                      <div className="flex items-center gap-1.5 p-1.5 px-3 rounded-xl bg-emerald-400/15 border border-emerald-400/35 text-xs font-semibold text-emerald-300 shadow-sm animate-fadeIn">
-                        <LocationIcon size={13} className="text-emerald-400 shrink-0" />
-                        <span className="text-emerald-400 font-bold">Ciudad:</span>
-                        <span className="text-white font-semibold">{selectedCity}</span>
+                      <div className="flex items-center gap-1.5 p-1.5 px-3 rounded-xl bg-amber-400/25 border border-amber-400/50 text-xs font-semibold text-white shadow-sm">
+                        <LocationIcon size={14} className="text-amber-400 shrink-0" />
+                        <span className="text-amber-400 font-bold">Ciudad:</span>
+                        <span>{selectedCity}</span>
                         <button
                           onClick={() => setSelectedCity(null)}
-                          className="ml-1 p-0.5 hover:text-white rounded-md hover:bg-white/10 transition-colors"
+                          className="ml-1 text-amber-400 hover:text-white p-0.5 rounded-full hover:bg-white/10"
                           title="Quitar filtro de ciudad"
                           aria-label="Quitar filtro de ciudad"
                         >
@@ -622,63 +738,39 @@ export function StationSidebar() {
                   </div>
 
                   {availableCities.length > 0 && (
-                    <div className="rounded-2xl liquid-glass-card border border-white/10 p-2.5 space-y-2">
-                      <div className="flex items-center justify-between px-1 text-xs font-semibold text-slate-300">
-                        <span className="flex items-center gap-1.5">
-                          <LocationIcon size={13} className="text-amber-400" />
-                          <span className="text-white font-bold">Filtro de Ciudades</span>
-                          <span className="text-[11px] text-amber-400/90 font-mono">({availableCities.length})</span>
+                    <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-2 shadow-inner">
+                      <div className="flex items-center justify-between pb-1 px-1">
+                        <span className="text-[11px] font-bold text-slate-300 flex items-center gap-1">
+                          <LocationIcon size={12} className="text-amber-400" />
+                          <span>Filtro de Ciudades ({availableCities.length}):</span>
                         </span>
-                        <div className="flex items-center gap-1.5">
-                          {selectedCity && (
-                            <button
-                              onClick={() => setSelectedCity(null)}
-                              className="text-amber-400 hover:text-amber-300 text-[11px] font-bold px-1.5 py-0.5 rounded-md hover:bg-amber-400/10 transition-colors"
-                            >
-                              Ver todas
-                            </button>
-                          )}
-                          <button
-                            onClick={() => setIsCityPickerExpanded(!isCityPickerExpanded)}
-                            className="flex items-center gap-1 text-[11px] font-bold text-amber-400 hover:text-amber-300 bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/30 px-2 py-0.5 rounded-lg transition-all active:scale-95"
-                            title={isCityPickerExpanded ? "Plegar vista" : "Desplegar todas las ciudades"}
-                          >
-                            <span>{isCityPickerExpanded ? "Plegar" : "Desplegar"}</span>
-                            <ChevronDownIcon
-                              size={12}
-                              className={`transition-transform duration-200 ${isCityPickerExpanded ? "rotate-180" : ""}`}
-                            />
-                          </button>
-                        </div>
+                        <button
+                          onClick={() => setIsCityPickerExpanded(!isCityPickerExpanded)}
+                          className="text-[11px] font-semibold text-amber-400 hover:underline flex items-center gap-1"
+                        >
+                          <span>{isCityPickerExpanded ? "Ver carrusel" : "Ver cuadrícula"}</span>
+                          <ChevronDownIcon
+                            size={12}
+                            className={`transition-transform duration-200 ${isCityPickerExpanded ? "rotate-180" : ""}`}
+                          />
+                        </button>
                       </div>
 
                       {isCityPickerExpanded ? (
-                        <div className="space-y-2 pt-1 animate-fadeIn">
-                          <div className="relative flex items-center">
-                            <SearchIcon size={14} className="absolute left-2.5 text-slate-400 pointer-events-none" />
+                        <div className="space-y-2 mt-1">
+                          <div className="relative">
+                            <SearchIcon size={13} className="absolute left-2.5 top-2 text-slate-400" />
                             <input
                               type="text"
                               value={citySearchQuery}
                               onChange={(e) => setCitySearchQuery(e.target.value)}
-                              placeholder={`Buscar ciudad (${availableCities.length})...`}
-                              className="w-full rounded-xl border border-white/10 bg-slate-950/80 py-1 pl-8 pr-7 text-xs text-white placeholder:text-slate-500 focus:border-amber-400 focus:outline-none transition-all"
-                              autoFocus
+                              placeholder="Buscar ciudad..."
+                              className="w-full rounded-lg border border-white/10 bg-slate-950/70 py-1 pl-7 pr-3 text-xs placeholder:text-slate-500 focus:border-amber-400 focus:outline-none"
                             />
-                            {citySearchQuery && (
-                              <button
-                                onClick={() => setCitySearchQuery("")}
-                                className="absolute right-2 text-slate-400 hover:text-white"
-                              >
-                                <CloseIcon size={12} />
-                              </button>
-                            )}
                           </div>
-
-                          <div className="grid grid-cols-2 gap-1.5 max-h-52 overflow-y-auto pr-1 scrollbar-thin">
+                          <div className="grid grid-cols-2 gap-1.5 max-h-48 overflow-y-auto pr-1">
                             <button
-                              onClick={() => {
-                                setSelectedCity(null);
-                              }}
+                              onClick={() => setSelectedCity(null)}
                               className={`rounded-xl p-2 text-left text-xs font-semibold transition-all border ${
                                 !selectedCity
                                   ? "bg-amber-400 text-slate-950 font-bold border-amber-400 shadow-sm"
@@ -786,10 +878,27 @@ export function StationSidebar() {
                   )}
                 </div>
               )}
+
+              <div className="flex items-center justify-between px-1 py-1 text-xs font-bold text-slate-300">
+                <span>
+                  {selectedCity
+                    ? `Emisoras de ${selectedCity}`
+                    : selectedCountryCode
+                    ? `Emisoras de ${countryList.find((c) => c.code === selectedCountryCode)?.name || selectedCountryCode}`
+                    : activeTab === "favorites"
+                    ? "Mis Favoritas"
+                    : "Populares en el mundo"}
+                </span>
+                <span className="text-[11px] font-mono text-amber-400 font-bold">
+                  {filteredStations.length.toLocaleString("es-ES")} emisoras
+                </span>
+              </div>
+
               {filteredStations.slice(0, 120).map((station) => {
                 const isCurrent = station.id === currentStation?.id;
                 const isCurrentPlaying = isCurrent && isPlaying;
                 const isFav = isFavorite(station.id);
+                const badgeText = getStationBadge(station);
 
                 return (
                   <div
@@ -807,11 +916,11 @@ export function StationSidebar() {
                         style={{
                           background: isCurrent
                             ? "linear-gradient(135deg, #f59e0b, #d97706)"
-                            : `linear-gradient(135deg, hsl(${station.hue || 200}, 70%, 42%), hsl(${(station.hue || 200) + 30}, 75%, 22%))`,
+                            : `linear-gradient(135deg, hsl(${station.hue || 200}, 75%, 45%), hsl(${(station.hue || 200) + 30}, 80%, 25%))`,
                           boxShadow: isCurrent ? "0 0 12px rgba(255, 201, 74, 0.4)" : undefined,
                         }}
                       >
-                        {station.frequency || station.name.slice(0, 3).toUpperCase()}
+                        {badgeText}
                       </div>
 
                       <div className="min-w-0 flex-1">
@@ -903,15 +1012,226 @@ export function StationSidebar() {
             </>
           )}
         </div>
-        <footer className="px-4 py-2 border-t border-white/10 bg-slate-950/40 flex items-center justify-between text-[11px] font-semibold text-slate-400 shrink-0">
-          <span className="truncate">Sintonizador Liquid Glass · 174 Naciones</span>
-          <span className="text-amber-400 font-mono text-[10px] shrink-0 font-bold ml-2">60-120 FPS</span>
-        </footer>
+
+        <nav className="flex items-center justify-around border-t border-white/10 bg-slate-950/70 p-1.5 shrink-0">
+          <button
+            onClick={() => setActiveTab("explore")}
+            className={`flex flex-col items-center justify-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
+              activeTab === "explore" || activeTab === "stations"
+                ? "text-amber-400 font-bold"
+                : "text-slate-400 hover:text-white"
+            }`}
+          >
+            <CompassIcon size={18} />
+            <span className="text-[10px] font-semibold">Explorar</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("favorites")}
+            className={`flex flex-col items-center justify-center gap-0.5 py-1 px-3 rounded-xl transition-all relative ${
+              activeTab === "favorites"
+                ? "text-amber-400 font-bold"
+                : "text-slate-400 hover:text-white"
+            }`}
+          >
+            <HeartIcon size={18} className={activeTab === "favorites" ? "fill-amber-400 text-amber-400" : ""} />
+            <span className="text-[10px] font-semibold">Favoritas</span>
+            {favorites.length > 0 && (
+              <span className="absolute top-0.5 right-2 h-3.5 w-3.5 rounded-full bg-rose-500 text-[9px] font-bold text-white flex items-center justify-center">
+                {favorites.length}
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={() => setActiveTab("countries")}
+            className={`flex flex-col items-center justify-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
+              activeTab === "countries"
+                ? "text-amber-400 font-bold"
+                : "text-slate-400 hover:text-white"
+            }`}
+          >
+            <GlobeIcon size={18} />
+            <span className="text-[10px] font-semibold">Países</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("more")}
+            className={`flex flex-col items-center justify-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
+              activeTab === "more"
+                ? "text-amber-400 font-bold"
+                : "text-slate-400 hover:text-white"
+            }`}
+          >
+            <EqualizerIcon size={18} />
+            <span className="text-[10px] font-semibold">Más</span>
+          </button>
+        </nav>
+
+        <div className="p-3 border-t border-white/10 bg-slate-950/85 backdrop-blur-2xl shrink-0">
+          <div className="flex items-center justify-between gap-2.5">
+            <div
+              onClick={() => setDetailsModalOpen(true)}
+              className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-xl font-bold text-xs text-white shadow-sm transition-all hover:scale-105 active:scale-95"
+              style={{
+                background: isPlaying
+                  ? "linear-gradient(135deg, #f59e0b, #d97706)"
+                  : `linear-gradient(135deg, hsl(${currentStation?.hue || 200}, 75%, 45%), hsl(${(currentStation?.hue || 200) + 30}, 80%, 25%))`,
+                boxShadow: isPlaying ? "0 0 14px rgba(255, 201, 74, 0.45)" : undefined,
+              }}
+              title="Ficha técnica"
+            >
+              {currentStation ? getStationBadge(currentStation) : "RAD"}
+            </div>
+
+            <div className="min-w-0 flex-1">
+              <p
+                onClick={() => setDetailsModalOpen(true)}
+                className="truncate text-xs font-bold text-white hover:text-amber-400 cursor-pointer transition-colors"
+              >
+                {currentStation?.name || "Selecciona una emisora"}
+              </p>
+              <div className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-300 truncate mt-0.5">
+                {currentStation ? (
+                  <>
+                    <span className="flex items-center gap-1 truncate">
+                      <span className={`inline-block h-1.5 w-1.5 rounded-full ${isPlaying ? "bg-emerald-400 animate-pulse" : "bg-slate-600"}`} />
+                      <span className="truncate">{currentStation.city ? `${currentStation.city}, ` : ""}{currentStation.country}</span>
+                    </span>
+                    <span>·</span>
+                    <span className="text-amber-400 font-mono font-bold shrink-0">{currentStation.bitrate}k</span>
+                    <span>·</span>
+                    <span className="text-emerald-400 font-mono font-bold shrink-0 flex items-center gap-0.5">
+                      <UsersIcon size={10} />
+                      <span>{liveListeners.formatted}</span>
+                    </span>
+                    <span className="hidden sm:inline">·</span>
+                    <span className="hidden sm:inline-flex items-center gap-0.5 text-amber-300 font-mono">
+                      {timeInfo.isDay ? <SunIcon size={10} className="text-amber-400" /> : <MoonIcon size={10} className="text-sky-300" />}
+                      <span>{timeInfo.timeString}</span>
+                    </span>
+                  </>
+                ) : (
+                  <span>34.900+ emisoras mundiales</span>
+                )}
+              </div>
+            </div>
+
+            {currentStation && (
+              <div className="flex items-center gap-1 shrink-0">
+                <button
+                  onClick={() => toggleFavorite(currentStation.id)}
+                  className="p-1 text-slate-400 hover:text-rose-400 transition-colors"
+                  aria-label={isFavorite(currentStation.id) ? "Quitar de favoritas" : "Añadir a favoritas"}
+                >
+                  <HeartIcon
+                    size={16}
+                    className={isFavorite(currentStation.id) ? "fill-rose-500 text-rose-500" : ""}
+                  />
+                </button>
+                <button
+                  onClick={() => handleShare(currentStation)}
+                  className="p-1 text-slate-400 hover:text-white transition-colors"
+                  title="Compartir emisora"
+                  aria-label="Compartir emisora"
+                >
+                  <ShareIcon size={15} />
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center justify-between gap-2 mt-2 pt-2 border-t border-white/5">
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={prevStation}
+                className="flex h-7 w-7 items-center justify-center rounded-full text-slate-300 hover:text-white hover:bg-white/10 active:scale-90 transition-all"
+                aria-label="Emisora anterior"
+              >
+                <PrevIcon size={15} />
+              </button>
+
+              <button
+                type="button"
+                onClick={togglePlay}
+                disabled={!currentStation}
+                className={`flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200 active:scale-95 shadow-md ${
+                  isPlaying
+                    ? "bg-gradient-to-tr from-amber-400 via-amber-500 to-amber-600 text-slate-950 font-bold shadow-amber-400/50 hover:brightness-110"
+                    : "liquid-glass-action-circle !h-9 !w-9"
+                }`}
+                aria-label={isPlaying ? "Pausar" : "Reproducir"}
+              >
+                {isLoading ? (
+                  <SpinnerIcon size={15} className="animate-spin text-white" />
+                ) : isPlaying ? (
+                  <PauseIcon size={15} />
+                ) : (
+                  <PlayIcon size={15} className="translate-x-0.5" />
+                )}
+              </button>
+
+              <button
+                onClick={nextStation}
+                className="flex h-7 w-7 items-center justify-center rounded-full text-slate-300 hover:text-white hover:bg-white/10 active:scale-90 transition-all"
+                aria-label="Siguiente emisora"
+              >
+                <NextIcon size={15} />
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              {sleepTimerRemaining !== null && (
+                <button
+                  onClick={() => setSleepTimerModalOpen(true)}
+                  className="flex items-center gap-1 bg-amber-400/20 text-amber-300 border border-amber-400/30 rounded-full px-1.5 py-0.5 text-[10px] font-semibold"
+                  title="Temporizador de apagado activo"
+                >
+                  <TimerIcon size={11} />
+                  <span className="font-mono">{formatTimer(sleepTimerRemaining)}</span>
+                </button>
+              )}
+
+              <button
+                onClick={toggleMute}
+                className="text-slate-300 hover:text-white transition-colors"
+                title={muted ? "Activar sonido" : "Silenciar"}
+              >
+                {muted || volume === 0 ? <MuteIcon size={16} /> : <VolumeIcon size={16} />}
+              </button>
+
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={muted ? 0 : volume}
+                onChange={(e) => setVolume(parseFloat(e.target.value))}
+                className="liquid-slider w-16 sm:w-20"
+                style={{ "--fill": `${(muted ? 0 : volume) * 100}%` } as React.CSSProperties}
+                aria-label="Control de volumen"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-center gap-1.5 mt-2 pt-1.5 border-t border-white/5 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+            <WorldRadioLogo size="sm" />
+            <span>WORLDRADIO</span>
+            <span>·</span>
+            <span className="text-amber-400 font-mono">174 NACIONES</span>
+          </div>
+        </div>
       </aside>
 
       <ChangelogModal
         isOpen={changelogOpen}
         onClose={() => setChangelogOpen(false)}
+      />
+
+      <StationDetailsModal
+        station={currentStation}
+        isOpen={detailsModalOpen}
+        onClose={() => setDetailsModalOpen(false)}
       />
     </>
   );

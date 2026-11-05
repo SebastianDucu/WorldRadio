@@ -51,6 +51,7 @@ export function AudioPlayer() {
     flyTo,
     setSleepTimerModalOpen,
     sleepTimerRemaining,
+    sidebarOpen,
   } = usePlayerStore();
 
   const liveListeners = useLiveListeners(currentStation);
@@ -166,7 +167,9 @@ export function AudioPlayer() {
       <footer
         role="region"
         aria-label="Reproductor de radio"
-        className="fixed inset-x-0 bottom-0 z-40 p-2 sm:p-3 pb-[max(0.65rem,calc(0.5rem+env(safe-area-inset-bottom,0px)))]"
+        className={`fixed inset-x-0 bottom-0 z-40 p-2 sm:p-3 pb-[max(0.65rem,calc(0.5rem+env(safe-area-inset-bottom,0px)))] transition-all duration-300 ${
+          sidebarOpen ? "lg:hidden" : "block"
+        }`}
       >
         <audio
           ref={audioRef}
