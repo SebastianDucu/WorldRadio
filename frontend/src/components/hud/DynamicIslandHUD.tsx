@@ -21,6 +21,7 @@ export function DynamicIslandHUD() {
     isLoading,
     togglePlay,
     toggleSidebar,
+    sidebarOpen,
     countries,
     sleepTimerRemaining,
     decrementSleepTimer,
@@ -66,7 +67,11 @@ export function DynamicIslandHUD() {
   const totalCountries = countries && countries.length > 0 ? countries.length : 174;
 
   return (
-    <div className="fixed top-[max(0.6rem,env(safe-area-inset-top,0px))] inset-x-0 z-30 flex justify-center pointer-events-none px-2 sm:px-4">
+    <div
+      className={`fixed top-[max(0.6rem,env(safe-area-inset-top,0px))] inset-x-0 z-30 justify-center pointer-events-none px-2 sm:px-4 transition-all duration-300 ${
+        sidebarOpen ? "lg:hidden" : "flex"
+      }`}
+    >
       <div className="relative liquid-glass-pill pointer-events-auto flex items-center justify-between gap-1.5 sm:gap-3 rounded-full px-2 sm:px-3.5 py-1.5 sm:py-2 max-w-full overflow-hidden transition-all duration-300 border border-amber-400/25 shadow-[0_10px_35px_rgba(0,0,0,0.6),0_0_20px_rgba(255,201,74,0.18)]">
         <button
           onClick={toggleSidebar}

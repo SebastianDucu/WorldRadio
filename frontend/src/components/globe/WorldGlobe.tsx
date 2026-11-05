@@ -204,7 +204,7 @@ export function WorldGlobe() {
     let width = container.clientWidth || window.innerWidth;
     let height = container.clientHeight || window.innerHeight;
     const isMobile = width < 768;
-    const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2);
+    const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 1.25);
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
@@ -423,6 +423,14 @@ export function WorldGlobe() {
     overlayCanvas.height = height * dpr;
     const ctx2d = overlayCanvas.getContext("2d");
 
+    const precalculatedFeatures = SATELLITE_FEATURES.map((item) => ({
+      ...item,
+      localPos: latLngToVector3(item.lat, item.lng, 1.004),
+    }));
+    const _scratchWorld = new THREE.Vector3();
+    const _scratchNorm = new THREE.Vector3();
+    const _scratchView = new THREE.Vector3();
+
     let animationId: number;
     let lastTime = performance.now();
 
@@ -468,18 +476,16 @@ export function WorldGlobe() {
         ctx2d.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
         const currentLabels: ProjectedScreenLabel[] = [];
 
-        for (const item of SATELLITE_FEATURES) {
-          const localVec = latLngToVector3(item.lat, item.lng, 1.004);
-          const worldPos = localVec.clone().applyEuler(earthGroup.rotation);
-
-          const normal = worldPos.clone().normalize();
-          const viewDir = camera.position.clone().sub(worldPos).normalize();
-          const dot = normal.dot(viewDir);
+        for (const item of precalculatedFeatures) {
+          _scratchWorld.copy(item.localPos).applyEuler(earthGroup.rotation);
+          _scratchNorm.copy(_scratchWorld).normalize();
+          _scratchView.copy(camera.position).sub(_scratchWorld).normalize();
+          const dot = _scratchNorm.dot(_scratchView);
 
           if (dot > 0.08) {
-            const screenPos = worldPos.clone().project(camera);
-            const x = ((screenPos.x * 0.5 + 0.5) * width) * dpr;
-            const y = ((-screenPos.y * 0.5 + 0.5) * height) * dpr;
+            _scratchWorld.project(camera);
+            const x = ((_scratchWorld.x * 0.5 + 0.5) * width) * dpr;
+            const y = ((-_scratchWorld.y * 0.5 + 0.5) * height) * dpr;
             const opacity = Math.min(1, Math.max(0, dot * 3.0));
 
             currentLabels.push({
@@ -504,13 +510,17 @@ export function WorldGlobe() {
             ctx2d.fill();
 
             ctx2d.font = isNorthPole
-              ? `bold ${Math.round(11.5 * dpr)}px -apple-system, system-ui, sans-serif`
+              ? `bold ${Math.round(11.5 * dpr)}px sans-serif`
               : isCountry
-              ? `bold ${Math.round(11 * dpr)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
-              : `600 ${Math.round(9 * dpr)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+              ? `bold ${Math.round(11 * dpr)}px sans-serif`
+              : `600 ${Math.round(9 * dpr)}px sans-serif`;
 
-            ctx2d.shadowColor = "rgba(0, 0, 0, 0.9)";
-            ctx2d.shadowBlur = 5 * dpr;
+            const textX = x + 6 * dpr;
+            const textY = y + (isCountry ? 3.5 : 3.0) * dpr;
+
+            ctx2d.lineWidth = 2.5 * dpr;
+            ctx2d.strokeStyle = "rgba(0, 0, 0, 0.85)";
+            ctx2d.strokeText(item.name, textX, textY);
 
             ctx2d.fillStyle = isNorthPole
               ? "#FFD670"
@@ -519,23 +529,21 @@ export function WorldGlobe() {
                 ? `rgba(255, 235, 175, ${opacity})`
                 : `rgba(240, 249, 255, ${opacity})`
               : `rgba(186, 230, 253, ${opacity * 0.85})`;
-
-            ctx2d.fillText(item.name, x + 6 * dpr, y + (isCountry ? 3.5 : 3.0) * dpr);
-            ctx2d.shadowBlur = 0;
+            ctx2d.fillText(item.name, textX, textY);
           }
         }
 
         if (currentStation) {
           const stLocal = latLngToVector3(currentStation.lat, currentStation.lng, 1.004);
-          const stWorld = stLocal.clone().applyEuler(earthGroup.rotation);
-          const stNormal = stWorld.clone().normalize();
-          const stView = camera.position.clone().sub(stWorld).normalize();
-          const stDot = stNormal.dot(stView);
+          _scratchWorld.copy(stLocal).applyEuler(earthGroup.rotation);
+          _scratchNorm.copy(_scratchWorld).normalize();
+          _scratchView.copy(camera.position).sub(_scratchWorld).normalize();
+          const stDot = _scratchNorm.dot(_scratchView);
 
           if (stDot > 0.06) {
-            const screenPos = stWorld.clone().project(camera);
-            const x = ((screenPos.x * 0.5 + 0.5) * width) * dpr;
-            const y = ((-screenPos.y * 0.5 + 0.5) * height) * dpr;
+            _scratchWorld.project(camera);
+            const x = ((_scratchWorld.x * 0.5 + 0.5) * width) * dpr;
+            const y = ((-_scratchWorld.y * 0.5 + 0.5) * height) * dpr;
             const opacity = Math.min(1, Math.max(0, stDot * 3.0));
             const pulse = (now % 1600) / 1600;
 
@@ -556,7 +564,7 @@ export function WorldGlobe() {
               ? `${currentStation.city}, ${currentStation.country || currentStation.countryCode}`
               : currentStation.country || currentStation.name;
 
-            ctx2d.font = `bold ${Math.round(10.5 * dpr)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+            ctx2d.font = `bold ${Math.round(10.5 * dpr)}px sans-serif`;
             const textMetrics = ctx2d.measureText(locationTitle);
             const tagW = textMetrics.width + 18 * dpr;
             const tagH = 22 * dpr;
@@ -589,7 +597,7 @@ export function WorldGlobe() {
       if (!container) return;
       width = container.clientWidth || window.innerWidth;
       height = container.clientHeight || window.innerHeight;
-      const currentDpr = Math.min(window.devicePixelRatio || 1, width < 768 ? 1.5 : 2);
+      const currentDpr = Math.min(window.devicePixelRatio || 1, width < 768 ? 1.5 : 1.25);
 
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
@@ -837,7 +845,7 @@ export function WorldGlobe() {
         style={{ width: "100%", height: "100%" }}
       />
 
-      <div className="absolute right-5 bottom-24 z-20 flex flex-col gap-2 p-1.5 rounded-2xl liquid-glass border border-white/10 shadow-xl">
+      <div className="absolute right-3.5 bottom-6 z-20 flex flex-col gap-1.5 p-1 rounded-2xl liquid-glass border border-white/10 shadow-lg">
         <IconButton
           size="sm"
           label={

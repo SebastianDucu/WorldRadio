@@ -328,21 +328,6 @@ export function StationSidebar() {
 
   return (
     <>
-      {!sidebarOpen && (
-        <button
-          onClick={toggleSidebar}
-          className="fixed top-3 left-3 sm:top-4 sm:left-4 z-30 liquid-glass-pill px-3.5 py-2 flex items-center gap-2.5 rounded-full border border-amber-400/30 text-white shadow-xl hover:scale-105 active:scale-95 transition-all pointer-events-auto"
-          aria-label="Abrir explorador de emisoras"
-          title="Abrir explorador de emisoras"
-        >
-          <WorldRadioLogo size="sm" />
-          <span className="text-xs font-bold text-white">Explorar</span>
-          <span className="rounded-full bg-amber-400/20 px-2 py-0.5 text-[10px] font-bold text-amber-300">
-            {countryList.length} Países
-          </span>
-        </button>
-      )}
-
       {sidebarOpen && (
         <div
           onClick={toggleSidebar}

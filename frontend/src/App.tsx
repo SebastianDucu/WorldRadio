@@ -12,7 +12,6 @@ import { BoltIcon } from "@/components/icons";
 
 import { LiquidAmbientBlobs } from "@/components/ambient/LiquidAmbientBlobs";
 import { DynamicIslandHUD } from "@/components/hud/DynamicIslandHUD";
-import { SnapshotBanner } from "@/components/hud/SnapshotBanner";
 import { SleepTimerModal } from "@/components/player/SleepTimerModal";
 import { AudioEqualizerModal } from "@/components/player/AudioEqualizerModal";
 import { RadioRecorderModal } from "@/components/player/RadioRecorderModal";
@@ -75,8 +74,6 @@ export default function App() {
       <ChristmasAura />
 
       <DynamicIslandHUD />
-
-      <SnapshotBanner />
 
       <main className="absolute inset-0 flex items-center justify-center">
         {liteMode ? (
