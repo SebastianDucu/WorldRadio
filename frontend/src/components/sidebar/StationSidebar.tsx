@@ -313,7 +313,7 @@ export function StationSidebar() {
         title: `${station.name} · WorldRadio`,
         text: `Escuchando ${station.name} (${station.city ? `${station.city}, ` : ""}${station.country}) en vivo en WorldRadio`,
         url: window.location.href,
-      }).catch(() => {});
+      }).catch(() => { });
     } else {
       navigator.clipboard.writeText(window.location.href);
       toast.success("Enlace copiado al portapapeles");
@@ -337,9 +337,8 @@ export function StationSidebar() {
       )}
 
       <aside
-        className={`fixed top-2 sm:top-3 bottom-2 sm:bottom-3 left-2 sm:left-3 z-30 flex flex-col rounded-3xl liquid-glass shadow-2xl transition-transform duration-300 w-[calc(100vw-1rem)] sm:w-[380px] lg:w-[410px] border border-amber-400/20 overflow-hidden ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-[120%]"
-        }`}
+        className={`fixed top-2 sm:top-3 bottom-2 sm:bottom-3 left-2 sm:left-3 z-30 flex flex-col rounded-3xl liquid-glass shadow-2xl transition-transform duration-300 w-[calc(100vw-1rem)] sm:w-[380px] lg:w-[410px] border border-amber-400/20 overflow-hidden ${sidebarOpen ? "translate-x-0" : "-translate-x-[120%]"
+          }`}
         aria-label="Consola de exploración y sintonización"
       >
         <div className="w-12 h-1 rounded-full bg-white/25 mx-auto mt-2.5 shrink-0" />
@@ -383,11 +382,10 @@ export function StationSidebar() {
             <button
               type="button"
               onClick={() => setActiveTab(activeTab === "more" ? "explore" : "more")}
-              className={`flex h-8 w-8 items-center justify-center rounded-full transition-all duration-200 active:scale-90 ${
-                activeTab === "more"
+              className={`flex h-8 w-8 items-center justify-center rounded-full transition-all duration-200 active:scale-90 ${activeTab === "more"
                   ? "bg-amber-400 text-slate-950 font-bold"
                   : "text-slate-300 hover:text-white hover:bg-white/10"
-              }`}
+                }`}
               title="Herramientas y opciones de audio"
               aria-label="Más opciones"
             >
@@ -436,11 +434,10 @@ export function StationSidebar() {
                 <button
                   key={cat.label}
                   onClick={() => setSelectedGenre(cat.value)}
-                  className={`shrink-0 rounded-full px-3.5 py-1 text-xs font-semibold transition-all duration-200 ${
-                    isSelected
+                  className={`shrink-0 rounded-full px-3.5 py-1 text-xs font-semibold transition-all duration-200 ${isSelected
                       ? "bg-amber-400 text-slate-950 font-bold shadow-md shadow-amber-400/35 scale-105"
                       : "bg-slate-900/80 text-slate-400 hover:text-white hover:bg-slate-800 border border-white/5"
-                  }`}
+                    }`}
                 >
                   {cat.label}
                 </button>
@@ -449,43 +446,44 @@ export function StationSidebar() {
           </div>
         )}
 
-        <div className="grid grid-cols-3 gap-2 px-3 py-2 border-b border-white/5 shrink-0">
-          <button
-            onClick={handleNearMe}
-            className="flex flex-col items-center justify-center gap-1 p-2 rounded-2xl bg-slate-900/60 hover:bg-white/10 border border-white/10 active:scale-95 transition-all text-center group"
-            title="Sintonizar emisoras cercanas a tu ubicación"
-          >
-            <LocationIcon size={18} className="text-amber-400 group-hover:scale-110 transition-transform" />
-            <span className="text-[11px] font-bold text-slate-200">Cerca de mí</span>
-          </button>
+        {(activeTab === "explore" || activeTab === "stations") && (
+          <div className="grid grid-cols-3 gap-1.5 px-3 py-1.5 border-b border-white/5 shrink-0">
+            <button
+              onClick={handleNearMe}
+              className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl bg-slate-900/60 hover:bg-white/10 border border-white/10 active:scale-95 transition-all text-center group"
+              title="Sintonizar emisoras cercanas a tu ubicación"
+            >
+              <LocationIcon size={14} className="text-amber-400 group-hover:scale-110 transition-transform shrink-0" />
+              <span className="text-[11px] font-bold text-slate-200 truncate">Cerca</span>
+            </button>
 
-          <button
-            onClick={handleSurprise}
-            className="flex flex-col items-center justify-center gap-1 p-2 rounded-2xl bg-slate-900/60 hover:bg-white/10 border border-white/10 active:scale-95 transition-all text-center group"
-            title="Sintonizar una frecuencia aleatoria del planeta"
-          >
-            <SparklesIcon size={18} className="text-amber-400 group-hover:scale-110 transition-transform" />
-            <span className="text-[11px] font-bold text-slate-200">Sorpréndeme</span>
-          </button>
+            <button
+              onClick={handleSurprise}
+              className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl bg-slate-900/60 hover:bg-white/10 border border-white/10 active:scale-95 transition-all text-center group"
+              title="Sintonizar una frecuencia aleatoria del planeta"
+            >
+              <SparklesIcon size={14} className="text-amber-400 group-hover:scale-110 transition-transform shrink-0" />
+              <span className="text-[11px] font-bold text-slate-200 truncate">Azar</span>
+            </button>
 
-          <button
-            onClick={handleTour}
-            className={`flex flex-col items-center justify-center gap-1 p-2 rounded-2xl border active:scale-95 transition-all text-center group ${
-              isTourActive
-                ? "bg-amber-400/25 border-amber-400/70 text-amber-300 shadow-md shadow-amber-400/25"
-                : "bg-slate-900/60 hover:bg-white/10 border-white/10 text-slate-200"
-            }`}
-            title={isTourActive ? "Pausar tour mundial" : "Iniciar viaje automático por las capitales"}
-          >
-            <CompassIcon
-              size={18}
-              className={`${isTourActive ? "text-amber-400 animate-spin" : "text-amber-400"} group-hover:scale-110 transition-transform`}
-            />
-            <span className="text-[11px] font-bold">
-              {isTourActive ? `Viaje (${tourCountdown}s)` : "Viaje"}
-            </span>
-          </button>
-        </div>
+            <button
+              onClick={handleTour}
+              className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl border active:scale-95 transition-all text-center group ${isTourActive
+                  ? "bg-amber-400/25 border-amber-400/70 text-amber-300 shadow-md shadow-amber-400/25"
+                  : "bg-slate-900/60 hover:bg-white/10 border-white/10 text-slate-200"
+                }`}
+              title={isTourActive ? "Pausar tour mundial" : "Iniciar viaje automático por las capitales"}
+            >
+              <CompassIcon
+                size={14}
+                className={`${isTourActive ? "text-amber-400 animate-spin" : "text-amber-400"} group-hover:scale-110 transition-transform shrink-0`}
+              />
+              <span className="text-[11px] font-bold truncate">
+                {isTourActive ? `${tourCountdown}s` : "Viaje"}
+              </span>
+            </button>
+          </div>
+        )}
 
         <div className="flex-1 overflow-y-auto p-3 space-y-2">
           {activeTab === "more" ? (
@@ -564,17 +562,15 @@ export function StationSidebar() {
 
               <button
                 onClick={() => setLiteMode(!liteMode)}
-                className={`w-full flex items-center justify-between p-3.5 rounded-2xl border transition-all duration-200 text-left shadow-lg group hover:scale-[1.01] active:scale-98 ${
-                  liteMode
+                className={`w-full flex items-center justify-between p-3.5 rounded-2xl border transition-all duration-200 text-left shadow-lg group hover:scale-[1.01] active:scale-98 ${liteMode
                     ? "bg-amber-400/20 border-amber-400 text-white"
                     : "bg-slate-900/80 hover:bg-slate-800/90 border-white/10 text-slate-300"
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-3">
                   <div
-                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
-                      liteMode ? "bg-amber-400 text-slate-950" : "bg-white/5 text-amber-400 border border-white/10"
-                    }`}
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${liteMode ? "bg-amber-400 text-slate-950" : "bg-white/5 text-amber-400 border border-white/10"
+                      }`}
                   >
                     <BoltIcon size={20} />
                   </div>
@@ -588,9 +584,8 @@ export function StationSidebar() {
                   </div>
                 </div>
                 <span
-                  className={`text-xs font-bold px-2.5 py-1 rounded-full ${
-                    liteMode ? "bg-amber-400 text-slate-950" : "bg-white/10 text-slate-400"
-                  }`}
+                  className={`text-xs font-bold px-2.5 py-1 rounded-full ${liteMode ? "bg-amber-400 text-slate-950" : "bg-white/10 text-slate-400"
+                    }`}
                 >
                   {liteMode ? "ON" : "OFF"}
                 </span>
@@ -642,11 +637,10 @@ export function StationSidebar() {
                           flyTo(country.lat, country.lng);
                           setActiveTab("explore");
                         }}
-                        className={`flex items-center justify-between p-2.5 rounded-xl border text-left text-sm font-semibold transition-all duration-200 ${
-                          isSelected
+                        className={`flex items-center justify-between p-2.5 rounded-xl border text-left text-sm font-semibold transition-all duration-200 ${isSelected
                             ? "bg-amber-400/20 border-amber-400 text-white shadow-md shadow-amber-400/20"
                             : "bg-slate-900/70 hover:bg-slate-800 border-white/5 text-slate-200 hover:border-white/20"
-                        }`}
+                          }`}
                       >
                         <span className="truncate text-xs font-semibold">{country.name}</span>
                         <span className="text-xs text-amber-400 font-bold ml-1">
@@ -756,11 +750,10 @@ export function StationSidebar() {
                           <div className="grid grid-cols-2 gap-1.5 max-h-48 overflow-y-auto pr-1">
                             <button
                               onClick={() => setSelectedCity(null)}
-                              className={`rounded-xl p-2 text-left text-xs font-semibold transition-all border ${
-                                !selectedCity
+                              className={`rounded-xl p-2 text-left text-xs font-semibold transition-all border ${!selectedCity
                                   ? "bg-amber-400 text-slate-950 font-bold border-amber-400 shadow-sm"
                                   : "bg-slate-900/80 text-slate-300 hover:text-white border-white/5 hover:border-white/20"
-                              }`}
+                                }`}
                             >
                               <div className="truncate">Todas las ciudades</div>
                               <div className={`text-[10px] font-mono mt-0.5 ${!selectedCity ? "text-slate-950/80" : "text-amber-400"}`}>
@@ -773,17 +766,15 @@ export function StationSidebar() {
                                 <button
                                   key={c.name}
                                   onClick={() => setSelectedCity(isCityActive ? null : c.name)}
-                                  className={`rounded-xl p-2 text-left text-xs font-semibold transition-all border flex flex-col justify-between ${
-                                    isCityActive
+                                  className={`rounded-xl p-2 text-left text-xs font-semibold transition-all border flex flex-col justify-between ${isCityActive
                                       ? "bg-amber-400 text-slate-950 font-bold border-amber-400 shadow-sm"
                                       : "bg-slate-900/80 text-slate-300 hover:text-white border-white/5 hover:border-white/20"
-                                  }`}
+                                    }`}
                                 >
                                   <span className="truncate">{c.name}</span>
                                   <span
-                                    className={`text-[10px] font-mono mt-0.5 ${
-                                      isCityActive ? "text-slate-950/80" : "text-amber-400 font-bold"
-                                    }`}
+                                    className={`text-[10px] font-mono mt-0.5 ${isCityActive ? "text-slate-950/80" : "text-amber-400 font-bold"
+                                      }`}
                                   >
                                     {c.count} {c.count === 1 ? "emisora" : "emisoras"}
                                   </span>
@@ -817,11 +808,10 @@ export function StationSidebar() {
                           >
                             <button
                               onClick={() => setSelectedCity(null)}
-                              className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all ${
-                                !selectedCity
+                              className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all ${!selectedCity
                                   ? "bg-amber-400 text-slate-950 font-bold shadow-xs shadow-amber-400/30 scale-105"
                                   : "bg-slate-900/80 text-slate-300 hover:text-white border border-white/10"
-                              }`}
+                                }`}
                             >
                               Todas las ciudades ({availableCities.reduce((acc, c) => acc + c.count, 0)})
                             </button>
@@ -831,17 +821,15 @@ export function StationSidebar() {
                                 <button
                                   key={c.name}
                                   onClick={() => setSelectedCity(isCityActive ? null : c.name)}
-                                  className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all flex items-center gap-1 ${
-                                    isCityActive
+                                  className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all flex items-center gap-1 ${isCityActive
                                       ? "bg-amber-400 text-slate-950 font-bold shadow-xs shadow-amber-400/30 scale-105"
                                       : "bg-slate-900/80 text-slate-300 hover:text-white border border-white/10"
-                                  }`}
+                                    }`}
                                 >
                                   <span>{c.name}</span>
                                   <span
-                                    className={`text-[10px] ${
-                                      isCityActive ? "text-slate-950/80 font-bold" : "text-amber-400 font-bold"
-                                    }`}
+                                    className={`text-[10px] ${isCityActive ? "text-slate-950/80 font-bold" : "text-amber-400 font-bold"
+                                      }`}
                                   >
                                     ({c.count})
                                   </span>
@@ -869,10 +857,10 @@ export function StationSidebar() {
                   {selectedCity
                     ? `Emisoras de ${selectedCity}`
                     : selectedCountryCode
-                    ? `Emisoras de ${countryList.find((c) => c.code === selectedCountryCode)?.name || selectedCountryCode}`
-                    : activeTab === "favorites"
-                    ? "Mis Favoritas"
-                    : "Populares en el mundo"}
+                      ? `Emisoras de ${countryList.find((c) => c.code === selectedCountryCode)?.name || selectedCountryCode}`
+                      : activeTab === "favorites"
+                        ? "Mis Favoritas"
+                        : "Populares en el mundo"}
                 </span>
                 <span className="text-[11px] font-mono text-amber-400 font-bold">
                   {filteredStations.length.toLocaleString("es-ES")} emisoras
@@ -889,11 +877,10 @@ export function StationSidebar() {
                   <div
                     key={station.id}
                     onClick={() => playStation(station)}
-                    className={`group relative flex cursor-pointer items-center justify-between rounded-2xl p-2.5 transition-all duration-200 ${
-                      isCurrent
+                    className={`group relative flex cursor-pointer items-center justify-between rounded-2xl p-2.5 transition-all duration-200 ${isCurrent
                         ? "liquid-glass-pill bg-amber-400/15 border-amber-400/50 shadow-lg shadow-amber-400/20"
                         : "liquid-glass-card hover:border-white/20"
-                    }`}
+                      }`}
                   >
                     <div className="flex min-w-0 flex-1 items-center gap-3">
                       <div
@@ -910,9 +897,8 @@ export function StationSidebar() {
 
                       <div className="min-w-0 flex-1">
                         <p
-                          className={`truncate text-sm font-semibold tracking-tight ${
-                            isCurrent ? "text-amber-400 font-bold" : "text-white"
-                          }`}
+                          className={`truncate text-sm font-semibold tracking-tight ${isCurrent ? "text-amber-400 font-bold" : "text-white"
+                            }`}
                         >
                           {station.name}
                         </p>
@@ -956,11 +942,10 @@ export function StationSidebar() {
                             playStation(station);
                           }
                         }}
-                        className={`liquid-glass-action-circle ${
-                          isCurrentPlaying
+                        className={`liquid-glass-action-circle ${isCurrentPlaying
                             ? "!bg-amber-400 !text-slate-950 !border-amber-300 shadow-md shadow-amber-400/40"
                             : ""
-                        }`}
+                          }`}
                         aria-label={isCurrentPlaying ? "Pausar" : "Reproducir"}
                       >
                         {isCurrentPlaying ? (
@@ -998,71 +983,16 @@ export function StationSidebar() {
           )}
         </div>
 
-        <nav className="flex items-center justify-around border-t border-white/10 bg-slate-950/70 p-1.5 shrink-0">
-          <button
-            onClick={() => setActiveTab("explore")}
-            className={`flex flex-col items-center justify-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
-              activeTab === "explore" || activeTab === "stations"
-                ? "text-amber-400 font-bold"
-                : "text-slate-400 hover:text-white"
-            }`}
-          >
-            <CompassIcon size={18} />
-            <span className="text-[10px] font-semibold">Explorar</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab("favorites")}
-            className={`flex flex-col items-center justify-center gap-0.5 py-1 px-3 rounded-xl transition-all relative ${
-              activeTab === "favorites"
-                ? "text-amber-400 font-bold"
-                : "text-slate-400 hover:text-white"
-            }`}
-          >
-            <HeartIcon size={18} className={activeTab === "favorites" ? "fill-amber-400 text-amber-400" : ""} />
-            <span className="text-[10px] font-semibold">Favoritas</span>
-            {favorites.length > 0 && (
-              <span className="absolute top-0.5 right-2 h-3.5 w-3.5 rounded-full bg-rose-500 text-[9px] font-bold text-white flex items-center justify-center">
-                {favorites.length}
-              </span>
-            )}
-          </button>
-
-          <button
-            onClick={() => setActiveTab("countries")}
-            className={`flex flex-col items-center justify-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
-              activeTab === "countries"
-                ? "text-amber-400 font-bold"
-                : "text-slate-400 hover:text-white"
-            }`}
-          >
-            <GlobeIcon size={18} />
-            <span className="text-[10px] font-semibold">Países</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab("more")}
-            className={`flex flex-col items-center justify-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
-              activeTab === "more"
-                ? "text-amber-400 font-bold"
-                : "text-slate-400 hover:text-white"
-            }`}
-          >
-            <EqualizerIcon size={18} />
-            <span className="text-[10px] font-semibold">Más</span>
-          </button>
-        </nav>
-
-        <div className="p-3 border-t border-white/10 bg-slate-950/85 backdrop-blur-2xl shrink-0">
-          <div className="flex items-center justify-between gap-2.5">
+        <div className="p-2 sm:p-2.5 border-t border-white/10 bg-slate-950/90 backdrop-blur-2xl shrink-0">
+          <div className="flex items-center justify-between gap-2">
             <div
               onClick={() => setDetailsModalOpen(true)}
-              className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-xl font-bold text-xs text-white shadow-sm transition-all hover:scale-105 active:scale-95"
+              className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-xl font-bold text-xs text-white shadow-sm transition-all hover:scale-105 active:scale-95"
               style={{
                 background: isPlaying
                   ? "linear-gradient(135deg, #f59e0b, #d97706)"
                   : `linear-gradient(135deg, hsl(${currentStation?.hue || 200}, 75%, 45%), hsl(${(currentStation?.hue || 200) + 30}, 80%, 25%))`,
-                boxShadow: isPlaying ? "0 0 14px rgba(255, 201, 74, 0.45)" : undefined,
+                boxShadow: isPlaying ? "0 0 12px rgba(255, 201, 74, 0.45)" : undefined,
               }}
               title="Ficha técnica"
             >
@@ -1072,7 +1002,7 @@ export function StationSidebar() {
             <div className="min-w-0 flex-1">
               <p
                 onClick={() => setDetailsModalOpen(true)}
-                className="truncate text-xs font-bold text-white hover:text-amber-400 cursor-pointer transition-colors"
+                className="truncate text-xs font-bold text-white hover:text-amber-400 cursor-pointer transition-colors leading-tight"
               >
                 {currentStation?.name || "Selecciona una emisora"}
               </p>
@@ -1095,6 +1025,19 @@ export function StationSidebar() {
                       {timeInfo.isDay ? <SunIcon size={10} className="text-amber-400" /> : <MoonIcon size={10} className="text-sky-300" />}
                       <span>{timeInfo.timeString}</span>
                     </span>
+                    {sleepTimerRemaining !== null && (
+                      <>
+                        <span>·</span>
+                        <button
+                          onClick={() => setSleepTimerModalOpen(true)}
+                          className="text-amber-300 font-mono text-[9px] flex items-center gap-0.5"
+                          title="Temporizador de apagado"
+                        >
+                          <TimerIcon size={9} />
+                          <span>{formatTimer(sleepTimerRemaining)}</span>
+                        </button>
+                      </>
+                    )}
                   </>
                 ) : (
                   <span>34.900+ emisoras mundiales</span>
@@ -1102,57 +1045,31 @@ export function StationSidebar() {
               </div>
             </div>
 
-            {currentStation && (
-              <div className="flex items-center gap-1 shrink-0">
-                <button
-                  onClick={() => toggleFavorite(currentStation.id)}
-                  className="p-1 text-slate-400 hover:text-rose-400 transition-colors"
-                  aria-label={isFavorite(currentStation.id) ? "Quitar de favoritas" : "Añadir a favoritas"}
-                >
-                  <HeartIcon
-                    size={16}
-                    className={isFavorite(currentStation.id) ? "fill-rose-500 text-rose-500" : ""}
-                  />
-                </button>
-                <button
-                  onClick={() => handleShare(currentStation)}
-                  className="p-1 text-slate-400 hover:text-white transition-colors"
-                  title="Compartir emisora"
-                  aria-label="Compartir emisora"
-                >
-                  <ShareIcon size={15} />
-                </button>
-              </div>
-            )}
-          </div>
-
-          <div className="flex items-center justify-between gap-2 mt-2 pt-2 border-t border-white/5">
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1 shrink-0">
               <button
                 onClick={prevStation}
                 className="flex h-7 w-7 items-center justify-center rounded-full text-slate-300 hover:text-white hover:bg-white/10 active:scale-90 transition-all"
                 aria-label="Emisora anterior"
               >
-                <PrevIcon size={15} />
+                <PrevIcon size={14} />
               </button>
 
               <button
                 type="button"
                 onClick={togglePlay}
                 disabled={!currentStation}
-                className={`flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200 active:scale-95 shadow-md ${
-                  isPlaying
+                className={`flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full transition-all duration-200 active:scale-95 shadow-md ${isPlaying
                     ? "bg-gradient-to-tr from-amber-400 via-amber-500 to-amber-600 text-slate-950 font-bold shadow-amber-400/50 hover:brightness-110"
-                    : "liquid-glass-action-circle !h-9 !w-9"
-                }`}
+                    : "liquid-glass-action-circle !h-8 !w-8 sm:!h-9 sm:!w-9"
+                  }`}
                 aria-label={isPlaying ? "Pausar" : "Reproducir"}
               >
                 {isLoading ? (
-                  <SpinnerIcon size={15} className="animate-spin text-white" />
+                  <SpinnerIcon size={14} className="animate-spin text-white" />
                 ) : isPlaying ? (
-                  <PauseIcon size={15} />
+                  <PauseIcon size={14} />
                 ) : (
-                  <PlayIcon size={15} className="translate-x-0.5" />
+                  <PlayIcon size={14} className="translate-x-0.5" />
                 )}
               </button>
 
@@ -1161,51 +1078,106 @@ export function StationSidebar() {
                 className="flex h-7 w-7 items-center justify-center rounded-full text-slate-300 hover:text-white hover:bg-white/10 active:scale-90 transition-all"
                 aria-label="Siguiente emisora"
               >
-                <NextIcon size={15} />
+                <NextIcon size={14} />
               </button>
-            </div>
 
-            <div className="flex items-center gap-2">
-              {sleepTimerRemaining !== null && (
-                <button
-                  onClick={() => setSleepTimerModalOpen(true)}
-                  className="flex items-center gap-1 bg-amber-400/20 text-amber-300 border border-amber-400/30 rounded-full px-1.5 py-0.5 text-[10px] font-semibold"
-                  title="Temporizador de apagado activo"
-                >
-                  <TimerIcon size={11} />
-                  <span className="font-mono">{formatTimer(sleepTimerRemaining)}</span>
-                </button>
+              {currentStation && (
+                <>
+                  <button
+                    onClick={() => toggleFavorite(currentStation.id)}
+                    className="p-1 text-slate-400 hover:text-rose-400 transition-colors ml-0.5"
+                    aria-label={isFavorite(currentStation.id) ? "Quitar de favoritas" : "Añadir a favoritas"}
+                  >
+                    <HeartIcon
+                      size={16}
+                      className={isFavorite(currentStation.id) ? "fill-rose-500 text-rose-500" : ""}
+                    />
+                  </button>
+                  <button
+                    onClick={() => handleShare(currentStation)}
+                    className="hidden md:inline-flex p-1 text-slate-400 hover:text-white transition-colors"
+                    title="Compartir emisora"
+                    aria-label="Compartir emisora"
+                  >
+                    <ShareIcon size={14} />
+                  </button>
+                </>
               )}
 
-              <button
-                onClick={toggleMute}
-                className="text-slate-300 hover:text-white transition-colors"
-                title={muted ? "Activar sonido" : "Silenciar"}
-              >
-                {muted || volume === 0 ? <MuteIcon size={16} /> : <VolumeIcon size={16} />}
-              </button>
-
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={muted ? 0 : volume}
-                onChange={(e) => setVolume(parseFloat(e.target.value))}
-                className="liquid-slider w-16 sm:w-20"
-                style={{ "--fill": `${(muted ? 0 : volume) * 100}%` } as React.CSSProperties}
-                aria-label="Control de volumen"
-              />
+              <div className="hidden sm:flex items-center gap-1.5 pl-1.5 border-l border-white/10 ml-0.5">
+                <button
+                  onClick={toggleMute}
+                  className="text-slate-300 hover:text-white transition-colors"
+                  title={muted ? "Activar sonido" : "Silenciar"}
+                >
+                  {muted || volume === 0 ? <MuteIcon size={15} /> : <VolumeIcon size={15} />}
+                </button>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={muted ? 0 : volume}
+                  onChange={(e) => setVolume(parseFloat(e.target.value))}
+                  className="liquid-slider w-16"
+                  style={{ "--fill": `${(muted ? 0 : volume) * 100}%` } as React.CSSProperties}
+                  aria-label="Control de volumen"
+                />
+              </div>
             </div>
           </div>
-
-          <div className="flex items-center justify-center gap-1.5 mt-2 pt-1.5 border-t border-white/5 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-            <WorldRadioLogo size="sm" />
-            <span>WORLDRADIO</span>
-            <span>·</span>
-            <span className="text-amber-400 font-mono">174 NACIONES</span>
-          </div>
         </div>
+
+        <nav className="flex items-center justify-around border-t border-white/10 bg-slate-950/95 py-1.5 px-2 shrink-0">
+          <button
+            onClick={() => setActiveTab("explore")}
+            className={`flex flex-col items-center justify-center gap-0.5 py-1 px-3 rounded-xl transition-all ${activeTab === "explore" || activeTab === "stations"
+                ? "text-amber-400 font-bold"
+                : "text-slate-400 hover:text-white"
+              }`}
+          >
+            <CompassIcon size={17} />
+            <span className="text-[10px] font-semibold">Explorar</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("favorites")}
+            className={`flex flex-col items-center justify-center gap-0.5 py-1 px-3 rounded-xl transition-all relative ${activeTab === "favorites"
+                ? "text-amber-400 font-bold"
+                : "text-slate-400 hover:text-white"
+              }`}
+          >
+            <HeartIcon size={17} className={activeTab === "favorites" ? "fill-amber-400 text-amber-400" : ""} />
+            <span className="text-[10px] font-semibold">Favoritas</span>
+            {favorites.length > 0 && (
+              <span className="absolute top-0.5 right-2 h-3.5 w-3.5 rounded-full bg-rose-500 text-[9px] font-bold text-white flex items-center justify-center">
+                {favorites.length}
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={() => setActiveTab("countries")}
+            className={`flex flex-col items-center justify-center gap-0.5 py-1 px-3 rounded-xl transition-all ${activeTab === "countries"
+                ? "text-amber-400 font-bold"
+                : "text-slate-400 hover:text-white"
+              }`}
+          >
+            <GlobeIcon size={17} />
+            <span className="text-[10px] font-semibold">Países</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("more")}
+            className={`flex flex-col items-center justify-center gap-0.5 py-1 px-3 rounded-xl transition-all ${activeTab === "more"
+                ? "text-amber-400 font-bold"
+                : "text-slate-400 hover:text-white"
+              }`}
+          >
+            <EqualizerIcon size={17} />
+            <span className="text-[10px] font-semibold">Más</span>
+          </button>
+        </nav>
       </aside>
 
       <ChangelogModal

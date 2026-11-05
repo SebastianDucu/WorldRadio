@@ -1,6 +1,5 @@
 import type { Config } from "tailwindcss";
 
-// Los colores leen variables CSS en formato "R G B" para poder usar opacidad (bg-accent/20).
 const rgb = (name: string) => `rgb(var(--color-${name}) / <alpha-value>)`;
 
 export default {
@@ -31,7 +30,6 @@ export default {
         mono: ["'JetBrains Mono'", "ui-monospace", "monospace"],
         xmas: ["'Mountains of Christmas'", "'Plus Jakarta Sans'", "cursive"],
       },
-      // Escala de espaciado: Tailwind ya usa múltiplos de 4 px (1 = 4 px).
       borderRadius: { xl: "1rem", "2xl": "1.5rem" },
       boxShadow: {
         glass: "0 8px 32px rgb(0 0 0 / 0.28)",
