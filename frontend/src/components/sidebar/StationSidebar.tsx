@@ -331,13 +331,13 @@ export function StationSidebar() {
       {sidebarOpen && (
         <div
           onClick={toggleSidebar}
-          className="fixed inset-0 z-20 bg-black/60 backdrop-blur-xs sm:hidden transition-opacity"
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs sm:hidden transition-opacity"
           aria-hidden="true"
         />
       )}
 
       <aside
-        className={`fixed top-2 sm:top-3 bottom-2 sm:bottom-3 left-2 sm:left-3 z-30 flex flex-col rounded-3xl liquid-glass shadow-2xl transition-transform duration-300 w-[calc(100vw-1rem)] sm:w-[380px] lg:w-[410px] border border-amber-400/20 overflow-hidden ${sidebarOpen ? "translate-x-0" : "-translate-x-[120%]"
+        className={`fixed top-2 sm:top-3 bottom-2 sm:bottom-3 left-2 sm:left-3 z-50 flex flex-col rounded-3xl liquid-glass shadow-2xl transition-transform duration-300 w-[calc(100vw-1rem)] sm:w-[380px] lg:w-[410px] border border-amber-400/20 overflow-hidden ${sidebarOpen ? "translate-x-0" : "-translate-x-[120%]"
           }`}
         aria-label="Consola de exploración y sintonización"
       >

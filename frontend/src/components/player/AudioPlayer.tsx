@@ -164,29 +164,29 @@ export function AudioPlayer() {
 
   return (
     <>
+      <audio
+        ref={audioRef}
+        preload="none"
+        onWaiting={() => {
+          setIsLoading(true);
+          setPlaybackStatus("connecting");
+        }}
+        onPlaying={() => {
+          setIsLoading(false);
+          setPlaybackStatus("playing");
+        }}
+        onCanPlay={() => {
+          setIsLoading(false);
+        }}
+        onError={handleAudioError}
+      />
+
       <footer
         role="region"
         aria-label="Reproductor de radio"
-        className={`fixed inset-x-0 bottom-0 z-40 p-2 sm:p-3 pb-[max(0.65rem,calc(0.5rem+env(safe-area-inset-bottom,0px)))] transition-all duration-300 ${
-          sidebarOpen ? "lg:hidden" : "block"
-        }`}
+        className={`fixed inset-x-0 bottom-0 z-40 p-2 sm:p-3 pb-[max(0.65rem,calc(0.5rem+env(safe-area-inset-bottom,0px)))] transition-all duration-300 ${sidebarOpen ? "hidden pointer-events-none" : "block"
+          }`}
       >
-        <audio
-          ref={audioRef}
-          preload="none"
-          onWaiting={() => {
-            setIsLoading(true);
-            setPlaybackStatus("connecting");
-          }}
-          onPlaying={() => {
-            setIsLoading(false);
-            setPlaybackStatus("playing");
-          }}
-          onCanPlay={() => {
-            setIsLoading(false);
-          }}
-          onError={handleAudioError}
-        />
 
         <div className="relative mx-auto max-w-4xl">
           <div className="liquid-glass flex items-center justify-between gap-2.5 sm:gap-3 rounded-2xl sm:rounded-3xl px-3 sm:px-4 py-2 sm:py-2.5 shadow-2xl border border-amber-400/25">
