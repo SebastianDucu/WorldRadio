@@ -112,12 +112,9 @@ export function ChristmasAura() {
         ctx.fillStyle = "#334155";
         ctx.fillRect(x - 1.5, sag - 2, 3, 3);
 
-        const glowGrad = ctx.createRadialGradient(x, sag + 4, 1, x, sag + 4, 14);
-        glowGrad.addColorStop(0, color.glow);
-        glowGrad.addColorStop(1, "rgba(0,0,0,0)");
-        ctx.fillStyle = glowGrad;
+        ctx.fillStyle = color.glow;
         ctx.beginPath();
-        ctx.arc(x, sag + 4, 14, 0, Math.PI * 2);
+        ctx.arc(x, sag + 4, 11, 0, Math.PI * 2);
         ctx.fill();
 
         ctx.fillStyle = color.core;
@@ -145,8 +142,6 @@ export function ChristmasAura() {
       ctx.translate(0, leap);
 
       ctx.fillStyle = "rgba(255, 235, 190, 0.95)";
-      ctx.shadowColor = "rgba(255, 201, 74, 0.6)";
-      ctx.shadowBlur = 8;
 
       ctx.beginPath();
       ctx.ellipse(0, 0, 11, 5, -0.08, 0, Math.PI * 2);
@@ -193,8 +188,6 @@ export function ChristmasAura() {
 
       if (isLead) {
         ctx.fillStyle = "#ff1744";
-        ctx.shadowColor = "#ff1744";
-        ctx.shadowBlur = 10;
         ctx.beginPath();
         ctx.arc(19, -11, 2.2, 0, Math.PI * 2);
         ctx.fill();
@@ -210,9 +203,6 @@ export function ChristmasAura() {
 
       const tilt = Math.sin(time * 0.002) * 0.05;
       ctx.rotate(tilt);
-
-      ctx.shadowColor = "rgba(255, 201, 74, 0.7)";
-      ctx.shadowBlur = 10;
 
       ctx.strokeStyle = "#ffd54f";
       ctx.lineWidth = 1.8;
@@ -297,8 +287,6 @@ export function ChristmasAura() {
         ctx.save();
         ctx.fillStyle = p.color;
         ctx.globalAlpha = p.alpha;
-        ctx.shadowColor = p.color;
-        ctx.shadowBlur = 6;
 
         ctx.beginPath();
         const s = p.size;
@@ -337,7 +325,7 @@ export function ChristmasAura() {
         drawReindeer(flightX + 88, flightY - 5, legPhase + 0.8, false);
         drawReindeer(flightX + 130, flightY - 8, legPhase + 1.6, true);
 
-        if (Math.random() < 0.65) {
+        if (stardustList.length < 24 && Math.random() < 0.45) {
           const goldHues = ["#ffe082", "#ffd54f", "#fff59d", "#ffffff", "#ff80ab"];
           stardustList.push({
             x: flightX - 10 + (Math.random() * 8 - 4),

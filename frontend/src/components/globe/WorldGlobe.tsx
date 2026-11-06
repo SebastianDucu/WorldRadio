@@ -185,15 +185,36 @@ export function WorldGlobe() {
     }
   }, [targetLocation]);
 
+  const zoomLevelRef = useRef(zoomLevel);
+  useEffect(() => {
+    zoomLevelRef.current = zoomLevel;
+  }, [zoomLevel]);
+
+  const autoRotateRef = useRef(autoRotate);
+  useEffect(() => {
+    autoRotateRef.current = autoRotate;
+  }, [autoRotate]);
+
+  const currentStationRef = useRef(currentStation);
+  useEffect(() => {
+    currentStationRef.current = currentStation;
+  }, [currentStation]);
+
+  const isPlayingRef = useRef(isPlaying);
+  useEffect(() => {
+    isPlayingRef.current = isPlaying;
+  }, [isPlaying]);
+
+  const arcsGroupRef = useRef<THREE.Group | null>(null);
+
   const stationPins = useMemo(() => {
     const list = allStations && allStations.length > 0 ? allStations : STATIONS;
     const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
     const maxPins = isMobile ? 800 : 1500;
     const sampled =
       list.length <= maxPins ? list : list.filter((_, i) => i % Math.ceil(list.length / maxPins) === 0);
-    const hasCurrent = sampled.some((s) => s.id === currentStation?.id);
-    return hasCurrent || !currentStation ? sampled : [currentStation, ...sampled];
-  }, [allStations, currentStation]);
+    return sampled;
+  }, [allStations?.length]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -383,41 +404,8 @@ export function WorldGlobe() {
     scene.add(ambientLight);
 
     const arcsGroup = new THREE.Group();
+    arcsGroupRef.current = arcsGroup;
     earthGroup.add(arcsGroup);
-
-    if (currentStation && isPlaying) {
-      const hubs: [number, number][] = [
-        [51.5074, -0.1278],
-        [40.7128, -74.006],
-        [35.6762, 139.6503],
-        [48.8566, 2.3522],
-        [-34.6037, -58.3816],
-        [4.711, -74.0721],
-        [-23.5505, -46.6333],
-      ];
-
-      const start = latLngToVector3(currentStation.lat, currentStation.lng, 1.005);
-      hubs
-        .filter(([hLat, hLng]) => Math.hypot(hLat - currentStation.lat, hLng - currentStation.lng) > 8)
-        .slice(0, 5)
-        .forEach(([hLat, hLng]) => {
-          const end = latLngToVector3(hLat, hLng, 1.005);
-          const mid = start.clone().add(end).multiplyScalar(0.5);
-          const distance = start.distanceTo(end);
-          mid.normalize().multiplyScalar(1.0 + distance * 0.28);
-
-          const curve = new THREE.QuadraticBezierCurve3(start, mid, end);
-          const points = curve.getPoints(36);
-          const arcGeo = new THREE.BufferGeometry().setFromPoints(points);
-          const arcMat = new THREE.LineBasicMaterial({
-            color: isChristmas ? 0xffc94a : 0x38b6ff,
-            transparent: true,
-            opacity: 0.65,
-          });
-          const arcLine = new THREE.Line(arcGeo, arcMat);
-          arcsGroup.add(arcLine);
-        });
-    }
 
     overlayCanvas.width = width * dpr;
     overlayCanvas.height = height * dpr;
@@ -439,6 +427,9 @@ export function WorldGlobe() {
       lastTime = now;
 
       if (!isDraggingRef.current) {
+        if (autoRotateRef.current && targetRotYRef.current === null) {
+          rotationYRef.current += 0.0012;
+        }
         rotationYRef.current += velocityYRef.current;
         rotationXRef.current += velocityXRef.current;
         velocityYRef.current *= 0.94;
@@ -468,7 +459,8 @@ export function WorldGlobe() {
       earthGroup.rotation.y = rotationYRef.current;
       earthGroup.rotation.x = rotationXRef.current;
 
-      camera.position.z = 2.85 / zoomLevel;
+      const targetZ = 2.85 / zoomLevelRef.current;
+      camera.position.z += (targetZ - camera.position.z) * 0.12;
 
       renderer.render(scene, camera);
 
@@ -533,8 +525,9 @@ export function WorldGlobe() {
           }
         }
 
-        if (currentStation) {
-          const stLocal = latLngToVector3(currentStation.lat, currentStation.lng, 1.004);
+        const activeSt = currentStationRef.current;
+        if (activeSt) {
+          const stLocal = latLngToVector3(activeSt.lat, activeSt.lng, 1.004);
           _scratchWorld.copy(stLocal).applyEuler(earthGroup.rotation);
           _scratchNorm.copy(_scratchWorld).normalize();
           _scratchView.copy(camera.position).sub(_scratchWorld).normalize();
@@ -560,9 +553,9 @@ export function WorldGlobe() {
             ctx2d.fillStyle = isChristmas ? `rgba(225, 29, 72, ${opacity})` : `rgba(16, 185, 129, ${opacity})`;
             ctx2d.fill();
 
-            const locationTitle = currentStation.city
-              ? `${currentStation.city}, ${currentStation.country || currentStation.countryCode}`
-              : currentStation.country || currentStation.name;
+            const locationTitle = activeSt.city
+              ? `${activeSt.city}, ${activeSt.country || activeSt.countryCode}`
+              : activeSt.country || activeSt.name;
 
             ctx2d.font = `bold ${Math.round(10.5 * dpr)}px sans-serif`;
             const textMetrics = ctx2d.measureText(locationTitle);
@@ -623,7 +616,53 @@ export function WorldGlobe() {
       pinsGeo.dispose();
       pinsMat.dispose();
     };
-  }, [isChristmas, motionOff, zoomLevel, stationPins, autoRotate, currentStation, isPlaying]);
+  }, [isChristmas, motionOff, stationPins]);
+
+  useEffect(() => {
+    const group = arcsGroupRef.current;
+    if (!group) return;
+    while (group.children.length > 0) {
+      const child = group.children[0] as THREE.Line;
+      group.remove(child);
+      if (child.geometry) child.geometry.dispose();
+      if (child.material) {
+        if (Array.isArray(child.material)) child.material.forEach((m) => m.dispose());
+        else child.material.dispose();
+      }
+    }
+    if (!currentStation || !isPlaying) return;
+    const hubs: [number, number][] = [
+      [51.5074, -0.1278],
+      [40.7128, -74.006],
+      [35.6762, 139.6503],
+      [48.8566, 2.3522],
+      [-34.6037, -58.3816],
+      [4.711, -74.0721],
+      [-23.5505, -46.6333],
+    ];
+
+    const start = latLngToVector3(currentStation.lat, currentStation.lng, 1.005);
+    hubs
+      .filter(([hLat, hLng]) => Math.hypot(hLat - currentStation.lat, hLng - currentStation.lng) > 8)
+      .slice(0, 5)
+      .forEach(([hLat, hLng]) => {
+        const end = latLngToVector3(hLat, hLng, 1.005);
+        const mid = start.clone().add(end).multiplyScalar(0.5);
+        const distance = start.distanceTo(end);
+        mid.normalize().multiplyScalar(1.0 + distance * 0.28);
+
+        const curve = new THREE.QuadraticBezierCurve3(start, mid, end);
+        const points = curve.getPoints(36);
+        const arcGeo = new THREE.BufferGeometry().setFromPoints(points);
+        const arcMat = new THREE.LineBasicMaterial({
+          color: isChristmas ? 0xffc94a : 0x38b6ff,
+          transparent: true,
+          opacity: 0.65,
+        });
+        const arcLine = new THREE.Line(arcGeo, arcMat);
+        group.add(arcLine);
+      });
+  }, [currentStation, isPlaying, isChristmas]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -679,7 +718,7 @@ export function WorldGlobe() {
       const dy = e.clientY - lastPointerPos.current.y;
       lastPointerPos.current = { x: e.clientX, y: e.clientY };
 
-      const factor = 0.0035 / zoomLevel;
+      const factor = 0.0035 / zoomLevelRef.current;
       rotationYRef.current += dx * factor;
       rotationXRef.current += dy * factor;
 
@@ -816,7 +855,7 @@ export function WorldGlobe() {
       container.removeEventListener("pointercancel", onPointerUp);
       container.removeEventListener("wheel", onWheel);
     };
-  }, [zoomLevel, allStations, flyTo, playStation, setSelectedCountryCode, setSelectedCity]);
+  }, [allStations, flyTo, playStation, setSelectedCountryCode, setSelectedCity]);
 
   return (
     <div

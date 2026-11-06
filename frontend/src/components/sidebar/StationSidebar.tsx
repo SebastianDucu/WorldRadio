@@ -254,42 +254,85 @@ export function StationSidebar() {
     return station.name.slice(0, 2).toUpperCase();
   };
 
-  const handleNearMe = () => {
-    if (navigator.geolocation) {
+  const handleNearMe = async () => {
+    toast.info("Localizando tu posición más cercana...");
+
+    const tuneClosest = (userLat: number, userLng: number, locName?: string) => {
+      const pool = allStations && allStations.length > 0 ? allStations : STATIONS;
+      let closestStation: Station | null = null;
+      let minDistance = Infinity;
+
+      for (const s of pool) {
+        if (typeof s.lat !== "number" || typeof s.lng !== "number") continue;
+        const dist = Math.hypot(s.lat - userLat, s.lng - userLng);
+        if (dist < minDistance) {
+          minDistance = dist;
+          closestStation = s;
+        }
+      }
+
+      let closestCountry = countryList[0];
+      let minCountryDist = Infinity;
+      for (const c of countryList) {
+        const dist = Math.hypot(c.lat - userLat, c.lng - userLng);
+        if (dist < minCountryDist) {
+          minCountryDist = dist;
+          closestCountry = c;
+        }
+      }
+
+      if (closestStation) {
+        setSelectedCountryCode(closestStation.countryCode || closestCountry?.code || null);
+        setSelectedCity(closestStation.city || null);
+        flyTo(closestStation.lat, closestStation.lng);
+        playStation(closestStation);
+        setActiveTab("explore");
+        const approxKm = Math.round(minDistance * 111);
+        const placeDesc = locName ? `${locName} · ` : "";
+        toast.success(`Sintonizando cerca de ti: ${closestStation.name} (${placeDesc}${approxKm} km)`);
+      } else if (closestCountry) {
+        setSelectedCountryCode(closestCountry.code);
+        setSelectedCity(null);
+        flyTo(closestCountry.lat, closestCountry.lng);
+        setActiveTab("explore");
+        toast.info(`Región cercana: ${closestCountry.name}`);
+      }
+    };
+
+    const fallbackToIp = async () => {
+      try {
+        const res = await fetch("https://ipwho.is/", { signal: AbortSignal.timeout(3500) });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && typeof data.latitude === "number" && typeof data.longitude === "number") {
+            const place = data.city ? `${data.city}, ${data.country}` : data.country;
+            tuneClosest(data.latitude, data.longitude, place);
+            return;
+          }
+        }
+      } catch {}
+
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+      const found = countryList.find((c) => tz.toLowerCase().includes(c.name.toLowerCase()));
+      if (found) {
+        tuneClosest(found.lat, found.lng, found.name);
+      } else {
+        toast.info("No pudimos detectar tu ubicación. Selecciona tu país en la lista.");
+      }
+    };
+
+    if (typeof navigator !== "undefined" && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          const { latitude, longitude } = pos.coords;
-          let closest = countryList[0];
-          let minDistance = Infinity;
-          for (const c of countryList) {
-            const dist = Math.hypot(c.lat - latitude, c.lng - longitude);
-            if (dist < minDistance) {
-              minDistance = dist;
-              closest = c;
-            }
-          }
-          if (closest) {
-            setSelectedCountryCode(closest.code);
-            setSelectedCity(null);
-            flyTo(closest.lat, closest.lng);
-            setActiveTab("explore");
-            toast.info(`Cerca de ti: Sintonizando ${closest.name}`);
-          }
+          tuneClosest(pos.coords.latitude, pos.coords.longitude);
         },
         () => {
-          const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
-          const found = countryList.find((c) => tz.toLowerCase().includes(c.name.toLowerCase()));
-          if (found) {
-            setSelectedCountryCode(found.code);
-            flyTo(found.lat, found.lng);
-            setActiveTab("explore");
-            toast.info(`Región detectada: ${found.name}`);
-          } else {
-            toast.info("Activa la ubicación para sintonizar emisoras cercanas");
-          }
+          fallbackToIp();
         },
-        { timeout: 4000 }
+        { enableHighAccuracy: true, timeout: 4500, maximumAge: 300000 }
       );
+    } else {
+      fallbackToIp();
     }
   };
 
@@ -877,9 +920,9 @@ export function StationSidebar() {
                   <div
                     key={station.id}
                     onClick={() => playStation(station)}
-                    className={`group relative flex cursor-pointer items-center justify-between rounded-2xl p-2.5 transition-all duration-200 ${isCurrent
-                        ? "liquid-glass-pill bg-amber-400/15 border-amber-400/50 shadow-lg shadow-amber-400/20"
-                        : "liquid-glass-card hover:border-white/20"
+                    className={`group relative flex cursor-pointer items-center justify-between rounded-2xl p-2.5 transition-all duration-150 ${isCurrent
+                        ? "bg-amber-400/20 border border-amber-400/60 shadow-md shadow-amber-400/25"
+                        : "bg-slate-900/65 border border-white/10 hover:bg-slate-800/80 hover:border-amber-400/30"
                       }`}
                   >
                     <div className="flex min-w-0 flex-1 items-center gap-3">
