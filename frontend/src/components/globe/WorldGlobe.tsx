@@ -353,7 +353,7 @@ export function WorldGlobe() {
 
     const pinsGeo = new THREE.SphereGeometry(0.0055, 6, 6);
     const pinsMat = new THREE.MeshBasicMaterial({
-      color: 0x38bdf8, // Luminous electric cyan matching Radio Garden exactly
+      color: 0x38bdf8, 
     });
 
     let pinsInstanced: THREE.InstancedMesh | null = null;

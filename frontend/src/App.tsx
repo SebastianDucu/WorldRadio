@@ -16,6 +16,7 @@ import { SleepTimerModal } from "@/components/player/SleepTimerModal";
 import { AudioEqualizerModal } from "@/components/player/AudioEqualizerModal";
 import { RadioRecorderModal } from "@/components/player/RadioRecorderModal";
 import { FrequencyTunerDial } from "@/components/tuner/FrequencyTunerDial";
+import { StartupSplashLoader } from "@/components/common/StartupSplashLoader";
 import { initStationsDirectory } from "@/services/stationsDirectory";
 
 export default function App() {
@@ -101,6 +102,8 @@ export default function App() {
       <AudioEqualizerModal />
       <RadioRecorderModal />
       <FrequencyTunerDial />
+
+      <StartupSplashLoader />
 
       <ToastViewport />
     </div>

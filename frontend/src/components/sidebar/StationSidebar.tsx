@@ -31,7 +31,6 @@ import { IconButton } from "@/components/ui/IconButton";
 import { STATIONS, COUNTRIES } from "@/data/stations";
 import { usePlayerStore } from "@/store/player";
 import { searchOnlineStations } from "@/services/radioApi";
-import { ChangelogModal } from "@/components/modals/ChangelogModal";
 import { StationDetailsModal } from "@/components/player/StationDetailsModal";
 import { WorldRadioLogo } from "@/components/common/WorldRadioLogo";
 import { getStationBaseListeners, formatListenerCount, useLiveListeners } from "@/hooks/useLiveListeners";
@@ -98,7 +97,6 @@ export function StationSidebar() {
 
   const [onlineResults, setOnlineResults] = useState<Station[]>([]);
   const [isSearchingOnline, setIsSearchingOnline] = useState(false);
-  const [changelogOpen, setChangelogOpen] = useState(false);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [isCityPickerExpanded, setIsCityPickerExpanded] = useState(false);
   const [citySearchQuery, setCitySearchQuery] = useState("");
@@ -634,23 +632,22 @@ export function StationSidebar() {
                 </span>
               </button>
 
-              <button
-                onClick={() => setChangelogOpen(true)}
-                className="w-full flex items-center justify-between p-3.5 rounded-2xl bg-slate-900/80 hover:bg-slate-800/90 border border-white/10 transition-all duration-200 text-left shadow-lg group hover:scale-[1.01] active:scale-98"
-              >
+              <div className="w-full flex items-center justify-between p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/10 via-slate-900/80 to-slate-900/80 border border-amber-400/20 shadow-lg">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/5 text-white border border-white/10">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-400/15 text-amber-400 border border-amber-400/30">
                     <SparklesIcon size={20} />
                   </div>
                   <div>
-                    <span className="text-sm font-semibold text-white block">Novedades Liquid Glass</span>
-                    <span className="text-xs font-semibold text-slate-400 block mt-0.5">
-                      Historial y mejoras de la versión
+                    <span className="text-sm font-semibold text-white block">WorldRadio</span>
+                    <span className="text-xs font-semibold text-amber-300/90 block mt-0.5">
+                      Elaborada Por Juan Ducuara
                     </span>
                   </div>
                 </div>
-                <span className="text-amber-400 font-bold text-lg">›</span>
-              </button>
+                <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-400/15 text-amber-300 border border-amber-400/30">
+                  CREADOR
+                </span>
+              </div>
             </div>
           ) : activeTab === "countries" ? (
             <div className="space-y-2 p-1">
@@ -1222,11 +1219,6 @@ export function StationSidebar() {
           </button>
         </nav>
       </aside>
-
-      <ChangelogModal
-        isOpen={changelogOpen}
-        onClose={() => setChangelogOpen(false)}
-      />
 
       <StationDetailsModal
         station={currentStation}
